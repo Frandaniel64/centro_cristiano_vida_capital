@@ -1,0 +1,51 @@
+.contenedor {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+}
+
+.caja {
+  width: 100%;
+  max-width: 420px;
+  padding: 32px;
+  gap: 20px;
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.marca img {
+  border-radius: 999px;
+}
+
+.marca p {
+  margin: 0;
+  font-size: 13px;
+}
+
+.pasos {
+  margin: 0;
+  padding-left: 20px;
+  line-height: 1.6;
+}
+
+.qr {
+  align-self: center;
+  border: 1px solid var(--linea);
+  border-radius: 12px;
+}
+
+code {
+  word-break: break-all;
+  font-size: 13px;
+}
+
+.codigo {
+  font-size: 22px;
+  letter-spacing: 0.3em;
+  font-variant-numeric: tabular-nums;
+}

@@ -156,6 +156,23 @@ describe('Panel (e2e)', () => {
     expect((await request(app.getHttpServer()).get('/api/pro-templo/estado')).body.recaudadoUsd).toBe(antes);
   });
 
+  it('un voucher recién pedido aparece en el filtro de pendientes y en el resumen', async () => {
+    const { agente } = await ingresar('tesoreria');
+    const antes = (await agente.get('/api/admin/resumen')).body.proTemplo.pendientes;
+    const creado = await request(app.getHttpServer())
+      .post('/api/vouchers')
+      .set('X-Forwarded-For', desde())
+      .send({ montoUsd: 15, nombre: 'Pendiente E2E', mostrarComo: 'anonimo', contactoTipo: 'whatsapp', contacto: '11 5555 1234', formaPago: 'efectivo', aceptaPrivacidad: true });
+    vouchers.push((await prisma.voucher.findUniqueOrThrow({ where: { numero: creado.body.numero } })).id);
+
+    const lista = await agente.get('/api/admin/vouchers').query({ estado: 'pendiente', q: String(creado.body.numero) });
+    expect(lista.body.items.map((v: { numero: number }) => v.numero)).toContain(creado.body.numero);
+    expect((await agente.get('/api/admin/resumen')).body.proTemplo.pendientes).toBe(antes + 1);
+    // Y no aparece entre los vencidos.
+    const vencidos = await agente.get('/api/admin/vouchers').query({ estado: 'vencido', q: String(creado.body.numero) });
+    expect(vencidos.body.total).toBe(0);
+  });
+
   it('pagado en pesos exige el tipo de cambio', async () => {
     const { agente } = await ingresar('tesoreria');
     const creado = await request(app.getHttpServer())

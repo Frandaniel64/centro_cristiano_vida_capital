@@ -41,6 +41,26 @@ npm run build       # compila todo
 
 Tests: `npm test -w @ccvida/api` (reglas) y `npm run test:e2e -w @ccvida/api` (contra la base de desarrollo).
 
+## Panel de administración
+
+Angular + Angular Material. Roles: administración, edición, tesorería y recepción.
+Administración y tesorería usan verificación en dos pasos (app de autenticación).
+
+Primera cuenta de administración (imprime una clave temporal que hay que cambiar al entrar):
+
+```bash
+npm run crear-admin -w @ccvida/api -- email@iglesia.org "Nombre Apellido"
+```
+
+El panel lee la URL de la API al compilar:
+
+```bash
+npm run build -w @ccvida/admin -- --define "API_URL='https://api.ccvida.com.ar'"
+```
+
+En la API, `CORS_ORIGINS` tiene que incluir la URL del panel y las variables `COOKIE_*`
+dependen de si panel y API comparten dominio (ver `apps/api/.env.example`).
+
 ## Despliegue
 
 | Pieza | Dónde |

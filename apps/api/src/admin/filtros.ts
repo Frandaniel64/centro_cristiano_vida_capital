@@ -8,7 +8,9 @@ const DIA_MS = 24 * 60 * 60 * 1000;
  */
 export function fueraDePlazo(diasVencimiento: number, ahora = Date.now()): Prisma.VoucherWhereInput {
   const limite = new Date(ahora - diasVencimiento * DIA_MS);
-  return { OR: [{ reactivadoEn: null, creado: { lt: limite } }, { reactivadoEn: { lt: limite } }] };
+  // `not: null` es necesario: sin él, en SQL "NULL < límite" da NULL y un NOT(...) alrededor
+  // (pendientes en plazo) descartaría los vouchers nunca reactivados.
+  return { OR: [{ reactivadoEn: null, creado: { lt: limite } }, { reactivadoEn: { not: null, lt: limite } }] };
 }
 
 export const pendientesEnPlazo = (dias: number): Prisma.VoucherWhereInput => ({ estado: 'pendiente', NOT: fueraDePlazo(dias) });
