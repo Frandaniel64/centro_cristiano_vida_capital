@@ -1,0 +1,212 @@
+@use '@angular/material' as mat;
+@use './theme-colors' as marca;
+@import '@fontsource-variable/figtree/wght.css';
+
+// Panel claro para trabajo de oficina, con el azul (principal) y el verde (acento) de la marca.
+html {
+  color-scheme: light;
+  @include mat.theme(
+    (
+      color: (
+        primary: marca.$primary-palette,
+        tertiary: marca.$tertiary-palette,
+        theme-type: light,
+      ),
+      typography: 'Figtree Variable',
+      density: 0,
+    )
+  );
+}
+
+:root {
+  --fondo: #f5f5f0;
+  --superficie: #ffffff;
+  --linea: #e2e2dc;
+  --texto: #111111;
+  --texto-suave: #5c5c58;
+  --azul: #0c74b8;
+  --verde: #8cc63f;
+  --amarillo: #f5d547;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: 'Figtree Variable', system-ui, sans-serif;
+  font-size: 15px;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: 26px;
+  font-weight: 800;
+}
+
+h2 {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+a {
+  color: var(--azul);
+}
+
+.suave {
+  color: var(--texto-suave);
+}
+
+.tarjeta {
+  background: var(--superficie);
+  border: 1px solid var(--linea);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.pila {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.fila {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.derecha {
+  justify-content: flex-end;
+}
+
+.error {
+  margin: 0;
+  color: #b42318;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.aviso-error {
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: #fdecea;
+  color: #8a1c12;
+  font-weight: 600;
+}
+
+.ayuda {
+  margin: 0;
+  color: var(--texto-suave);
+  font-size: 13px;
+}
+
+.encabezado {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.numero {
+  font-variant-numeric: tabular-nums;
+}
+
+.campo-completo {
+  width: 100%;
+}
+
+// Etiqueta de estado (pendiente, confirmado…). Los colores se distinguen también por el texto.
+.etiqueta {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+
+  &.success {
+    background: #e3f4d7;
+    color: #2f6b12;
+  }
+  &.warn {
+    background: #fff3c4;
+    color: #6b4e00;
+  }
+  &.danger {
+    background: #fde2df;
+    color: #8a1c12;
+  }
+  &.info {
+    background: #dcecf8;
+    color: #0a4f80;
+  }
+  &.secondary {
+    background: #ebebe6;
+    color: #44443f;
+  }
+}
+
+// Filtros sobre las tablas: en el celular el grupo de botones scrollea solo
+// y los campos ocupan el ancho disponible.
+.filtros {
+  min-width: 0;
+
+  mat-button-toggle-group {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  mat-form-field {
+    width: min(16rem, 100%);
+  }
+}
+
+// Tablas: scroll horizontal dentro de su caja en pantallas chicas.
+.tabla-caja {
+  overflow-x: auto;
+  background: var(--superficie);
+  border: 1px solid var(--linea);
+  border-radius: 16px;
+
+  table {
+    width: 100%;
+  }
+}
+
+// Acciones destructivas (anular, dar de baja).
+.peligro.mat-mdc-button {
+  color: #b42318;
+}
+.peligro-relleno.mat-mdc-unelevated-button:not(:disabled) {
+  background: #b42318;
+  color: #fff;
+}
+
+.aviso-snack-error {
+  --mat-snack-bar-container-color: #8a1c12;
+}
+
+.mat-mdc-dialog-content .pila {
+  padding-top: 8px;
+}
+
+:focus-visible {
+  outline: 3px solid var(--azul);
+  outline-offset: 2px;
+}

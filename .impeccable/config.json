@@ -1,0 +1,23 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "arial",
+        "createdAt": "2026-10-27T18:24:48.783Z",
+        "reason": "Claude: plantilla de email transaccional; los clientes de correo no cargan fuentes web de forma confiable, Arial es el respaldo seguro (apps/api/src/comun/email.service.ts)"
+      },
+      {
+        "rule": "broken-image",
+        "value": "*",
+        "files": [
+          "apps/admin/src/app/ingreso/ingreso.ts"
+        ],
+        "createdAt": "2026-10-27T18:55:42.772Z",
+        "reason": "Claude: el QR usa binding de Angular [src]=\"c.qr\" con un data URL que devuelve la API; el detector solo ve atributos estáticos"
+      }
+    ]
+  }
+}

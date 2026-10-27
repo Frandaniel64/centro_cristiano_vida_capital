@@ -2,6 +2,7 @@
 import ContadorEnVivo from '../components/ContadorEnVivo.astro';
 import CuentaRegresiva from '../components/CuentaRegresiva.astro';
 import Foto from '../components/Foto.astro';
+import LogoArbol from '../components/LogoArbol.astro';
 import OcultarPasados from '../components/OcultarPasados.astro';
 import Pared from '../components/Pared.astro';
 import TarjetaEvento from '../components/TarjetaEvento.astro';
@@ -43,10 +44,7 @@ const jsonLd = {
   <section class="wrap pt-14">
     <div class="flex flex-wrap items-end gap-8">
       <h1 class="d h1 min-w-0 flex-[1_1_640px]">La iglesia sos <span class="text-verde-hoja">vos.</span></h1>
-      <svg aria-hidden="true" viewBox="-120 -130 240 190" class="h-auto w-[280px] max-w-full flex-[0_1_280px]">
-        <rect x="-16" y="-16" width="32" height="76" rx="16" fill="#ffffff"></rect>
-        {[-78, -52, -26, 0, 26, 52, 78].map((g) => <path fill="#ffffff" transform={`rotate(${g})`} d="M0 -24 A72 72 0 0 1 0 -112 A72 72 0 0 1 0 -24 Z" />)}
-      </svg>
+      <LogoArbol class="h-auto w-[280px] max-w-full flex-[0_1_280px]" />
     </div>
 
     <div class="mt-12 flex flex-wrap border-y border-linea">

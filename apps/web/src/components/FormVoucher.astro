@@ -97,6 +97,7 @@ const errorClase = 'm-0 text-sm font-bold text-[#7a1a10]';
           </label>
         ))
       }
+      <p data-error="formaPago" class={errorClase} hidden></p>
     </fieldset>
 
     <div class="flex flex-col gap-1.5">
@@ -130,6 +131,7 @@ const errorClase = 'm-0 text-sm font-bold text-[#7a1a10]';
     <p class="m-0">Está <strong>pendiente de pago</strong>. Suma a la pared cuando tesorería lo confirme.</p>
     <p class="m-0 rounded-2xl bg-black px-5 py-4 whitespace-pre-line text-texto" data-ok="instrucciones"></p>
     <p class="m-0 text-sm">Guardá tu número: lo vas a necesitar para pagar.</p>
+    <a data-ok="link" href="/pro-templo" class="self-start font-extrabold text-black">Ver el estado de mi voucher</a>
     <button type="button" data-otro-voucher class="min-h-11 cursor-pointer self-start border-0 bg-transparent p-0 font-extrabold text-black underline">Dar otro voucher</button>
   </div>
 </div>
@@ -221,12 +223,14 @@ const errorClase = 'm-0 text-sm font-bold text-[#7a1a10]';
         ok.querySelector('[data-ok="numero"]')!.textContent = numeroVoucher(v.numero);
         ok.querySelector('[data-ok="monto"]')!.textContent = usd(v.montoUsd);
         ok.querySelector('[data-ok="instrucciones"]')!.textContent = v.instrucciones;
+        ok.querySelector<HTMLAnchorElement>('[data-ok="link"]')!.href = `/pro-templo/voucher/${numeroVoucher(v.numero)}`;
         form.hidden = true;
         ok.hidden = false;
         ok.focus();
       } catch (err) {
         if (err instanceof ErrorDeApi) {
-          Object.entries(err.campos).forEach(([campo, msg]) => mostrarError(form, campo, msg));
+          // La API llama montoUsd a lo que en el formulario se corrige en "Otro monto".
+          Object.entries(err.campos).forEach(([campo, msg]) => mostrarError(form, campo === 'montoUsd' ? 'otroMonto' : campo, msg));
           mostrarError(form, 'general', err.message);
         }
         enfocarPrimerError(form);
