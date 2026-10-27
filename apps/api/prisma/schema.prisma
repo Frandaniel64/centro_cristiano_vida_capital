@@ -72,16 +72,39 @@ model Usuario {
   passwordHash String   @map("password_hash")
   rol          Rol
   activo       Boolean  @default(true)
-  // Secreto TOTP; obligatorio para administración y tesorería.
+  // Secreto TOTP; obligatorio para administración y tesorería. Se guarda al
+  // configurarlo y vale recién cuando la persona confirma un código.
   totpSecreto  String?  @map("totp_secreto")
+  totpActivo   Boolean  @default(false) @map("totp_activo")
+  // Las cuentas nuevas y las claves reiniciadas por un administrador usan una
+  // clave temporal que hay que cambiar al ingresar.
+  debeCambiarClave Boolean @default(true) @map("debe_cambiar_clave")
+  ultimoIngreso DateTime? @map("ultimo_ingreso")
   creado       DateTime @default(now())
   actualizado  DateTime @updatedAt
 
   vouchersConfirmados Voucher[]        @relation("VoucherConfirmadoPor")
   ajustesCargados     AjusteCampana[]
   visitasAtendidas    Visita[]
+  sesiones            Sesion[]
 
   @@map("usuarios")
+}
+
+model Sesion {
+  id        String   @id @default(uuid(7))
+  // Hash SHA-256 del token de la cookie: con la base sola no se puede entrar.
+  tokenHash String   @unique @map("token_hash")
+  usuarioId String   @map("usuario_id")
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  // false mientras falta el segundo paso (código 2FA).
+  completa  Boolean  @default(true)
+  expira    DateTime
+  ip        String?
+  creado    DateTime @default(now())
+
+  @@index([usuarioId])
+  @@map("sesiones")
 }
 
 model Medio {
@@ -267,6 +290,8 @@ model Voucher {
   confirmadoPor    Usuario?      @relation("VoucherConfirmadoPor", fields: [confirmadoPorId], references: [id])
   confirmadoEn     DateTime?     @map("confirmado_en")
   motivoAnulacion  String?       @map("motivo_anulacion")
+  // Al reactivar un vencido, el plazo vuelve a contar desde acá.
+  reactivadoEn     DateTime?     @map("reactivado_en")
   idPagoExterno    String?       @unique @map("id_pago_externo")
   creado           DateTime      @default(now())
   actualizado      DateTime      @updatedAt

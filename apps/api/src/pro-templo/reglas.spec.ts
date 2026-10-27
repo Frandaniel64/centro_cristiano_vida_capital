@@ -75,6 +75,11 @@ describe('estadoVisible', () => {
     expect(estadoVisible({ estado: 'pendiente', creado: new Date('2026-11-20T12:00:00Z') }, 30, ahora)).toBe('pendiente');
   });
 
+  it('al reactivarlo, el plazo cuenta desde la reactivación', () => {
+    const v = { estado: 'pendiente' as const, creado: new Date('2026-09-01T12:00:00Z'), reactivadoEn: new Date('2026-11-25T12:00:00Z') };
+    expect(estadoVisible(v, 30, ahora)).toBe('pendiente');
+  });
+
   it('confirmado no vence nunca', () => {
     expect(estadoVisible({ estado: 'confirmado', creado: new Date('2026-01-01T12:00:00Z') }, 30, ahora)).toBe('confirmado');
   });

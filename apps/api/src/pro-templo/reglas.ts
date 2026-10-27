@@ -44,7 +44,12 @@ export function instruccionesDePago(forma: FormaPago, numero: number, datosTrans
 }
 
 /** Un pendiente que pasó el plazo se informa como vencido aunque nadie lo haya marcado todavía. */
-export function estadoVisible(v: { estado: EstadoVoucher; creado: Date }, diasVencimiento: number, ahora = new Date()): EstadoVoucher {
-  if (v.estado === 'pendiente' && ahora.getTime() - v.creado.getTime() > diasVencimiento * DIA_MS) return 'vencido';
+export function estadoVisible(
+  v: { estado: EstadoVoucher; creado: Date; reactivadoEn?: Date | null },
+  diasVencimiento: number,
+  ahora = new Date(),
+): EstadoVoucher {
+  const desde = v.reactivadoEn ?? v.creado;
+  if (v.estado === 'pendiente' && ahora.getTime() - desde.getTime() > diasVencimiento * DIA_MS) return 'vencido';
   return v.estado;
 }

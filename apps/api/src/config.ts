@@ -14,4 +14,12 @@ export const config = {
   emailRecepcion: process.env.RECEPCION_EMAIL ?? '',
   emailTesoreria: process.env.TESORERIA_EMAIL ?? '',
   turnstileSecreto: process.env.TURNSTILE_SECRET_KEY ?? '',
+  // Cookie de sesión del panel. Con panel y API en subdominios del mismo
+  // dominio alcanza "lax"; si están en dominios distintos (demo), "none".
+  cookie: {
+    nombre: 'ccvida_sesion',
+    segura: (process.env.COOKIE_SECURE ?? (process.env.NODE_ENV === 'production' ? 'true' : 'false')) === 'true',
+    sameSite: (process.env.COOKIE_SAMESITE ?? 'lax') as 'lax' | 'strict' | 'none',
+    dominio: process.env.COOKIE_DOMAIN || undefined,
+  },
 };

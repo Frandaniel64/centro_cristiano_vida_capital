@@ -127,7 +127,7 @@ export class ProTemploService {
     const campana = await this.campana();
     const v = await this.prisma.voucher.findUnique({
       where: { numero },
-      select: { numero: true, montoUsd: true, estado: true, formaPago: true, creado: true },
+      select: { numero: true, montoUsd: true, estado: true, formaPago: true, creado: true, reactivadoEn: true },
     });
     if (!v) throw new NotFoundException({ mensaje: 'No encontramos un voucher con ese número.' });
     const configuracion = await this.prisma.configuracion.findUnique({ where: { id: 1 } });

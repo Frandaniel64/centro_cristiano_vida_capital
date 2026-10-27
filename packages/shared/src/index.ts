@@ -68,6 +68,116 @@ export interface CrearVisita {
   sitioWeb?: string;
 }
 
+// ── Panel ──
+
+export interface UsuarioPanel {
+  id: string;
+  nombre: string;
+  email: string;
+  rol: Rol;
+  totpActivo: boolean;
+  debeCambiarClave: boolean;
+}
+
+// Respuesta de POST /api/auth/ingresar y /api/auth/codigo.
+// "codigo": falta el código 2FA. "configurar-2fa": el rol lo exige y todavía no lo activó.
+export type PasoIngreso =
+  | { paso: 'listo'; usuario: UsuarioPanel }
+  | { paso: 'codigo' }
+  | { paso: 'configurar-2fa' };
+
+export interface Configuracion2fa {
+  secreto: string;
+  // Imagen del código QR como data URL.
+  qr: string;
+}
+
+export interface Pagina<T> {
+  items: T[];
+  total: number;
+}
+
+// GET /api/admin/resumen: cada bloque viene solo si el rol lo puede ver.
+export interface ResumenPanel {
+  proTemplo?: EstadoProTemplo & { pendientes: number; apodosPorRevisar: number };
+  visitas?: { nuevas: number; ultimaSemana: number };
+}
+
+export interface VoucherAdmin {
+  id: string;
+  numero: number;
+  montoUsd: number;
+  nombre: string;
+  mostrarComo: MostrarComo;
+  apodo: string | null;
+  apodoAprobado: boolean;
+  contactoTipo: ContactoTipo;
+  contacto: string;
+  formaPago: FormaPago;
+  mensaje: string | null;
+  // Estado guardado, salvo los pendientes fuera de plazo, que vienen como "vencido".
+  estado: EstadoVoucher;
+  montoRecibido: string | null;
+  monedaRecibida: 'USD' | 'ARS' | null;
+  tipoCambio: string | null;
+  nota: string | null;
+  confirmadoPor: string | null;
+  confirmadoEn: string | null;
+  motivoAnulacion: string | null;
+  creado: string;
+}
+
+export interface ConfirmarVoucher {
+  montoRecibido: number;
+  monedaRecibida: 'USD' | 'ARS';
+  tipoCambio?: number;
+  nota?: string;
+}
+
+export interface AjusteAdmin {
+  id: string;
+  montoUsd: number;
+  motivo: string;
+  cargadoPor: string;
+  creado: string;
+}
+
+export interface CampanaAdmin {
+  metaUsd: number;
+  montoMaximoUsd: number;
+  mostrarMontos: boolean;
+  mensajeMetaCumplida: string | null;
+  montosSugeridos: number[];
+  formasPagoActivas: FormaPago[];
+  diasVencimiento: number;
+}
+
+export type EstadoVisita = 'nueva' | 'contactada' | 'vino';
+
+export interface VisitaAdmin {
+  id: string;
+  nombre: string;
+  contactoTipo: ContactoTipo;
+  contacto: string;
+  intereses: string[];
+  estado: EstadoVisita;
+  notas: string | null;
+  atendidoPor: string | null;
+  creado: string;
+}
+
+export interface UsuarioAdmin extends UsuarioPanel {
+  activo: boolean;
+  ultimoIngreso: string | null;
+  creado: string;
+}
+
+// Respuesta al crear un usuario o reiniciar su clave: la temporal se muestra una sola vez.
+export interface ClaveTemporal {
+  usuario: UsuarioAdmin;
+  claveTemporal: string;
+}
+
 // Respuesta de error de la API para formularios.
 export interface ErrorApi {
   mensaje: string;
