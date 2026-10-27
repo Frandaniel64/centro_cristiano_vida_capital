@@ -33,6 +33,21 @@ export const routes: Routes = [
         canActivate: [soloRoles('administrador', 'recepcion')],
         loadComponent: () => import('./visitas/visitas').then((m) => m.Visitas),
       },
+      ...(
+        [
+          ['ministerios', 'Ministerios', () => import('./contenido/ministerios').then((m) => m.Ministerios)],
+          ['nosotros', 'Nosotros', () => import('./contenido/nosotros').then((m) => m.Nosotros)],
+          ['eventos', 'Eventos', () => import('./contenido/eventos').then((m) => m.Eventos)],
+          ['predicas', 'Prédicas', () => import('./contenido/predicas').then((m) => m.Predicas)],
+          ['fotos', 'Fotos', () => import('./medios/medios').then((m) => m.Medios)],
+          ['textos', 'Textos del sitio', () => import('./contenido/textos').then((m) => m.Textos)],
+        ] as const
+      ).map(([path, titulo, loadComponent]) => ({
+        path,
+        title: `${titulo} · Panel CCVida`,
+        canActivate: [soloRoles('administrador', 'editor')],
+        loadComponent,
+      })),
       {
         path: 'usuarios',
         title: 'Usuarios · Panel CCVida',

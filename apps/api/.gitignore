@@ -1,3 +1,6 @@
 
 # Cliente generado por Prisma
 /src/generated
+
+# Fotos subidas en desarrollo (sin R2)
+/medios

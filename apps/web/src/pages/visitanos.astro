@@ -3,17 +3,25 @@ import Faq from '../components/Faq.astro';
 import Foto from '../components/Foto.astro';
 import FormVisita from '../components/FormVisita.astro';
 import Base from '../layouts/Base.astro';
-import { config, fotos, visita } from '../data/sitio';
+import { fotos } from '../data/estaticos';
+import { contenido } from '../lib/contenido';
+
+export const prerender = false;
+
+const { textos, ministerios } = await contenido();
+const ACENTOS = ['#f5f5f0', '#4fa3e0', '#f5d547', '#8cc63f'];
+const mapa = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${textos.direccion}, ${textos.barrio}`)}`;
+const intereses = [...ministerios.map((m) => m.nombre), 'Pro Templo'];
 ---
 
-<Base titulo="Planeá tu visita" descripcion={`Todo lo que necesitás saber para tu primer domingo en CCVida: horarios, cómo llegar a ${config.direccion} y qué esperar.`} imagen={fotos.comidaFamilias.src}>
+<Base titulo="Planeá tu visita" descripcion={`Todo lo que necesitás saber para tu primer domingo en CCVida: horarios, cómo llegar a ${textos.direccion} y qué esperar.`} imagen={fotos.comidaFamilias}>
   <section class="wrap flex flex-col gap-8 pt-14">
     <h1 class="d h1">Planeá tu <span class="text-verde-hoja">visita</span></h1>
     <p class="lead muted max-w-[560px] border-t border-linea pt-6">
       Si es tu primera vez, te contamos todo para que llegues tranquilo. Y si querés, avisanos y te esperamos en la puerta.
     </p>
     <div class="h-[clamp(260px,36vw,520px)] overflow-hidden rounded-3xl">
-      <Foto foto={{ ...fotos.comidaFamilias, alt: 'Gente conversando y riendo alrededor de una mesa' }} sizes="(max-width: 1408px) 100vw, 1360px" prioridad />
+      <Foto foto={fotos.comidaFamilias} sizes="(max-width: 1408px) 100vw, 1360px" prioridad />
     </div>
   </section>
 
@@ -21,9 +29,9 @@ import { config, fotos, visita } from '../data/sitio';
     <h2 class="d h2">Un domingo en CCVida</h2>
     <ol class="m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(min(100%,220px),1fr))] border-t border-l border-linea p-0">
       {
-        visita.agenda.map((a) => (
+        textos.agendaDomingo.map((a, i) => (
           <li class="flex min-h-[220px] flex-col justify-between gap-4 border-r border-b border-linea p-7">
-            <span class="d text-5xl leading-none tracking-[-.04em]" style={`color: ${a.acento}`}>{a.hora}</span>
+            <span class="d text-5xl leading-none tracking-[-.04em]" style={`color: ${ACENTOS[i % ACENTOS.length]}`}>{a.hora}</span>
             <span>
               <strong class="block text-lg">{a.titulo}</strong>
               <span class="muted">{a.texto}</span>
@@ -38,10 +46,10 @@ import { config, fotos, visita } from '../data/sitio';
     <div class="wrap flex flex-wrap items-stretch gap-10 py-30">
       <div class="flex flex-[1_1_380px] flex-col gap-[18px]">
         <h2 class="d h2">Cómo llegar</h2>
-        <p class="d text-[34px] leading-[1.1]">{config.direccion}, {config.barrio}</p>
+        <p class="d text-[34px] leading-[1.1]">{textos.direccion}, {textos.barrio}</p>
         <ul class="m-0 flex list-none flex-col border-t border-white/35 p-0">
           {
-            config.comoLlegar.map((c) => (
+            textos.comoLlegar.map((c) => (
               <li class="flex gap-3 border-b border-white/35 py-3">
                 <strong class="min-w-[120px]">{c.titulo}</strong>
                 {c.texto}
@@ -49,7 +57,7 @@ import { config, fotos, visita } from '../data/sitio';
             ))
           }
         </ul>
-        <a href={config.mapsUrl} class="btn b-negro self-start">Abrir en Google Maps</a>
+        <a href={mapa} class="btn b-negro self-start">Abrir en Google Maps</a>
       </div>
       <div class="relative min-h-[400px] flex-[2_1_520px] overflow-hidden rounded-3xl bg-black">
         <svg aria-hidden="true" viewBox="0 0 600 400" preserveAspectRatio="xMidYMid slice" class="absolute inset-0 size-full">
@@ -59,7 +67,7 @@ import { config, fotos, visita } from '../data/sitio';
           <rect x="236" y="192" width="80" height="54" rx="10" fill="#1d2b12"></rect>
         </svg>
         <span class="absolute top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-full flex-col items-center gap-1.5">
-          <span class="chip bg-verde-hoja px-3.5 py-2 text-sm text-black">CCVida · {config.direccion}</span>
+          <span class="chip bg-verde-hoja px-3.5 py-2 text-sm text-black">CCVida · {textos.direccion}</span>
           <svg aria-hidden="true" width="40" height="48" viewBox="0 0 24 28"><path d="M12 27s-9-8.1-9-15a9 9 0 0 1 18 0c0 6.9-9 15-9 15z" fill="#f5d547"></path><circle cx="12" cy="12" r="3.5" fill="#000000"></circle></svg>
         </span>
       </div>
@@ -69,8 +77,8 @@ import { config, fotos, visita } from '../data/sitio';
   <section class="wrap flex flex-wrap gap-14 py-30">
     <div class="flex min-w-0 flex-[1_1_400px] flex-col">
       <h2 class="d h2 mb-6">Preguntas de primera vez</h2>
-      <Faq preguntas={visita.faq} />
+      <Faq preguntas={textos.faqVisita} />
     </div>
-    <FormVisita />
+    <FormVisita intereses={intereses} reunion={textos.reunion} direccion={textos.direccion} />
   </section>
 </Base>

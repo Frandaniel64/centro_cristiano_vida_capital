@@ -2,34 +2,35 @@
 import Foto from '../../components/Foto.astro';
 import TarjetaPredica from '../../components/TarjetaPredica.astro';
 import Base from '../../layouts/Base.astro';
-import { predicas, type Predica } from '../../data/sitio';
+import { contenido } from '../../lib/contenido';
 import { fechaLarga } from '../../lib/formato';
 
-export function getStaticPaths() {
-  return predicas.map((predica) => ({ params: { slug: predica.slug }, props: { predica } }));
-}
+export const prerender = false;
 
-interface Props {
-  predica: Predica;
+const { predicas } = await contenido();
+const p = predicas.find((x) => x.slug === Astro.params.slug);
+if (!p) {
+  Astro.response.status = 404;
+  return Astro.rewrite('/404');
 }
-const { predica: p } = Astro.props;
-const deLaSerie = predicas.filter((o) => o.serie === p.serie && o.slug !== p.slug).slice(0, 3);
+const deLaSerie = p.serie ? predicas.filter((o) => o.serie === p.serie && o.slug !== p.slug).slice(0, 3) : [];
+const datos = [fechaLarga(p.fecha), p.predicador, p.duracionMin && `${p.duracionMin} min`].filter(Boolean).join(' · ');
 
 // Acepta links de YouTube (watch?v=, youtu.be/, /live/) y devuelve el id del video.
-const idYoutube = p.urlVideo.match(/(?:v=|youtu\.be\/|\/live\/|\/embed\/)([\w-]{11})/)?.[1];
+const idYoutube = (p.urlVideo ?? '').match(/(?:v=|youtu\.be\/|\/live\/|\/embed\/)([\w-]{11})/)?.[1];
 ---
 
-<Base titulo={p.titulo} descripcion={p.resumen} imagen={p.foto.src}>
+<Base titulo={p.titulo} descripcion={p.resumen ?? `Prédica de ${p.predicador}.`} imagen={p.foto}>
   <article class="wrap flex flex-col gap-8 pt-8 pb-24">
     <a href="/en-vivo" class="self-start text-sm font-bold">← Todas las prédicas</a>
     <header class="flex flex-col gap-4">
-      <p class="m-0 text-sm font-bold text-verde-hoja">{p.serie}</p>
+      {p.serie && <p class="m-0 text-sm font-bold text-verde-hoja">{p.serie}</p>}
       <h1 class="d h2">{p.titulo}</h1>
-      <p class="muted m-0">{fechaLarga(p.fecha)} · {p.predicador} · {p.duracion}</p>
+      <p class="muted m-0">{datos}</p>
     </header>
 
     <div class="relative aspect-video overflow-hidden rounded-3xl border border-linea bg-panel" data-video>
-      <Foto foto={p.foto} sizes="(max-width: 1408px) 100vw, 1360px" class="absolute inset-0" prioridad />
+      {p.foto && <Foto foto={p.foto} decorativa sizes="(max-width: 1408px) 100vw, 1360px" class="absolute inset-0" prioridad />}
       {
         idYoutube ? (
           <button type="button" class="btn b-blanco absolute top-1/2 left-1/2 size-26 -translate-1/2 p-0" aria-label={`Reproducir ${p.titulo}`} data-youtube={idYoutube}>
@@ -46,7 +47,7 @@ const idYoutube = p.urlVideo.match(/(?:v=|youtu\.be\/|\/live\/|\/embed\/)([\w-]{
     </div>
 
     <div class="flex flex-wrap gap-12">
-      <p class="lead flex-[2_1_480px]">{p.resumen}</p>
+      {p.resumen && <p class="lead flex-[2_1_480px]">{p.resumen}</p>}
       {
         p.versiculos.length > 0 && (
           <div class="flex-[1_1_280px]">

@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://ccvida.com.ar/sitemap-index.xml
+Sitemap: https://ccvida.com.ar/sitemap.xml

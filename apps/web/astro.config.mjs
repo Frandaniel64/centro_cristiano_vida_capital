@@ -2,15 +2,16 @@
 import { defineConfig } from 'astro/config';
 
 import cloudflare from '@astrojs/cloudflare';
-import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
   site: process.env.SITE_URL ?? 'https://ccvida.com.ar',
-  // Por ahora todo se genera al compilar; las páginas pasan a SSR cuando lean de la API.
-  adapter: cloudflare({ imageService: 'compile' }),
-  integrations: [sitemap({ filter: (pagina) => !pagina.endsWith('.ics') && !pagina.includes('/pro-templo/voucher/') })],
+  // Las páginas se arman en cada pedido con el contenido de la API (lib/contenido.ts).
+  // Las fotos ya llegan optimizadas: las del panel desde la API y las de diseño
+  // desde public/fotos (scripts/optimizar-fotos.mjs).
+  output: 'server',
+  adapter: cloudflare({ imageService: 'passthrough' }),
 
   vite: {
     plugins: [tailwindcss()],

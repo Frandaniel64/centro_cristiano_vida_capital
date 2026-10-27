@@ -1,6 +1,5 @@
 ---
-import { Image } from 'astro:assets';
-import type { Foto } from '../data/sitio';
+import { srcset, type Foto } from '../lib/fotos';
 
 interface Props {
   foto: Foto;
@@ -8,21 +7,21 @@ interface Props {
   sizes: string;
   // Solo las fotos del primer pantallazo cargan de inmediato.
   prioridad?: boolean;
+  // Para fotos decorativas dentro de un link que ya tiene texto.
+  decorativa?: boolean;
   class?: string;
 }
 
-const { foto, sizes, prioridad = false, class: clase } = Astro.props;
-const anchos = [400, 640, 960, 1280, 1600].filter((w) => w <= foto.src.width);
+const { foto, sizes, prioridad = false, decorativa = false, class: clase } = Astro.props;
 ---
 
-<Image
-  src={foto.src}
-  alt={foto.alt}
-  widths={anchos.length ? anchos : [foto.src.width]}
+<img
+  src={foto.url}
+  srcset={srcset(foto)}
   sizes={sizes}
-  format="webp"
-  quality={70}
+  alt={decorativa ? '' : foto.alt}
   loading={prioridad ? 'eager' : 'lazy'}
   fetchpriority={prioridad ? 'high' : 'auto'}
+  decoding="async"
   class:list={['foto', clase]}
 />

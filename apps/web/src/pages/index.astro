@@ -7,49 +7,58 @@ import OcultarPasados from '../components/OcultarPasados.astro';
 import Pared from '../components/Pared.astro';
 import TarjetaEvento from '../components/TarjetaEvento.astro';
 import Base from '../layouts/Base.astro';
-import { config, estadoProTemploInicial as pt, eventos, fotos, ministerios, predicas, primeraVez } from '../data/sitio';
+import { fotos, primeraVez } from '../data/estaticos';
+import { colorTexto, contenido, estadoProTemplo } from '../lib/contenido';
 import { proximosEventos } from '../lib/eventos';
 import { fechaLarga, usd } from '../lib/formato';
 
-const ultimaPredica = predicas[0];
+export const prerender = false;
+
+const { textos, ministerios, eventos, predicas, campana } = await contenido();
+const pt = await estadoProTemplo(campana.metaUsd);
+const ultimaPredica = predicas.find((p) => p.destacada) ?? predicas[0];
 const destacados = proximosEventos(eventos.filter((e) => e.destacado)).slice(0, 3);
 const flecha = 'M5 12h14M13 6l6 6-6 6';
+// El lema se muestra con la última palabra en verde: "La iglesia sos vos."
+const palabras = textos.lema.trim().split(' ');
+const lemaFinal = palabras.pop() ?? '';
+const NOMBRE = 'Centro Cristiano Vida Capital';
 
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Church',
-  name: config.nombre,
+  name: NOMBRE,
   url: Astro.site?.href,
   address: {
     '@type': 'PostalAddress',
-    streetAddress: config.direccion,
+    streetAddress: textos.direccion,
     addressLocality: 'Ciudad Autónoma de Buenos Aires',
     addressCountry: 'AR',
   },
-  sameAs: [config.instagram.url, config.youtube.url, config.facebook.url].filter(Boolean),
+  sameAs: [textos.instagram, textos.youtube, textos.facebook].filter(Boolean),
   event: {
     '@type': 'Event',
     name: 'Reunión del domingo',
     eventSchedule: { '@type': 'Schedule', byDay: 'https://schema.org/Sunday', startTime: '10:00', scheduleTimezone: 'America/Argentina/Buenos_Aires' },
-    location: { '@type': 'Place', name: config.nombre, address: `${config.direccion}, ${config.barrio}` },
+    location: { '@type': 'Place', name: NOMBRE, address: `${textos.direccion}, ${textos.barrio}` },
   },
 };
 ---
 
 <Base
   titulo="Inicio"
-  descripcion={`Iglesia cristiana en Buenos Aires. Nos reunimos los domingos a las 10 h en ${config.direccion}, ${config.barrio}. Vení como estés.`}
+  descripcion={`Iglesia cristiana en Buenos Aires. ${textos.reunion} en ${textos.direccion}, ${textos.barrio}. Vení como estés.`}
   jsonLd={jsonLd}
 >
   <section class="wrap pt-14">
     <div class="flex flex-wrap items-end gap-8">
-      <h1 class="d h1 min-w-0 flex-[1_1_640px]">La iglesia sos <span class="text-verde-hoja">vos.</span></h1>
+      <h1 class="d h1 min-w-0 flex-[1_1_640px]">{palabras.join(' ')} <span class="text-verde-hoja">{lemaFinal}</span></h1>
       <LogoArbol class="h-auto w-[280px] max-w-full flex-[0_1_280px]" />
     </div>
 
     <div class="mt-12 flex flex-wrap border-y border-linea">
-      <div class="dato"><p class="muted m-0 text-[13px]">Reunión</p><p class="mt-0.5 mb-0 text-xl font-bold">{config.reunion}</p></div>
-      <div class="dato"><p class="muted m-0 text-[13px]">Dónde</p><p class="mt-0.5 mb-0 text-xl font-bold">{config.direccion}, {config.barrio}</p></div>
+      <div class="dato"><p class="muted m-0 text-[13px]">Reunión</p><p class="mt-0.5 mb-0 text-xl font-bold">{textos.reunion}</p></div>
+      <div class="dato"><p class="muted m-0 text-[13px]">Dónde</p><p class="mt-0.5 mb-0 text-xl font-bold">{textos.direccion}, {textos.barrio}</p></div>
       <a href="/pro-templo" class="dato">
         <span class="muted block text-[13px]">Pro Templo</span>
         <span class="mt-0.5 block text-xl font-bold"><span class="text-amarillo"><span data-pt="porcentaje">{pt.porcentaje}</span>%</span> de la meta</span>
@@ -62,9 +71,7 @@ const jsonLd = {
         <a href="/en-vivo" class="btn b-borde min-h-14"><span class="size-2 rounded-full bg-[#e5484d]"></span>En vivo</a>
       </div>
     </div>
-    <p class="lead muted mt-8 max-w-[560px] text-xl">
-      Una familia en Buenos Aires que se apoya, ora unida y camina junta en la fe. <span class="text-texto">Vení como estés.</span>
-    </p>
+    <p class="lead muted mt-8 max-w-[560px] text-xl">{textos.bajadaInicio}</p>
   </section>
 
   <section aria-label="Fotos de la comunidad" class="wrap mt-14 flex flex-wrap gap-3">
@@ -93,8 +100,8 @@ const jsonLd = {
         ))
       }
       <div class="flex flex-col gap-3.5 border-r border-b border-linea p-8">
-        <p class="d h3">{config.direccion}</p>
-        <p class="muted m-0">{config.barrio} · Colectivos {config.colectivos}</p>
+        <p class="d h3">{textos.direccion}</p>
+        <p class="muted m-0">{textos.barrio}{textos.colectivos && ` · Colectivos ${textos.colectivos}`}</p>
         <a href="/visitanos#como-llegar" class="inline-flex min-h-11 items-center self-start font-bold no-underline">Cómo llegar</a>
       </div>
     </div>
@@ -144,6 +151,7 @@ const jsonLd = {
     </div>
   </section>
 
+  {ministerios.length > 0 && (
   <section class="linea">
     <div class="wrap flex flex-col gap-10 py-30">
       <div class="flex flex-wrap items-end justify-between gap-4">
@@ -153,14 +161,16 @@ const jsonLd = {
       <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,260px),1fr))] gap-3">
         {
           ministerios.map((m) => (
-            <a href={`/ministerios/${m.slug}`} class="fila flex min-h-[420px] flex-col overflow-hidden rounded-3xl no-underline" style={`background: ${m.color}; color: ${m.colorTexto}`}>
-              <span class="block h-[200px] w-full">
-                <Foto foto={{ ...m.foto, alt: '' }} sizes="(max-width: 860px) 100vw, 25vw" />
-              </span>
+            <a href={`/ministerios/${m.slug}`} class="fila flex min-h-[420px] flex-col overflow-hidden rounded-3xl no-underline" style={`background: ${m.color ?? '#f5f5f0'}; color: ${colorTexto(m.color)}`}>
+              {m.foto && (
+                <span class="block h-[200px] w-full">
+                  <Foto foto={m.foto} decorativa sizes="(max-width: 860px) 100vw, 25vw" />
+                </span>
+              )}
               <span class="flex grow flex-col justify-between gap-4 p-6">
                 <span>
                   <span class="d block text-4xl leading-none tracking-[-.03em]">{m.nombre}</span>
-                  <span class="mt-2 block text-[15px]">{m.corto}</span>
+                  {m.resumen && <span class="mt-2 block text-[15px]">{m.resumen}</span>}
                 </span>
                 <span class="flex items-center justify-between gap-3">
                   <span class="text-sm font-bold">{m.horario}</span>
@@ -175,6 +185,7 @@ const jsonLd = {
       </div>
     </div>
   </section>
+  )}
 
   {
     destacados.length > 0 && (
@@ -185,7 +196,7 @@ const jsonLd = {
             <a href="/eventos" class="btn b-borde">Ver todos los eventos</a>
           </div>
           <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,340px),1fr))] gap-3">
-            {destacados.map((o) => <TarjetaEvento evento={o.evento} inicio={o.inicio} fin={o.fin} />)}
+            {destacados.map((o) => <TarjetaEvento evento={o.evento} inicio={o.inicio} fin={o.fin} ministerios={ministerios} />)}
           </div>
         </div>
       </section>
@@ -200,8 +211,9 @@ const jsonLd = {
         <CuentaRegresiva />
         <a href="/en-vivo" class="btn b-blanco self-start">Ir a En vivo y prédicas</a>
       </div>
+      {ultimaPredica && (
       <a href={`/predicas/${ultimaPredica.slug}`} aria-label={`Ver la última prédica: ${ultimaPredica.titulo}`} class="relative aspect-[16/10] min-w-0 flex-[1_1_520px] overflow-hidden rounded-3xl border border-linea bg-panel">
-        <Foto foto={ultimaPredica.foto} sizes="(max-width: 860px) 100vw, 50vw" class="absolute inset-0" />
+        {ultimaPredica.foto && <Foto foto={ultimaPredica.foto} decorativa sizes="(max-width: 860px) 100vw, 50vw" class="absolute inset-0" />}
         <span class="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,.92),rgba(0,0,0,.1))]"></span>
         <span class="absolute top-[42%] left-1/2 inline-flex size-22 -translate-1/2 items-center justify-center rounded-full bg-texto">
           <svg aria-hidden="true" width="32" height="32" viewBox="0 0 24 24" fill="#000000"><path d="M8 5l11 7-11 7z"></path></svg>
@@ -211,6 +223,7 @@ const jsonLd = {
           <span class="d block text-[30px] leading-[1.1]">{ultimaPredica.titulo}</span>
         </span>
       </a>
+      )}
     </div>
   </section>
 
@@ -218,7 +231,7 @@ const jsonLd = {
     <div class="wrap flex flex-wrap items-center justify-between gap-8 py-24">
       <h2 class="d h2 flex-[1_1_560px]">Te esperamos este domingo.</h2>
       <div class="flex flex-col items-start gap-3.5">
-        <p class="m-0 text-lg font-bold">{config.horaReunion} · {config.direccion}, {config.barrio}</p>
+        <p class="m-0 text-lg font-bold">{textos.reunion} · {textos.direccion}, {textos.barrio}</p>
         <a href="/visitanos" class="btn b-negro min-h-14">Planeá tu visita</a>
       </div>
     </div>

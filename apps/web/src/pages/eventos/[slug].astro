@@ -1,17 +1,19 @@
 ---
 import Foto from '../../components/Foto.astro';
 import Base from '../../layouts/Base.astro';
-import { config, eventos, ministerios, type Evento } from '../../data/sitio';
+import { colorTexto, contenido, parrafos } from '../../lib/contenido';
 import { fechaEvento, proximaOcurrencia } from '../../lib/eventos';
+import { imagenCompartir } from '../../lib/fotos';
 
-export function getStaticPaths() {
-  return eventos.map((evento) => ({ params: { slug: evento.slug }, props: { evento } }));
-}
+export const prerender = false;
 
-interface Props {
-  evento: Evento;
+const NOMBRE = 'Centro Cristiano Vida Capital';
+const { eventos, ministerios } = await contenido();
+const e = eventos.find((x) => x.slug === Astro.params.slug);
+if (!e) {
+  Astro.response.status = 404;
+  return Astro.rewrite('/404');
 }
-const { evento: e } = Astro.props;
 const { inicio, fin } = proximaOcurrencia(e);
 const f = fechaEvento(e, inicio);
 const ministerio = ministerios.find((m) => m.slug === e.ministerio);
@@ -22,25 +24,25 @@ const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Event',
   name: e.titulo,
-  description: e.resumen,
+  description: e.resumen ?? undefined,
   startDate: new Date(inicio).toISOString(),
   endDate: new Date(fin).toISOString(),
   eventStatus: 'https://schema.org/EventScheduled',
   eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
-  location: { '@type': 'Place', name: config.nombre, address: e.lugar },
-  organizer: { '@type': 'Organization', name: config.nombre, url: Astro.site?.href },
-  image: [new URL(e.foto.src.src, Astro.site).href],
+  location: { '@type': 'Place', name: NOMBRE, address: e.lugar ?? undefined },
+  organizer: { '@type': 'Organization', name: NOMBRE, url: Astro.site?.href },
+  ...(e.foto ? { image: [new URL(imagenCompartir(e.foto)!, Astro.site).href] } : {}),
 };
 ---
 
-<Base titulo={e.titulo} descripcion={`${e.resumen} ${f.cuando}, ${f.hora}.`} imagen={e.foto.src} jsonLd={jsonLd}>
+<Base titulo={e.titulo} descripcion={[e.resumen, `${f.cuando}, ${f.hora}.`].filter(Boolean).join(' ')} imagen={e.foto} jsonLd={jsonLd}>
   <article>
     <div class="wrap flex flex-col gap-8 pt-8">
       <a href="/eventos" class="self-start text-sm font-bold">← Todos los eventos</a>
       <div class="flex flex-col gap-4">
         {
           ministerio && (
-            <a href={`/ministerios/${ministerio.slug}`} class="chip self-start no-underline" style={`background: ${ministerio.color}; color: ${ministerio.colorTexto}`}>
+            <a href={`/ministerios/${ministerio.slug}`} class="chip self-start no-underline" style={`background: ${ministerio.color ?? '#f5f5f0'}; color: ${colorTexto(ministerio.color)}`}>
               {ministerio.nombre}
             </a>
           )
@@ -55,17 +57,19 @@ const jsonLd = {
           {f.proxima && <p class="muted m-0 text-sm">{f.proxima}</p>}
         </div>
         <div class="dato"><p class="muted m-0 text-[13px]">Hora</p><p class="mt-0.5 mb-0 text-xl font-bold">{f.hora}</p></div>
-        <div class="dato"><p class="muted m-0 text-[13px]">Dónde</p><p class="mt-0.5 mb-0 text-xl font-bold">{e.lugar}</p></div>
+        {e.lugar && <div class="dato"><p class="muted m-0 text-[13px]">Dónde</p><p class="mt-0.5 mb-0 text-xl font-bold">{e.lugar}</p></div>}
       </div>
     </div>
 
     <div class="wrap flex flex-wrap gap-12 pt-12 pb-30">
-      <div class="h-[clamp(260px,32vw,460px)] min-w-0 flex-[3_1_520px] overflow-hidden rounded-3xl">
-        <Foto foto={e.foto} sizes="(max-width: 860px) 100vw, 60vw" prioridad />
-      </div>
+      {e.foto && (
+        <div class="h-[clamp(260px,32vw,460px)] min-w-0 flex-[3_1_520px] overflow-hidden rounded-3xl">
+          <Foto foto={e.foto} sizes="(max-width: 860px) 100vw, 60vw" prioridad />
+        </div>
+      )}
       <div class="flex min-w-0 flex-[2_1_360px] flex-col gap-5">
-        <p class="lead">{e.resumen}</p>
-        {e.descripcion.map((p) => <p class="muted m-0">{p}</p>)}
+        {e.resumen && <p class="lead">{e.resumen}</p>}
+        {parrafos(e.descripcion).map((p) => <p class="muted m-0">{p}</p>)}
         <div class="mt-3 flex flex-wrap gap-2.5">
           {e.linkInscripcion && <a href={e.linkInscripcion} class="btn b-verde">Quiero anotarme</a>}
           <a href={`/eventos/${e.slug}.ics`} download={`${e.slug}.ics`} class="btn b-blanco">

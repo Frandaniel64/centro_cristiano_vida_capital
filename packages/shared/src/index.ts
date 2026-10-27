@@ -178,6 +178,183 @@ export interface ClaveTemporal {
   claveTemporal: string;
 }
 
+// ── Contenido (panel, etapa 2) ──
+
+export type EstadoContenido = 'borrador' | 'publicado';
+export type Repeticion = 'ninguna' | 'semanal' | 'mensual';
+
+export interface MedioAdmin {
+  id: string;
+  // Variante más grande; `tamanos` tiene todas por ancho en px.
+  url: string;
+  tamanos: Record<string, string>;
+  textoAlternativo: string;
+  credito: string | null;
+  ancho: number | null;
+  alto: number | null;
+  creado: string;
+}
+
+/** Foto asociada a un contenido. */
+export type FotoRef = Pick<MedioAdmin, 'id' | 'url' | 'tamanos' | 'textoAlternativo'> | null;
+
+interface ContenidoBase {
+  id: string;
+  slug: string;
+  estado: EstadoContenido;
+  foto: FotoRef;
+  actualizado: string;
+}
+
+export interface MinisterioAdmin extends ContenidoBase {
+  nombre: string;
+  edades: string | null;
+  horario: string | null;
+  resumen: string | null;
+  descripcion: string | null;
+  actividades: string[];
+  color: string | null;
+  orden: number;
+}
+
+export interface EventoAdmin extends ContenidoBase {
+  titulo: string;
+  inicio: string;
+  fin: string | null;
+  repeticion: Repeticion;
+  lugar: string | null;
+  resumen: string | null;
+  descripcion: string | null;
+  ministerioId: string | null;
+  destacado: boolean;
+  linkInscripcion: string | null;
+}
+
+export interface SerieAdmin extends ContenidoBase {
+  nombre: string;
+  descripcion: string | null;
+  predicas: number;
+}
+
+export interface PredicaAdmin extends ContenidoBase {
+  titulo: string;
+  fecha: string; // AAAA-MM-DD
+  predicador: string;
+  serieId: string | null;
+  urlVideo: string | null;
+  duracionMin: number | null;
+  resumen: string | null;
+  versiculos: string[];
+  destacada: boolean;
+}
+
+/** Lo que se manda al crear o editar: los mismos campos sin id ni fechas, con la foto por id. */
+export type Guardar<T extends ContenidoBase> = Omit<T, 'id' | 'foto' | 'actualizado' | 'slug' | 'predicas'> & {
+  fotoId: string | null;
+  // Vacío: se arma a partir del título o nombre.
+  slug?: string;
+};
+
+export interface PreguntaFrecuente {
+  pregunta: string;
+  respuesta: string;
+}
+
+/** Textos editables del sitio ("Textos del sitio" en el panel). */
+export interface TextosSitio {
+  lema: string;
+  bajadaInicio: string;
+  reunion: string; // "Domingos 10 h"
+  direccion: string;
+  barrio: string;
+  colectivos: string;
+  comoLlegar: { titulo: string; texto: string }[];
+  agendaDomingo: { hora: string; titulo: string; texto: string }[];
+  faqVisita: PreguntaFrecuente[];
+  faqProTemplo: PreguntaFrecuente[];
+  historia: string;
+  datosIglesia: string; // "Más de 150 personas · Desde 2016 · Floresta, CABA"
+  pastores: { nombres: string; texto: string; cita: string };
+  creemos: { titulo: string; texto: string }[];
+  // Página Nosotros (sección "Nosotros" del panel).
+  nosotrosIntro: string;
+  // "Lo que nos mueve": bloques de color.
+  pilares: { titulo: string; texto: string; color: string }[];
+  // Fotos de Nosotros, por id de la biblioteca de fotos.
+  fotosNosotros: { portada: string | null; historia: string | null; pastores: string | null; galeria: string[] };
+  whatsapp: string;
+  instagram: string;
+  youtube: string;
+  facebook: string;
+  datosTransferencia: string;
+}
+
+// ── Contenido público (GET /api/contenido): lo que lee la web ──
+
+export interface FotoPublica {
+  // Variante más grande; `tamanos` tiene las demás por ancho y "compartir" (JPG 1200×630).
+  url: string;
+  tamanos: Record<string, string>;
+  alt: string;
+}
+
+export interface MinisterioPublico {
+  slug: string;
+  nombre: string;
+  edades: string | null;
+  horario: string | null;
+  resumen: string | null;
+  descripcion: string | null;
+  actividades: string[];
+  color: string | null;
+  foto: FotoPublica | null;
+}
+
+export interface EventoPublico {
+  slug: string;
+  titulo: string;
+  inicio: string;
+  fin: string | null;
+  repeticion: Repeticion;
+  lugar: string | null;
+  resumen: string | null;
+  descripcion: string | null;
+  ministerio: string | null; // slug
+  destacado: boolean;
+  linkInscripcion: string | null;
+  foto: FotoPublica | null;
+}
+
+export interface PredicaPublica {
+  slug: string;
+  titulo: string;
+  fecha: string; // AAAA-MM-DD
+  predicador: string;
+  serie: string | null; // nombre
+  urlVideo: string | null;
+  duracionMin: number | null;
+  resumen: string | null;
+  versiculos: string[];
+  destacada: boolean;
+  foto: FotoPublica | null;
+}
+
+/** GET /api/admin/textos: los textos más los datos de las fotos que nombran, para mostrarlas en el panel. */
+export interface TextosAdmin extends TextosSitio {
+  fotos: Record<string, FotoRef>;
+}
+
+export interface ContenidoPublico {
+  textos: TextosSitio;
+  // Fotos de Nosotros ya resueltas; null = la web usa la de diseño.
+  nosotros: { portada: FotoPublica | null; historia: FotoPublica | null; pastores: FotoPublica | null; galeria: FotoPublica[] };
+  ministerios: MinisterioPublico[];
+  // Solo los que no terminaron, más los que se repiten.
+  eventos: EventoPublico[];
+  predicas: PredicaPublica[];
+  campana: { metaUsd: number; montoMaximoUsd: number; montosSugeridos: number[]; formasPago: FormaPago[] };
+}
+
 // Respuesta de error de la API para formularios.
 export interface ErrorApi {
   mensaje: string;

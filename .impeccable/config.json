@@ -17,6 +17,24 @@
         ],
         "createdAt": "2026-10-27T18:55:42.772Z",
         "reason": "Claude: el QR usa binding de Angular [src]=\"c.qr\" con un data URL que devuelve la API; el detector solo ve atributos estáticos"
+      },
+      {
+        "rule": "broken-image",
+        "value": "*",
+        "files": [
+          "apps/admin/src/app/medios/galeria.ts"
+        ],
+        "createdAt": "2026-10-27T19:57:20.712Z",
+        "reason": "Claude: las <img> usan binding de Angular ([src]=miniatura(m) y [src]=previa()), con URLs reales de la API o blob: de la vista previa"
+      },
+      {
+        "rule": "broken-image",
+        "value": "*",
+        "files": [
+          "apps/admin/src/app/medios/selector-foto.ts"
+        ],
+        "createdAt": "2026-10-27T19:57:42.628Z",
+        "reason": "Claude: la <img> usa binding de Angular [src]=miniatura(f) con la URL real de la foto elegida"
       }
     ]
   }

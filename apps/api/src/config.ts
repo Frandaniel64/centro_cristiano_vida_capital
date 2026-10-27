@@ -8,6 +8,15 @@ export const config = {
     .map((o) => o.trim())
     .filter(Boolean),
   sitioUrl: (process.env.SITE_URL ?? 'http://localhost:4321').replace(/\/$/, ''),
+  // Dirección pública de esta API, para las URLs de las fotos guardadas en disco.
+  apiUrl: (process.env.API_URL ?? 'http://localhost:3000').replace(/\/$/, ''),
+  r2: {
+    cuenta: process.env.R2_ACCOUNT_ID ?? '',
+    claveId: process.env.R2_ACCESS_KEY_ID ?? '',
+    claveSecreta: process.env.R2_SECRET_ACCESS_KEY ?? '',
+    bucket: process.env.R2_BUCKET ?? 'ccvida-medios',
+    urlPublica: (process.env.R2_PUBLIC_URL ?? '').replace(/\/$/, ''),
+  },
   resendApiKey: process.env.RESEND_API_KEY ?? '',
   emailDe: process.env.EMAIL_FROM ?? 'CCVida Capital <hola@ccvida.com.ar>',
   // Quién recibe los avisos internos. Vacío: no se avisa.

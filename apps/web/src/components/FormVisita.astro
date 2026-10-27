@@ -1,6 +1,14 @@
 ---
-import { visita } from '../data/sitio';
 import AntiSpam from './AntiSpam.astro';
+
+interface Props {
+  // Opciones de "¿Qué te interesa?": los ministerios publicados y Pro Templo.
+  intereses: string[];
+  // Para el mensaje de éxito: "Nos vemos <cuándo> en <dirección>".
+  reunion: string;
+  direccion: string;
+}
+const { intereses, reunion, direccion } = Astro.props;
 
 const pill = 'opcion inline-flex min-h-11 items-center rounded-full px-5 text-[15px] font-bold has-[:checked]:bg-texto has-[:checked]:text-black';
 const errorClase = 'm-0 text-sm font-semibold text-error';
@@ -13,7 +21,7 @@ const errorClase = 'm-0 text-sm font-semibold text-error';
     <button type="button" data-cambiar class="min-h-11 cursor-pointer self-start border-0 bg-transparent p-0 font-extrabold text-black underline">Cambiar mis datos</button>
   </div>
 
-  <form id="form-visita" novalidate class="flex flex-col gap-[18px]">
+  <form id="form-visita" novalidate class="flex flex-col gap-[18px]" data-despedida={`Nos vemos ${reunion.toLowerCase()} en ${direccion}.`}>
     <h2 class="d h3">Avisanos que venís</h2>
     <p class="muted m-0 text-sm">Los campos con * son obligatorios.</p>
 
@@ -38,7 +46,7 @@ const errorClase = 'm-0 text-sm font-semibold text-error';
       <legend class="mb-2.5 p-0 text-[15px] font-semibold">¿Qué te interesa? <span class="muted font-medium">(opcional)</span></legend>
       <div class="flex flex-wrap gap-2">
         {
-          visita.intereses.map((i) => (
+          intereses.map((i) => (
             <label class="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full border-[1.5px] border-borde-control px-4 text-[15px] font-semibold">
               <input type="checkbox" name="intereses" value={i} class="size-[18px] accent-verde-hoja" />
               {i}
@@ -110,7 +118,7 @@ const errorClase = 'm-0 text-sm font-semibold text-error';
         await enviar('/api/visitas', datos);
         ok.querySelector('[data-ok="nombre"]')!.textContent = datos.nombre.split(' ')[0];
         ok.querySelector('[data-ok="mensaje"]')!.textContent =
-          `Te escribimos por ${tipo === 'whatsapp' ? 'WhatsApp' : 'email'} antes del domingo. Nos vemos a las 10 en Camarones 2201.`;
+          `Te escribimos por ${tipo === 'whatsapp' ? 'WhatsApp' : 'email'} antes del domingo. ${form.dataset.despedida}`;
         form.hidden = true;
         ok.hidden = false;
         ok.focus();

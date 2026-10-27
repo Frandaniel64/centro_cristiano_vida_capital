@@ -163,7 +163,10 @@ model Evento {
   lugar            String?
   fotoId           String?         @map("foto_id")
   foto             Medio?          @relation(fields: [fotoId], references: [id], onDelete: SetNull)
-  descripcion      Json?
+  // Una línea para las tarjetas.
+  resumen          String?
+  // Texto corrido; los párrafos se separan con una línea en blanco.
+  descripcion      String?
   ministerioId     String?         @map("ministerio_id")
   ministerio       Ministerio?     @relation(fields: [ministerioId], references: [id], onDelete: SetNull)
   destacado        Boolean         @default(false)
@@ -224,6 +227,8 @@ model Ministerio {
   slug             String          @unique
   edades           String?
   horario          String?
+  // Una línea para las tarjetas del inicio.
+  resumen          String?
   descripcion      String?
   actividades      String[]
   fotoId           String?         @map("foto_id")
@@ -365,6 +370,9 @@ model Configuracion {
   canalYoutube       String?  @map("canal_youtube")
   datosTransferencia String?  @map("datos_transferencia")
   textosPie          Json     @default("{}") @map("textos_pie")
+  // Textos editables del sitio (TextosSitio en @ccvida/shared): hero, historia,
+  // pastores, "Un domingo en CCVida", preguntas frecuentes, cómo llegar…
+  textos             Json     @default("{}")
   actualizado        DateTime @updatedAt
   actualizadoPorId   String?  @map("actualizado_por_id")
 

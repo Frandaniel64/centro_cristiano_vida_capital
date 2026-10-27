@@ -1,0 +1,108 @@
+{
+  "abuela-nieta": {
+    "480": "/fotos/abuela-nieta/480.webp",
+    "960": "/fotos/abuela-nieta/960.webp",
+    "1200": "/fotos/abuela-nieta/1200.webp",
+    "compartir": "/fotos/abuela-nieta/compartir.jpg"
+  },
+  "alabanza": {
+    "480": "/fotos/alabanza/480.webp",
+    "960": "/fotos/alabanza/960.webp",
+    "1600": "/fotos/alabanza/1600.webp",
+    "compartir": "/fotos/alabanza/compartir.jpg"
+  },
+  "amigas": {
+    "480": "/fotos/amigas/480.webp",
+    "960": "/fotos/amigas/960.webp",
+    "1200": "/fotos/amigas/1200.webp",
+    "compartir": "/fotos/amigas/compartir.jpg"
+  },
+  "amigos-mesa": {
+    "480": "/fotos/amigos-mesa/480.webp",
+    "960": "/fotos/amigos-mesa/960.webp",
+    "1200": "/fotos/amigos-mesa/1200.webp",
+    "compartir": "/fotos/amigos-mesa/compartir.jpg"
+  },
+  "atardecer": {
+    "480": "/fotos/atardecer/480.webp",
+    "960": "/fotos/atardecer/960.webp",
+    "1400": "/fotos/atardecer/1400.webp",
+    "compartir": "/fotos/atardecer/compartir.jpg"
+  },
+  "bautismo": {
+    "480": "/fotos/bautismo/480.webp",
+    "960": "/fotos/bautismo/960.webp",
+    "1200": "/fotos/bautismo/1200.webp",
+    "compartir": "/fotos/bautismo/compartir.jpg"
+  },
+  "biblia": {
+    "480": "/fotos/biblia/480.webp",
+    "960": "/fotos/biblia/960.webp",
+    "1200": "/fotos/biblia/1200.webp",
+    "compartir": "/fotos/biblia/compartir.jpg"
+  },
+  "comida-familias": {
+    "480": "/fotos/comida-familias/480.webp",
+    "960": "/fotos/comida-familias/960.webp",
+    "1400": "/fotos/comida-familias/1400.webp",
+    "compartir": "/fotos/comida-familias/compartir.jpg"
+  },
+  "grupo-ciudad": {
+    "480": "/fotos/grupo-ciudad/480.webp",
+    "960": "/fotos/grupo-ciudad/960.webp",
+    "1600": "/fotos/grupo-ciudad/1600.webp",
+    "compartir": "/fotos/grupo-ciudad/compartir.jpg"
+  },
+  "jovenes": {
+    "480": "/fotos/jovenes/480.webp",
+    "960": "/fotos/jovenes/960.webp",
+    "1400": "/fotos/jovenes/1400.webp",
+    "compartir": "/fotos/jovenes/compartir.jpg"
+  },
+  "kids-vida": {
+    "480": "/fotos/kids-vida/480.webp",
+    "960": "/fotos/kids-vida/960.webp",
+    "1200": "/fotos/kids-vida/1200.webp",
+    "compartir": "/fotos/kids-vida/compartir.jpg"
+  },
+  "logo": {
+    "150": "/fotos/logo/150.webp",
+    "compartir": "/fotos/logo/compartir.jpg"
+  },
+  "manos-en-alto": {
+    "480": "/fotos/manos-en-alto/480.webp",
+    "960": "/fotos/manos-en-alto/960.webp",
+    "1400": "/fotos/manos-en-alto/1400.webp",
+    "compartir": "/fotos/manos-en-alto/compartir.jpg"
+  },
+  "matrimonio": {
+    "480": "/fotos/matrimonio/480.webp",
+    "960": "/fotos/matrimonio/960.webp",
+    "1200": "/fotos/matrimonio/1200.webp",
+    "compartir": "/fotos/matrimonio/compartir.jpg"
+  },
+  "pastor": {
+    "480": "/fotos/pastor/480.webp",
+    "960": "/fotos/pastor/960.webp",
+    "1200": "/fotos/pastor/1200.webp",
+    "compartir": "/fotos/pastor/compartir.jpg"
+  },
+  "predica-desierto": {
+    "480": "/fotos/predica-desierto/480.webp",
+    "960": "/fotos/predica-desierto/960.webp",
+    "1200": "/fotos/predica-desierto/1200.webp",
+    "compartir": "/fotos/predica-desierto/compartir.jpg"
+  },
+  "salon-vacio": {
+    "480": "/fotos/salon-vacio/480.webp",
+    "960": "/fotos/salon-vacio/960.webp",
+    "1600": "/fotos/salon-vacio/1600.webp",
+    "compartir": "/fotos/salon-vacio/compartir.jpg"
+  },
+  "transmision": {
+    "480": "/fotos/transmision/480.webp",
+    "960": "/fotos/transmision/960.webp",
+    "1600": "/fotos/transmision/1600.webp",
+    "compartir": "/fotos/transmision/compartir.jpg"
+  }
+}

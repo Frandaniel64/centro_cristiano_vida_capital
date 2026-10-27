@@ -3,6 +3,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { AdminModule } from './admin/admin.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { ComunModule } from './comun/comun.module.js';
+import { ContenidoModule } from './contenido/contenido.module.js';
 import { EnVivoController } from './en-vivo/en-vivo.controller.js';
 import { HealthController } from './health/health.controller.js';
 import { PrismaModule } from './prisma/prisma.module.js';
@@ -20,6 +21,7 @@ import { VisitasModule } from './visitas/visitas.module.js';
     ProTemploModule,
     VisitasModule,
     AdminModule,
+    ContenidoModule,
   ],
   controllers: [HealthController, EnVivoController],
 })

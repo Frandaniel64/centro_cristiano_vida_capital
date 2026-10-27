@@ -23,6 +23,8 @@ docker compose up -d                       # Postgres de desarrollo en el puerto
 npm run db:migrate -w @ccvida/api          # aplica las migraciones
 npm run db:seed -w @ccvida/api             # campaña Pro Templo y configuración
 
+npm run db:seed-ejemplo -w @ccvida/api    # opcional: ministerios, eventos y prédicas de ejemplo (nunca en producción)
+
 npm run dev:api     # http://localhost:3000
 npm run dev:web     # http://localhost:4321
 npm run dev:admin   # http://localhost:4200
@@ -40,6 +42,16 @@ npm run build       # compila todo
 | `GET /api/en-vivo` | Si hay transmisión en curso (por horario) y el link del canal |
 
 Tests: `npm test -w @ccvida/api` (reglas) y `npm run test:e2e -w @ccvida/api` (contra la base de desarrollo).
+
+## Sitio público y contenido
+
+La web se arma en cada pedido con lo publicado en el panel (`GET /api/contenido`). Un cambio
+guardado en el panel se ve en el sitio en menos de 1 minuto (cachés de 20 s en la web y en el CDN).
+Si la API no responde, la web sigue mostrando la última versión que recibió.
+
+- `PUBLIC_DEMO=true`: versión de muestra con el contenido de la maqueta, sin API.
+- Fotos de diseño (hero, galería): van en `apps/web/src/assets/fotos` y se optimizan con
+  `node apps/web/scripts/optimizar-fotos.mjs`, que genera `public/fotos`.
 
 ## Panel de administración
 

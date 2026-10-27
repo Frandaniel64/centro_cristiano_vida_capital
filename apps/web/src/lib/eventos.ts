@@ -1,4 +1,4 @@
-import type { Evento } from '../data/sitio';
+import type { EventoPublico as Evento } from '@ccvida/shared';
 
 const ZONA = 'America/Argentina/Buenos_Aires';
 const DIA_MS = 24 * 60 * 60 * 1000;
@@ -6,7 +6,8 @@ const DIA_MS = 24 * 60 * 60 * 1000;
 /** Inicio y fin de la próxima vez que ocurre el evento (o la última, si ya pasó). */
 export function proximaOcurrencia(e: Evento, ahora: number = Date.now()) {
   let inicio = new Date(e.inicio).getTime();
-  let fin = new Date(e.fin).getTime();
+  // Sin hora de fin, el evento se considera terminado al empezar.
+  let fin = e.fin ? new Date(e.fin).getTime() : inicio;
   if (e.repeticion === 'semanal') {
     while (fin < ahora) {
       inicio += 7 * DIA_MS;
@@ -78,11 +79,11 @@ export function ics(e: Evento, url: string) {
     `UID:${e.slug}@ccvida`,
     `DTSTAMP:${fechaIcs(Date.now())}`,
     `DTSTART:${fechaIcs(new Date(e.inicio).getTime())}`,
-    `DTEND:${fechaIcs(new Date(e.fin).getTime())}`,
+    e.fin ? `DTEND:${fechaIcs(new Date(e.fin).getTime())}` : null,
     regla,
     `SUMMARY:${textoIcs(e.titulo)}`,
-    `DESCRIPTION:${textoIcs(`${e.resumen}\n${url}`)}`,
-    `LOCATION:${textoIcs(e.lugar)}`,
+    `DESCRIPTION:${textoIcs(e.resumen ? `${e.resumen}\n${url}` : url)}`,
+    e.lugar ? `LOCATION:${textoIcs(e.lugar)}` : null,
     `URL:${url}`,
     'END:VEVENT',
     'END:VCALENDAR',
