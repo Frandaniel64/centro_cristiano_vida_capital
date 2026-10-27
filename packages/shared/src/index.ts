@@ -46,6 +46,17 @@ export interface VoucherCreado {
   instrucciones: string;
 }
 
+// GET /api/vouchers/:numero (sin nombre ni contacto)
+export interface VoucherPublico {
+  numero: number;
+  montoUsd: number;
+  estado: EstadoVoucher;
+  formaPago: FormaPago;
+  creado: string;
+  // Solo mientras está pendiente.
+  instrucciones: string | null;
+}
+
 // POST /api/visitas
 export interface CrearVisita {
   nombre: string;

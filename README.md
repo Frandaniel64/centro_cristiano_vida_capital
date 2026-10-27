@@ -29,6 +29,18 @@ npm run dev:admin   # http://localhost:4200
 npm run build       # compila todo
 ```
 
+## API pública
+
+| Método y ruta | Qué hace |
+|---|---|
+| `POST /api/vouchers` | Crea un voucher pendiente, manda el email y devuelve número e instrucciones. Máximo 5 por hora por conexión |
+| `GET /api/vouchers/:numero` | Estado público del voucher, sin datos personales |
+| `GET /api/pro-templo/estado` | Datos del contador (caché de 10 s). Solo suman vouchers confirmados y ajustes |
+| `POST /api/visitas` | Guarda la solicitud de primera visita y avisa a recepción. Máximo 5 por hora por conexión |
+| `GET /api/en-vivo` | Si hay transmisión en curso (por horario) y el link del canal |
+
+Tests: `npm test -w @ccvida/api` (reglas) y `npm run test:e2e -w @ccvida/api` (contra la base de desarrollo).
+
 ## Despliegue
 
 | Pieza | Dónde |
