@@ -8,8 +8,7 @@ COPY packages/shared/package.json packages/shared/
 RUN npm ci -w @ccvida/api -w @ccvida/shared --include-workspace-root
 COPY packages/shared packages/shared
 COPY apps/api apps/api
-# prisma generate no se conecta a la base, pero la config exige la variable.
-RUN DATABASE_URL=postgresql://build:build@localhost:5432/build npm run build -w @ccvida/api \
+RUN npm run build -w @ccvida/api \
  && npm prune --omit=dev -w @ccvida/api -w @ccvida/shared
 
 FROM node:24-alpine
