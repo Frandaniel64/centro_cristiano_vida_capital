@@ -67,7 +67,8 @@ describe('Contenido (e2e)', () => {
     const editor = await ingresar('editor');
     const res = await subirFoto(editor);
     expect(res.status).toBe(201);
-    expect(Object.keys(res.body.tamanos)).toEqual(['480', '960', '1200']);
+    expect(Object.keys(res.body.tamanos)).toEqual(['480', '960', '1200', 'compartir']);
+    expect(res.body.tamanos.compartir).toMatch(/compartir\.jpg$/);
     const ruta = new URL(res.body.url).pathname;
     const archivo = await request(app.getHttpServer()).get(ruta);
     expect(archivo.status).toBe(200);
@@ -136,6 +137,33 @@ describe('Contenido (e2e)', () => {
     expect(res.status).toBe(409);
     const lista = (await editor.get('/api/admin/series')).body as { id: string; predicas: number }[];
     expect(lista.find((s) => s.id === serie.body.id)?.predicas).toBe(1);
+  });
+
+  it('la web solo recibe lo publicado y ve los cambios enseguida', async () => {
+    const editor = await ingresar('editor');
+    const publico = async () => (await request(app.getHttpServer()).get('/api/contenido')).body;
+    const titulos = async () => (await publico()).eventos.map((e: { titulo: string }) => e.titulo);
+
+    const base = { estado: 'borrador', fin: null, repeticion: 'ninguna', lugar: null, resumen: null, descripcion: null, ministerioId: null, destacado: false, linkInscripcion: null, fotoId: null };
+    const futuro = await editor.post('/api/admin/eventos').send({ ...base, titulo: `Futuro ${SUFIJO}`, inicio: '2099-01-01T13:00:00.000Z' });
+    const pasado = await editor.post('/api/admin/eventos').send({ ...base, estado: 'publicado', titulo: `Pasado ${SUFIJO}`, inicio: '2020-01-01T13:00:00.000Z' });
+    const semanal = await editor.post('/api/admin/eventos').send({ ...base, estado: 'publicado', repeticion: 'semanal', titulo: `Semanal ${SUFIJO}`, inicio: '2020-01-04T22:00:00.000Z' });
+    borrar.eventos.push(futuro.body.id, pasado.body.id, semanal.body.id);
+
+    let lista = await titulos();
+    expect(lista).not.toContain(`Futuro ${SUFIJO}`); // borrador
+    expect(lista).not.toContain(`Pasado ${SUFIJO}`); // ya terminó
+    expect(lista).toContain(`Semanal ${SUFIJO}`); // se repite
+
+    // Publicarlo desde el panel lo muestra en la siguiente lectura.
+    await editor.put(`/api/admin/eventos/${futuro.body.id}`).send({ ...base, estado: 'publicado', titulo: `Futuro ${SUFIJO}`, inicio: '2099-01-01T13:00:00.000Z' });
+    lista = await titulos();
+    expect(lista).toContain(`Futuro ${SUFIJO}`);
+
+    const res = await request(app.getHttpServer()).get('/api/contenido');
+    expect(res.headers['cache-control']).toContain('max-age=30');
+    expect(res.body.textos.lema).toBeDefined();
+    expect(res.body.campana.montosSugeridos.length).toBeGreaterThan(0);
   });
 
   it('los textos del sitio arrancan con los de la maqueta y se guardan', async () => {

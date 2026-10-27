@@ -103,6 +103,7 @@ export class MediosController {
     for (const v of foto.variantes) {
       tamanos[v.ancho] = await this.almacen.guardar(`fotos/${id}/${v.ancho}.webp`, v.datos, 'image/webp');
     }
+    tamanos['compartir'] = await this.almacen.guardar(`fotos/${id}/compartir.jpg`, foto.compartir, 'image/jpeg');
     const mayor = Math.max(...foto.variantes.map((v) => v.ancho));
     const medio = await this.prisma.medio.create({
       data: {
@@ -141,8 +142,9 @@ export class MediosController {
     if (!m) throw new NotFoundException({ mensaje: 'No encontramos esa foto.' });
     const usos = Object.values(m._count).reduce((a, b) => a + b, 0);
     if (usos > 0) throw new ConflictException({ mensaje: `Esta foto se usa en ${usos} contenido${usos === 1 ? '' : 's'}. Cambiala ahí antes de borrarla.` });
-    for (const ancho of Object.keys((m.tamanos ?? {}) as Record<string, string>)) {
-      await this.almacen.borrar(`${m.clave}/${ancho}.webp`);
+    // Cada variante se guardó como <clave>/<archivo>: el nombre sale del final de su URL.
+    for (const url of Object.values((m.tamanos ?? {}) as Record<string, string>)) {
+      await this.almacen.borrar(`${m.clave}/${url.split('/').pop()}`);
     }
     await this.prisma.medio.delete({ where: { id } });
   }

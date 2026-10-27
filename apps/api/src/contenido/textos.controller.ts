@@ -8,7 +8,6 @@ import { ErrorDeFormulario } from '../comun/validacion.js';
 import type { Prisma } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { ContenidoService } from './contenido.service.js';
-import { TEXTOS_INICIALES } from './textos-iniciales.js';
 
 class ItemDto {
   @IsString() @MaxLength(80) titulo!: string;
@@ -63,11 +62,9 @@ export class TextosController {
     private readonly contenido: ContenidoService,
   ) {}
 
-  /** Lo guardado, completado con los textos iniciales en lo que falte. */
   @Get()
-  async ver(): Promise<TextosSitio> {
-    const c = await this.prisma.configuracion.findUnique({ where: { id: 1 } });
-    return { ...TEXTOS_INICIALES, ...((c?.textos ?? {}) as Partial<TextosSitio>) };
+  ver(): Promise<TextosSitio> {
+    return this.contenido.textos();
   }
 
   @Put()

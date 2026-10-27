@@ -32,5 +32,8 @@ export async function procesarFoto(original: Buffer) {
       datos: await sharp(girada.data).resize({ width: a, withoutEnlargement: true }).webp({ quality: 75 }).toBuffer(),
     })),
   );
-  return { ancho, alto, variantes };
+  // Para la vista previa al compartir (WhatsApp, Facebook): JPG recortado a 1200×630,
+  // porque no todas las apps muestran WebP.
+  const compartir = await sharp(girada.data).resize({ width: 1200, height: 630, fit: 'cover' }).jpeg({ quality: 80, mozjpeg: true }).toBuffer();
+  return { ancho, alto, variantes, compartir };
 }

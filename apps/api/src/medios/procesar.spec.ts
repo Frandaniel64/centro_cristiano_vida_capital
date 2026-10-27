@@ -17,6 +17,13 @@ describe('procesarFoto', () => {
     expect(meta.width).toBe(1600);
   });
 
+  it('genera un JPG de 1200×630 para compartir', async () => {
+    const r = await procesarFoto(await fotoDePrueba(2000, 1500));
+    const meta = await sharp(r.compartir).metadata();
+    expect(meta).toMatchObject({ format: 'jpeg', width: 1200, height: 630 });
+    expect(meta.exif).toBeUndefined();
+  });
+
   it('una foto chica no se agranda', async () => {
     const r = await procesarFoto(await fotoDePrueba(700, 500));
     expect(r.variantes.map((v) => v.ancho)).toEqual([480, 700]);

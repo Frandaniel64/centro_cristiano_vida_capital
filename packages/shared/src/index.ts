@@ -283,6 +283,65 @@ export interface TextosSitio {
   datosTransferencia: string;
 }
 
+// ── Contenido público (GET /api/contenido): lo que lee la web ──
+
+export interface FotoPublica {
+  // Variante más grande; `tamanos` tiene las demás por ancho y "compartir" (JPG 1200×630).
+  url: string;
+  tamanos: Record<string, string>;
+  alt: string;
+}
+
+export interface MinisterioPublico {
+  slug: string;
+  nombre: string;
+  edades: string | null;
+  horario: string | null;
+  resumen: string | null;
+  descripcion: string | null;
+  actividades: string[];
+  color: string | null;
+  foto: FotoPublica | null;
+}
+
+export interface EventoPublico {
+  slug: string;
+  titulo: string;
+  inicio: string;
+  fin: string | null;
+  repeticion: Repeticion;
+  lugar: string | null;
+  resumen: string | null;
+  descripcion: string | null;
+  ministerio: string | null; // slug
+  destacado: boolean;
+  linkInscripcion: string | null;
+  foto: FotoPublica | null;
+}
+
+export interface PredicaPublica {
+  slug: string;
+  titulo: string;
+  fecha: string; // AAAA-MM-DD
+  predicador: string;
+  serie: string | null; // nombre
+  urlVideo: string | null;
+  duracionMin: number | null;
+  resumen: string | null;
+  versiculos: string[];
+  destacada: boolean;
+  foto: FotoPublica | null;
+}
+
+export interface ContenidoPublico {
+  textos: TextosSitio;
+  ministerios: MinisterioPublico[];
+  // Solo los que no terminaron, más los que se repiten.
+  eventos: EventoPublico[];
+  predicas: PredicaPublica[];
+  campana: { metaUsd: number; montoMaximoUsd: number; montosSugeridos: number[]; formasPago: FormaPago[] };
+}
+
 // Respuesta de error de la API para formularios.
 export interface ErrorApi {
   mensaje: string;
