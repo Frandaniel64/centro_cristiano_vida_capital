@@ -6,14 +6,16 @@ import { PrismaService } from '../prisma/prisma.service.js';
 import { TEXTOS_INICIALES } from './textos-iniciales.js';
 
 const DIA_MS = 24 * 60 * 60 * 1000;
+const CACHE_MS = 60_000;
 
 const fotoPublica = (m: Medio | null): FotoPublica | null =>
   m ? { url: m.url, tamanos: (m.tamanos ?? {}) as Record<string, string>, alt: m.textoAlternativo } : null;
 
 @Injectable()
 export class ContenidoService {
-  // Lo que lee la web; se rearma la próxima vez que se pide después de un cambio.
-  private cache: ContenidoPublico | null = null;
+  // Lo que lee la web. Se rearma después de un cambio en el panel o, como mucho,
+  // al minuto (por si algo se cambió por fuera del panel: un seed, una migración).
+  private cache: { datos: ContenidoPublico; hasta: number } | null = null;
 
   constructor(private readonly prisma: PrismaService) {}
 
@@ -40,7 +42,7 @@ export class ContenidoService {
 
   /** Todo lo publicado que muestra la web. */
   async publico(ahora = Date.now()): Promise<ContenidoPublico> {
-    if (this.cache) return this.cache;
+    if (this.cache && this.cache.hasta > ahora) return this.cache.datos;
     const publicado = { estado: 'publicado' as const };
     // Un evento de una sola vez deja de mostrarse un día después de terminar.
     const desde = new Date(ahora - DIA_MS);
@@ -61,7 +63,7 @@ export class ContenidoService {
       this.prisma.campana.findUnique({ where: { slug: 'pro-templo' } }),
     ]);
 
-    this.cache = {
+    const datos: ContenidoPublico = {
       textos,
       ministerios: ministerios.map((m) => ({
         slug: m.slug,
@@ -109,6 +111,7 @@ export class ContenidoService {
         formasPago: campana?.formasPagoActivas ?? [],
       },
     };
-    return this.cache;
+    this.cache = { datos, hasta: ahora + CACHE_MS };
+    return datos;
   }
 }

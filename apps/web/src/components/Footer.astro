@@ -1,13 +1,18 @@
 ---
-import { Image } from 'astro:assets';
-import logo from '../assets/fotos/logo.jpg';
-import { config, navCompleta } from '../data/sitio';
+import type { TextosSitio } from '@ccvida/shared';
+import { fotos, navCompleta } from '../data/estaticos';
+import { linkWhatsapp } from '../lib/formato';
+
+interface Props {
+  textos: TextosSitio;
+}
+const { textos } = Astro.props;
 
 const redes = [
-  { label: 'Instagram', url: config.instagram.url },
-  { label: 'YouTube', url: config.youtube.url },
-  { label: 'Facebook', url: config.facebook.url },
-  { label: 'WhatsApp', url: `https://wa.me/${config.whatsapp.numero}` },
+  { label: 'Instagram', url: textos.instagram },
+  { label: 'YouTube', url: textos.youtube },
+  { label: 'Facebook', url: textos.facebook },
+  { label: 'WhatsApp', url: linkWhatsapp(textos.whatsapp) },
 ].filter((r) => r.url);
 
 const titulo = 'm-0 mb-3 text-[13px] font-bold tracking-[.08em] text-texto-suave uppercase';
@@ -17,13 +22,13 @@ const link = 'inline-flex min-h-9 items-center text-[15px] text-texto no-underli
 <footer class="border-t border-linea">
   <div class="wrap grid grid-cols-2 gap-x-10 gap-y-12 pt-16 pb-12 lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
     <div class="col-span-2 flex flex-col items-start gap-5 lg:col-span-1">
-      <Image src={logo} alt="CCVida Capital" width={88} height={88} class="size-22 rounded-full" />
+      <img src={fotos.logo.url} alt="CCVida Capital" width="88" height="88" class="size-22 rounded-full" loading="lazy" />
       <p class="d text-[32px] leading-[1.05] tracking-[-.02em]">¡La iglesia sos <span class="text-verde-hoja">vos</span>!</p>
     </div>
 
     <div class="col-span-2 lg:col-span-1">
       <p class={titulo}>Reunión</p>
-      <p class="m-0 text-[15px]">{config.reunion}<br />{config.direccion}, {config.barrio}</p>
+      <p class="m-0 text-[15px]">{textos.reunion}<br />{textos.direccion}, {textos.barrio}</p>
       <a href="/visitanos" class="btn b-verde mt-5 min-h-11 px-5 text-sm">Planeá tu visita</a>
     </div>
 
@@ -44,7 +49,7 @@ const link = 'inline-flex min-h-9 items-center text-[15px] text-texto no-underli
 
   <div class="wrap">
     <p class="muted m-0 flex flex-wrap gap-x-4 gap-y-1 border-t border-linea py-6 text-[13px]">
-      <span>© {new Date().getFullYear()} {config.nombre}</span>
+      <span>© {new Date().getFullYear()} Centro Cristiano Vida Capital</span>
       <a href="/privacidad" class="text-texto-suave hover:text-texto">Política de privacidad</a>
     </p>
   </div>

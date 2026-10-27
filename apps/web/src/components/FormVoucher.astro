@@ -1,9 +1,13 @@
 ---
-import type { FormaPago } from '@ccvida/shared';
-import { proTemplo } from '../data/sitio';
+import type { ContenidoPublico, FormaPago } from '@ccvida/shared';
 import AntiSpam from './AntiSpam.astro';
 
-const MONTO_INICIAL = 20;
+interface Props {
+  campana: ContenidoPublico['campana'];
+}
+const { campana } = Astro.props;
+// Se preselecciona USD 20 si está entre los botones; si no, el del medio.
+const MONTO_INICIAL = campana.montosSugeridos.includes(20) ? 20 : (campana.montosSugeridos[Math.floor(campana.montosSugeridos.length / 2)] ?? 20);
 const formasPago: Record<FormaPago, { titulo: string; texto: string }> = {
   efectivo: { titulo: 'Efectivo en la mesa Pro Templo', texto: 'El domingo después de la reunión, con tu número.' },
   transferencia: { titulo: 'Transferencia en dólares', texto: 'Te mostramos los datos bancarios al terminar.' },
@@ -15,7 +19,7 @@ const errorClase = 'm-0 text-sm font-bold text-[#7a1a10]';
 ---
 
 <div class="claro flex flex-[2_1_380px] min-w-0 flex-col gap-[18px] rounded-[28px] bg-amarillo p-[clamp(24px,3.5vw,40px)] text-black">
-  <form id="form-voucher" novalidate class="flex flex-col gap-[18px]" data-maximo={proTemplo.montoMaximoUsd}>
+  <form id="form-voucher" novalidate class="flex flex-col gap-[18px]" data-maximo={campana.montoMaximoUsd}>
     <div>
       <h2 class="d text-[38px] leading-none tracking-[-.02em]">Tu voucher, tu ladrillo</h2>
       <p class="mt-1.5 mb-0">Desde USD 1 hasta lo que el corazón te diga.</p>
@@ -25,7 +29,7 @@ const errorClase = 'm-0 text-sm font-bold text-[#7a1a10]';
       <legend class="sr-only">Monto del voucher</legend>
       <div class="grid grid-cols-3 gap-2">
         {
-          proTemplo.montosSugeridos.map((m) => (
+          campana.montosSugeridos.map((m) => (
             <label class="opcion flex min-h-14 cursor-pointer items-center justify-center rounded-2xl border-2 border-black text-lg font-extrabold has-[:checked]:bg-black has-[:checked]:text-amarillo">
               <input type="radio" name="monto" value={m} checked={m === MONTO_INICIAL} />
               USD {m}
@@ -37,7 +41,7 @@ const errorClase = 'm-0 text-sm font-bold text-[#7a1a10]';
 
     <div class="flex flex-col gap-1.5">
       <label for="otro-monto" class="text-sm font-bold">Otro monto en dólares</label>
-      <input id="otro-monto" name="otroMonto" type="number" min="1" max={proTemplo.montoMaximoUsd} step="1" inputmode="numeric" placeholder="Ej.: 250" class="campo" aria-describedby="error-otro-monto" />
+      <input id="otro-monto" name="otroMonto" type="number" min="1" max={campana.montoMaximoUsd} step="1" inputmode="numeric" placeholder="Ej.: 250" class="campo" aria-describedby="error-otro-monto" />
       <p id="error-otro-monto" data-error="otroMonto" class={errorClase} hidden></p>
     </div>
 
@@ -89,7 +93,7 @@ const errorClase = 'm-0 text-sm font-bold text-[#7a1a10]';
     <fieldset class="m-0 flex flex-col gap-2 border-0 p-0">
       <legend class="mb-2.5 p-0 text-[15px] font-bold">¿Cómo lo vas a pagar? *</legend>
       {
-        proTemplo.formasPago.map((f, i) => (
+        campana.formasPago.map((f, i) => (
           <label class="opcion flex cursor-pointer flex-col rounded-2xl border-2 border-black px-[18px] py-3 has-[:checked]:bg-black has-[:checked]:text-amarillo">
             <input type="radio" name="formaPago" value={f} checked={i === 0} />
             <span class="font-bold">{formasPago[f].titulo}</span>

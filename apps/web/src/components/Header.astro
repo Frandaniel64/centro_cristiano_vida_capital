@@ -1,7 +1,5 @@
 ---
-import { Image } from 'astro:assets';
-import logo from '../assets/fotos/logo.jpg';
-import { nav, navCompleta } from '../data/sitio';
+import { fotos, nav, navCompleta } from '../data/estaticos';
 
 const actual = Astro.url.pathname.replace(/\/$/, '') || '/';
 const esActual = (href: string) => (href === '/' ? actual === '/' : actual.startsWith(href));
@@ -12,7 +10,7 @@ const acento = (href: string) =>
 <header class="border-b border-linea bg-fondo">
   <div class="wrap flex items-center justify-between gap-4 py-3.5">
     <a href="/" aria-label="CCVida Capital, ir al inicio" class="flex items-center gap-3 text-texto no-underline">
-      <Image src={logo} alt="" width={40} height={40} class="size-10 rounded-full object-cover" loading="eager" />
+      <img src={fotos.logo.url} alt="" width="40" height="40" class="size-10 rounded-full object-cover" />
       <span class="d text-[19px] tracking-[-.01em]">CCVida Capital</span>
     </a>
 

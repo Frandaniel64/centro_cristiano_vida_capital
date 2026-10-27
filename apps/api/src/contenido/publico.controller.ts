@@ -8,7 +8,7 @@ export class ContenidoPublicoController {
 
   /** Lo que muestra la web. Spec: lo publicado en el panel aparece en menos de 1 minuto. */
   @Get()
-  @Header('Cache-Control', 'public, max-age=30, s-maxage=30')
+  @Header('Cache-Control', 'public, max-age=20, s-maxage=20')
   publico(): Promise<ContenidoPublico> {
     return this.contenido.publico();
   }

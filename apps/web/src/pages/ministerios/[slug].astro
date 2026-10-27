@@ -1,36 +1,41 @@
 ---
 import MinisterioArticulo from '../../components/MinisterioArticulo.astro';
 import Base from '../../layouts/Base.astro';
-import { ministerios, type Ministerio } from '../../data/sitio';
+import { contenido } from '../../lib/contenido';
 
-export function getStaticPaths() {
-  return ministerios.map((ministerio) => ({ params: { slug: ministerio.slug }, props: { ministerio } }));
-}
+export const prerender = false;
 
-interface Props {
-  ministerio: Ministerio;
+const { ministerios } = await contenido();
+const ministerio = ministerios.find((m) => m.slug === Astro.params.slug);
+if (!ministerio) {
+  Astro.response.status = 404;
+  return Astro.rewrite('/404');
 }
-const { ministerio } = Astro.props;
 const otros = ministerios.filter((m) => m.slug !== ministerio.slug);
+const descripcion = [ministerio.resumen, ministerio.horario].filter(Boolean).join(' · ') || `${ministerio.nombre} en CCVida Capital.`;
 ---
 
-<Base titulo={ministerio.nombre} descripcion={`${ministerio.corto} ${ministerio.horario}.`} imagen={ministerio.foto.src}>
+<Base titulo={ministerio.nombre} descripcion={descripcion} imagen={ministerio.foto}>
   <nav aria-label="Ruta" class="wrap pt-8">
     <a href="/ministerios" class="text-sm font-bold">← Todos los ministerios</a>
   </nav>
   <MinisterioArticulo ministerio={ministerio} nivel="h1" />
-  <section class="linea">
-    <div class="wrap flex flex-col gap-6 py-18">
-      <h2 class="d h3">Otros ministerios</h2>
-      <ul class="m-0 flex list-none flex-wrap gap-2 p-0">
-        {
-          otros.map((m) => (
-            <li>
-              <a href={`/ministerios/${m.slug}`} class="btn b-borde">{m.nombre}</a>
-            </li>
-          ))
-        }
-      </ul>
-    </div>
-  </section>
+  {
+    otros.length > 0 && (
+      <section class="linea">
+        <div class="wrap flex flex-col gap-6 py-18">
+          <h2 class="d h3">Otros ministerios</h2>
+          <ul class="m-0 flex list-none flex-wrap gap-2 p-0">
+            {otros.map((m) => (
+              <li>
+                <a href={`/ministerios/${m.slug}`} class="btn b-borde">
+                  {m.nombre}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
 </Base>

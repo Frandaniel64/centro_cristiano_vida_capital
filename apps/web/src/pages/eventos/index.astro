@@ -2,13 +2,17 @@
 import OcultarPasados from '../../components/OcultarPasados.astro';
 import TarjetaEvento from '../../components/TarjetaEvento.astro';
 import Base from '../../layouts/Base.astro';
-import { eventos, fotos } from '../../data/sitio';
+import { fotos } from '../../data/estaticos';
+import { contenido } from '../../lib/contenido';
 import { proximosEventos } from '../../lib/eventos';
 
+export const prerender = false;
+
+const { eventos, ministerios } = await contenido();
 const proximos = proximosEventos(eventos);
 ---
 
-<Base titulo="Eventos" descripcion="Bautismos, encuentros, campamentos y todo lo que viene en CCVida Capital." imagen={fotos.manosEnAlto.src}>
+<Base titulo="Eventos" descripcion="Bautismos, encuentros, campamentos y todo lo que viene en CCVida Capital." imagen={proximos[0]?.evento.foto ?? fotos.galeria[1]}>
   <section class="wrap flex flex-col gap-8 pt-14 pb-18">
     <h1 class="d h1">Lo que <span class="text-amarillo">viene</span></h1>
     <p class="lead muted max-w-[560px] border-t border-linea pt-6">
@@ -19,7 +23,7 @@ const proximos = proximosEventos(eventos);
   <section class="linea">
     <div class="wrap pt-18 pb-30">
       <div id="lista-eventos" class="grid grid-cols-[repeat(auto-fill,minmax(min(100%,360px),1fr))] gap-3">
-        {proximos.map((o) => <TarjetaEvento evento={o.evento} inicio={o.inicio} fin={o.fin} />)}
+        {proximos.map((o) => <TarjetaEvento evento={o.evento} inicio={o.inicio} fin={o.fin} ministerios={ministerios} />)}
       </div>
       <div data-sin-eventos="#lista-eventos" hidden={proximos.length > 0} class="flex flex-col items-start gap-5">
         <p class="lead muted m-0">Por ahora no hay eventos programados. Mientras tanto, te esperamos el domingo.</p>

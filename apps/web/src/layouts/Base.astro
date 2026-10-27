@@ -1,26 +1,29 @@
 ---
 import '../styles/global.css';
-import { getImage } from 'astro:assets';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
-import { config, fotos } from '../data/sitio';
+import { fotos } from '../data/estaticos';
 import { DEMO as demo } from '../lib/api';
+import { contenido } from '../lib/contenido';
+import { imagenCompartir, type Foto } from '../lib/fotos';
 
 interface Props {
   titulo: string;
   descripcion: string;
-  imagen?: ImageMetadata;
+  // Foto para la vista previa al compartir; si no hay, la de la alabanza.
+  imagen?: Foto | null;
   // Datos estructurados (schema.org) propios de la página.
   jsonLd?: Record<string, unknown>;
   // Páginas personales, como el comprobante de un voucher.
   noindex?: boolean;
 }
 
-const { titulo, descripcion, imagen = fotos.alabanza.src, jsonLd, noindex = false } = Astro.props;
-const tituloCompleto = Astro.url.pathname === '/' ? `${config.nombreCorto} · ${config.lema}` : `${titulo} · ${config.nombreCorto}`;
+const NOMBRE = 'CCVida Capital';
+const { titulo, descripcion, imagen, jsonLd, noindex = false } = Astro.props;
+const { textos } = await contenido();
+const tituloCompleto = Astro.url.pathname === '/' ? `${NOMBRE} · ${textos.lema}` : `${titulo} · ${NOMBRE}`;
 const canonica = new URL(Astro.url.pathname, Astro.site);
-const og = await getImage({ src: imagen, width: 1200, height: 630, fit: 'cover', format: 'jpg' });
-const ogUrl = new URL(og.src, Astro.site);
+const ogUrl = new URL(imagenCompartir(imagen ?? fotos.alabanza)!, Astro.site);
 ---
 
 <!doctype html>
@@ -32,13 +35,13 @@ const ogUrl = new URL(og.src, Astro.site);
     <meta name="description" content={descripcion} />
     <link rel="canonical" href={canonica} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="sitemap" href="/sitemap.xml" />
     <meta name="theme-color" content="#000000" />
     {(demo || noindex) && <meta name="robots" content="noindex, nofollow" />}
 
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="es_AR" />
-    <meta property="og:site_name" content={config.nombreCorto} />
+    <meta property="og:site_name" content={NOMBRE} />
     <meta property="og:title" content={tituloCompleto} />
     <meta property="og:description" content={descripcion} />
     <meta property="og:url" content={canonica} />
@@ -64,6 +67,6 @@ const ogUrl = new URL(og.src, Astro.site);
     <a href="/visitanos" class="cta-movil btn b-verde mx-4 mb-4 min-h-14 w-[calc(100%-32px)] shadow-[0_8px_24px_rgba(0,0,0,.5)]">
       Planeá tu visita
     </a>
-    <Footer />
+    <Footer textos={textos} />
   </body>
 </html>

@@ -2,7 +2,11 @@
 // BORRADOR: el spec pide revisarlo con alguien de confianza en temas legales
 // antes del lanzamiento (Ley 25.326 de Protección de Datos Personales).
 import Base from '../layouts/Base.astro';
-import { config } from '../data/sitio';
+import { contenido } from '../lib/contenido';
+import { linkWhatsapp } from '../lib/formato';
+
+export const prerender = false;
+const { textos } = await contenido();
 
 const secciones = [
   {
@@ -47,8 +51,8 @@ const secciones = [
       ))
     }
     <p class="m-0 border-t border-linea pt-6">
-      {config.nombre} · {config.direccion}, {config.barrio} ·
-      <a href={`https://wa.me/${config.whatsapp.numero}`}>WhatsApp {config.whatsapp.visible}</a>
+      Centro Cristiano Vida Capital · {textos.direccion}, {textos.barrio}
+      {textos.whatsapp && <> · <a href={linkWhatsapp(textos.whatsapp)}>WhatsApp {textos.whatsapp}</a></>}
     </p>
   </section>
 </Base>

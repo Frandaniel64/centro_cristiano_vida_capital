@@ -3,19 +3,29 @@ import CuentaRegresiva from '../components/CuentaRegresiva.astro';
 import Foto from '../components/Foto.astro';
 import TarjetaPredica from '../components/TarjetaPredica.astro';
 import Base from '../layouts/Base.astro';
-import { config, fotos, predicas, series } from '../data/sitio';
+import { fotos } from '../data/estaticos';
+import { contenido } from '../lib/contenido';
 
-const canalId = config.youtube.canalId;
+export const prerender = false;
+
+const { textos, predicas } = await contenido();
+const series = [...new Set(predicas.map((p) => p.serie).filter((s): s is string => !!s))];
+const youtube = textos.youtube.replace(/\/$/, '');
+// Con el id del canal (/channel/UC…) se puede incrustar el vivo; con un @usuario,
+// YouTube no lo permite y el botón abre la página del vivo en YouTube.
+const canalId = youtube.match(/\/channel\/(UC[\w-]{22})/)?.[1] ?? '';
+const linkVivo = youtube ? `${youtube}/live` : '';
+const usuario = (url: string) => url.replace(/^https:\/\/(www\.)?[^/]+\//, '').replace(/\/$/, '') || url;
 const redes = [
-  { red: 'YouTube', nombre: config.youtube.nombre, url: config.youtube.url },
-  { red: 'Facebook', nombre: config.facebook.nombre, url: config.facebook.url },
-  { red: 'Instagram', nombre: config.instagram.usuario, url: config.instagram.url },
+  { red: 'YouTube', nombre: youtube ? usuario(youtube) : 'CCVida Capital', url: youtube },
+  { red: 'Facebook', nombre: textos.facebook ? usuario(textos.facebook) : 'CCVida Capital', url: textos.facebook },
+  { red: 'Instagram', nombre: textos.instagram ? `@${usuario(textos.instagram).replace(/^@/, '')}` : 'CCVida Capital', url: textos.instagram },
 ];
 const pill =
   'inline-flex min-h-11 cursor-pointer items-center rounded-full border-[1.5px] border-borde-control bg-transparent px-[18px] text-sm font-bold text-texto aria-pressed:border-texto aria-pressed:bg-texto aria-pressed:text-black';
 ---
 
-<Base titulo="En vivo y prédicas" descripcion="Mirá la reunión en vivo cada domingo a las 10 h y el archivo de prédicas por serie." imagen={fotos.transmision.src}>
+<Base titulo="En vivo y prédicas" descripcion="Mirá la reunión en vivo cada domingo a las 10 h y el archivo de prédicas por serie." imagen={fotos.transmision}>
   <section class="wrap flex flex-col gap-8 pt-14 pb-24">
     <div class="flex flex-wrap items-end justify-between gap-6">
       <div class="flex flex-[1_1_560px] flex-col gap-4">
@@ -30,14 +40,20 @@ const pill =
       <div class="absolute inset-0 bg-black/50"></div>
       <span data-solo-en-vivo hidden class="chip absolute top-5 left-5 rounded-lg bg-rojo-vivo text-white">EN VIVO</span>
       {
-        canalId && (
+        canalId ? (
           <button type="button" class="btn b-blanco absolute top-1/2 left-1/2 size-26 -translate-1/2 p-0" aria-label="Reproducir la transmisión" data-reproducir={canalId}>
             <svg aria-hidden="true" width="36" height="36" viewBox="0 0 24 24" fill="#000000"><path d="M8 5l11 7-11 7z" /></svg>
           </button>
+        ) : (
+          linkVivo && (
+            <a href={linkVivo} class="btn b-blanco absolute top-1/2 left-1/2 size-26 -translate-1/2 p-0" aria-label="Ver la transmisión en YouTube">
+              <svg aria-hidden="true" width="36" height="36" viewBox="0 0 24 24" fill="#000000"><path d="M8 5l11 7-11 7z" /></svg>
+            </a>
+          )
         )
       }
       <p class="absolute bottom-5 left-6 m-0 font-semibold">
-        <span data-solo-en-vivo hidden>Transmisión en vivo desde {config.direccion}</span>
+        <span data-solo-en-vivo hidden>Transmisión en vivo desde {textos.direccion}</span>
         <span data-solo-sin-vivo>La transmisión arranca el domingo a las 10 h</span>
       </p>
     </div>
@@ -78,6 +94,7 @@ const pill =
       <div class="grid grid-cols-[repeat(auto-fill,minmax(min(100%,360px),1fr))] gap-x-5 gap-y-8" data-lista-predicas>
         {predicas.map((p) => <TarjetaPredica predica={p} />)}
       </div>
+      {predicas.length === 0 && <p class="lead muted m-0">Pronto vas a encontrar acá las prédicas de cada domingo.</p>}
     </div>
   </section>
 </Base>
@@ -86,7 +103,8 @@ const pill =
   // Filtro por serie: sin JavaScript se ven todas las prédicas.
   const filtro = document.querySelector<HTMLElement>('[data-filtro-series]');
   const tarjetas = document.querySelectorAll<HTMLElement>('[data-lista-predicas] > article');
-  if (filtro) {
+  // Además de "Todas" tiene que haber al menos una serie para que valga la pena filtrar.
+  if (filtro && filtro.querySelectorAll('button').length > 1) {
     filtro.hidden = false;
     const botones = filtro.querySelectorAll<HTMLButtonElement>('button');
     botones.forEach((b) =>

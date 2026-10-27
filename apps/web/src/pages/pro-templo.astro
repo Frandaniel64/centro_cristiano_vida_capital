@@ -6,14 +6,19 @@ import FormVoucher from '../components/FormVoucher.astro';
 import Pared from '../components/Pared.astro';
 import UltimosVouchers from '../components/UltimosVouchers.astro';
 import Base from '../layouts/Base.astro';
-import { estadoProTemploInicial as pt, fotos, proTemplo } from '../data/sitio';
+import { fotos, proTemploDestinos, proTemploPasos } from '../data/estaticos';
+import { contenido, estadoProTemplo } from '../lib/contenido';
 import { usd } from '../lib/formato';
+
+export const prerender = false;
+const { textos, campana } = await contenido();
+const pt = await estadoProTemplo(campana.metaUsd);
 ---
 
 <Base
   titulo="Pro Templo"
-  descripcion={`Estamos juntando USD ${usd(proTemplo.metaUsd)} para alquilar nuestro primer local. Sumá tu voucher y mirá cómo sube la pared en tiempo real.`}
-  imagen={fotos.salonVacio.src}
+  descripcion={`Estamos juntando USD ${usd(campana.metaUsd)} para alquilar nuestro primer local. Sumá tu voucher y mirá cómo sube la pared en tiempo real.`}
+  imagen={fotos.salonVacio}
 >
   <section class="wrap flex flex-col gap-8 pt-14">
     <h1 class="d h1">Pro <span class="text-amarillo">Templo</span></h1>
@@ -43,7 +48,7 @@ import { usd } from '../lib/formato';
       <UltimosVouchers vouchers={pt.ultimosVouchers} />
     </div>
 
-    <FormVoucher />
+    <FormVoucher campana={campana} />
   </section>
 
   <section class="wrap pb-30">
@@ -58,10 +63,10 @@ import { usd } from '../lib/formato';
 
   <section class="linea">
     <div class="wrap flex flex-col gap-10 py-30">
-      <h2 class="d h2">¿Para qué son los USD {usd(proTemplo.metaUsd)}?</h2>
+      <h2 class="d h2">¿Para qué son los USD {usd(campana.metaUsd)}?</h2>
       <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,300px),1fr))] gap-3">
         {
-          proTemplo.destinos.map((d) => (
+          proTemploDestinos.map((d) => (
             <div class="flex min-h-[260px] flex-col justify-between gap-2.5 rounded-3xl p-8" style={`background: ${d.bg}; color: ${d.fg}`}>
               <p class="d text-[52px] leading-none tracking-[-.04em]">{d.monto}</p>
               <div>
@@ -81,7 +86,7 @@ import { usd } from '../lib/formato';
         <h2 class="d h2">Cómo funciona</h2>
         <ol class="m-0 flex list-none flex-col border-t border-linea p-0">
           {
-            proTemplo.pasos.map((p) => (
+            proTemploPasos.map((p) => (
               <li class="flex items-start gap-5 border-b border-linea py-[22px]">
                 <span class="d inline-flex size-14 flex-none items-center justify-center rounded-full text-2xl" style={`background: ${p.bg}; color: ${p.fg}`}>{p.n}</span>
                 <span>
@@ -95,7 +100,7 @@ import { usd } from '../lib/formato';
       </div>
       <div class="flex min-w-0 flex-[1_1_480px] flex-col">
         <h2 class="d h3 mb-4">Preguntas frecuentes</h2>
-        <Faq preguntas={proTemplo.faq} />
+        <Faq preguntas={textos.faqProTemplo} />
       </div>
     </div>
   </section>

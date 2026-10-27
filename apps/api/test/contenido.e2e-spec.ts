@@ -161,7 +161,7 @@ describe('Contenido (e2e)', () => {
     expect(lista).toContain(`Futuro ${SUFIJO}`);
 
     const res = await request(app.getHttpServer()).get('/api/contenido');
-    expect(res.headers['cache-control']).toContain('max-age=30');
+    expect(res.headers['cache-control']).toContain('max-age=20');
     expect(res.body.textos.lema).toBeDefined();
     expect(res.body.campana.montosSugeridos.length).toBeGreaterThan(0);
   });
