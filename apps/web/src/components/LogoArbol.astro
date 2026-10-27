@@ -1,14 +1,14 @@
 ---
-// Árbol del hero. Cada hoja tiene nervaduras recortadas en negro, brota al
-// cargar la página y después se mece despacio, cada una a su ritmo.
+// Árbol del hero. Cada hoja brota al cargar la página y después se mece
+// despacio, cada una a su ritmo, con aire entre una y otra.
 interface Props {
   class?: string;
 }
 const { class: clase } = Astro.props;
 
-const HOJA = 'M0 -24 A72 72 0 0 1 0 -112 A72 72 0 0 1 0 -24 Z';
-// Nervadura central y tres pares laterales, de la base a la punta.
-const NERVADURAS = 'M0 -30 V-104 M0 -48 L-7 -58 M0 -48 L7 -58 M0 -66 L-9 -77 M0 -66 L9 -77 M0 -84 L-6 -93 M0 -84 L6 -93';
+// Hoja más corta y angosta que la de la maqueta: deja unos 9° de separación
+// entre hojas vecinas (están cada 26°).
+const HOJA = 'M0 -30 A73.45 73.45 0 0 1 0 -104 A73.45 73.45 0 0 1 0 -30 Z';
 
 const hojas = [-78, -52, -26, 0, 26, 52, 78].map((giro, i) => ({
   giro,
@@ -26,7 +26,6 @@ const hojas = [-78, -52, -26, 0, 26, 52, 78].map((giro, i) => ({
         <g class="brote" style={`animation-delay: ${h.retraso}s`}>
           <g class="hoja" style={`animation-duration: ${h.duracion}s; animation-delay: ${-h.duracion * h.retraso * 4}s`}>
             <path d={HOJA} fill="#ffffff" />
-            <path d={NERVADURAS} fill="none" stroke="#000000" stroke-width="2.6" stroke-linecap="round" />
           </g>
         </g>
       </g>
