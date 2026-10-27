@@ -1,0 +1,100 @@
+import { Body, Controller, Get, Put, UseGuards } from '@nestjs/common';
+import type { TextosSitio } from '@ccvida/shared';
+import { Type } from 'class-transformer';
+import { ArrayMaxSize, IsArray, IsString, MaxLength, ValidateNested } from 'class-validator';
+import type { SesionActual } from '../auth/auth.service.js';
+import { Roles, Sesion, SesionGuard } from '../auth/sesion.guard.js';
+import { ErrorDeFormulario } from '../comun/validacion.js';
+import type { Prisma } from '../generated/prisma/client.js';
+import { PrismaService } from '../prisma/prisma.service.js';
+import { ContenidoService } from './contenido.service.js';
+import { TEXTOS_INICIALES } from './textos-iniciales.js';
+
+class ItemDto {
+  @IsString() @MaxLength(80) titulo!: string;
+  @IsString() @MaxLength(400) texto!: string;
+}
+
+class AgendaDto extends ItemDto {
+  @IsString() @MaxLength(10) hora!: string;
+}
+
+class PreguntaDto {
+  @IsString() @MaxLength(200) pregunta!: string;
+  @IsString() @MaxLength(1000) respuesta!: string;
+}
+
+class PastoresDto {
+  @IsString() @MaxLength(120) nombres!: string;
+  @IsString() @MaxLength(1500) texto!: string;
+  @IsString() @MaxLength(300) cita!: string;
+}
+
+class TextosDto implements TextosSitio {
+  @IsString() @MaxLength(80) lema!: string;
+  @IsString() @MaxLength(400) bajadaInicio!: string;
+  @IsString() @MaxLength(60) reunion!: string;
+  @IsString() @MaxLength(120) direccion!: string;
+  @IsString() @MaxLength(60) barrio!: string;
+  @IsString() @MaxLength(120) colectivos!: string;
+  @IsArray() @ArrayMaxSize(8) @ValidateNested({ each: true }) @Type(() => ItemDto) comoLlegar!: ItemDto[];
+  @IsArray() @ArrayMaxSize(10) @ValidateNested({ each: true }) @Type(() => AgendaDto) agendaDomingo!: AgendaDto[];
+  @IsArray() @ArrayMaxSize(12) @ValidateNested({ each: true }) @Type(() => PreguntaDto) faqVisita!: PreguntaDto[];
+  @IsArray() @ArrayMaxSize(12) @ValidateNested({ each: true }) @Type(() => PreguntaDto) faqProTemplo!: PreguntaDto[];
+  @IsString() @MaxLength(4000) historia!: string;
+  @IsString() @MaxLength(200) datosIglesia!: string;
+  @ValidateNested() @Type(() => PastoresDto) pastores!: PastoresDto;
+  @IsArray() @ArrayMaxSize(8) @ValidateNested({ each: true }) @Type(() => ItemDto) creemos!: ItemDto[];
+  @IsString() @MaxLength(40) whatsapp!: string;
+  @IsString() @MaxLength(300) instagram!: string;
+  @IsString() @MaxLength(300) youtube!: string;
+  @IsString() @MaxLength(300) facebook!: string;
+  @IsString() @MaxLength(1000) datosTransferencia!: string;
+}
+
+const esLink = (v: string) => !v || /^https:\/\//.test(v);
+
+@Controller('admin/textos')
+@UseGuards(SesionGuard)
+@Roles('administrador', 'editor')
+export class TextosController {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly contenido: ContenidoService,
+  ) {}
+
+  /** Lo guardado, completado con los textos iniciales en lo que falte. */
+  @Get()
+  async ver(): Promise<TextosSitio> {
+    const c = await this.prisma.configuracion.findUnique({ where: { id: 1 } });
+    return { ...TEXTOS_INICIALES, ...((c?.textos ?? {}) as Partial<TextosSitio>) };
+  }
+
+  @Put()
+  async guardar(@Body() d: TextosDto, @Sesion() s: SesionActual): Promise<TextosSitio> {
+    const campos: Record<string, string> = {};
+    for (const red of ['instagram', 'youtube', 'facebook'] as const) {
+      if (!esLink(d[red].trim())) campos[red] = 'Pegá el link completo, que empieza con https://';
+    }
+    if (d.whatsapp && d.whatsapp.replace(/\D/g, '').length < 10) campos['whatsapp'] = 'Escribí el número con código de área, por ejemplo 11 5555 1234.';
+    if (Object.keys(campos).length) throw new ErrorDeFormulario(campos);
+
+    const textos = JSON.parse(JSON.stringify(d)) as Prisma.InputJsonValue;
+    // Algunos datos también viven en columnas propias porque los usan otras partes de la API.
+    const columnas = {
+      direccion: d.direccion,
+      horarioReunion: d.reunion,
+      whatsapp: d.whatsapp || null,
+      canalYoutube: d.youtube || null,
+      datosTransferencia: d.datosTransferencia || null,
+      actualizadoPorId: s.usuario.id,
+    };
+    await this.prisma.configuracion.upsert({
+      where: { id: 1 },
+      update: { textos, ...columnas },
+      create: { id: 1, textos, ...columnas },
+    });
+    this.contenido.cambio();
+    return this.ver();
+  }
+}
