@@ -1,0 +1,79 @@
+---
+// Árbol del hero. Cada hoja tiene nervaduras recortadas en negro, brota al
+// cargar la página y después se mece despacio, cada una a su ritmo.
+interface Props {
+  class?: string;
+}
+const { class: clase } = Astro.props;
+
+const HOJA = 'M0 -24 A72 72 0 0 1 0 -112 A72 72 0 0 1 0 -24 Z';
+// Nervadura central y tres pares laterales, de la base a la punta.
+const NERVADURAS = 'M0 -30 V-104 M0 -48 L-7 -58 M0 -48 L7 -58 M0 -66 L-9 -77 M0 -66 L9 -77 M0 -84 L-6 -93 M0 -84 L6 -93';
+
+const hojas = [-78, -52, -26, 0, 26, 52, 78].map((giro, i) => ({
+  giro,
+  // Duraciones distintas para que no se muevan todas al mismo tiempo.
+  duracion: [6.2, 5.4, 6.8, 5.8, 6.5, 5.2, 7][i],
+  retraso: i * 0.08,
+}));
+---
+
+<svg aria-hidden="true" viewBox="-120 -130 240 190" class:list={['arbol', clase]}>
+  <rect x="-16" y="-16" width="32" height="76" rx="16" fill="#ffffff"></rect>
+  {
+    hojas.map((h) => (
+      <g transform={`rotate(${h.giro})`}>
+        <g class="brote" style={`animation-delay: ${h.retraso}s`}>
+          <g class="hoja" style={`animation-duration: ${h.duracion}s; animation-delay: ${-h.duracion * h.retraso * 4}s`}>
+            <path d={HOJA} fill="#ffffff" />
+            <path d={NERVADURAS} fill="none" stroke="#000000" stroke-width="2.6" stroke-linecap="round" />
+          </g>
+        </g>
+      </g>
+    ))
+  }
+</svg>
+
+<style>
+  .brote,
+  .hoja {
+    transform-box: fill-box;
+    /* La base de la hoja, donde se une al tronco. */
+    transform-origin: 50% 100%;
+  }
+
+  .brote {
+    animation: brotar 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+
+  .hoja {
+    animation: mecer ease-in-out infinite alternate;
+  }
+
+  @keyframes brotar {
+    from {
+      transform: scale(0.2);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes mecer {
+    from {
+      transform: rotate(-2.5deg);
+    }
+    to {
+      transform: rotate(2.5deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .brote,
+    .hoja {
+      animation: none;
+    }
+  }
+</style>
