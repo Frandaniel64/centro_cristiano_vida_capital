@@ -2,12 +2,16 @@
 import ContadorEnVivo from '../components/ContadorEnVivo.astro';
 import CuentaRegresiva from '../components/CuentaRegresiva.astro';
 import Foto from '../components/Foto.astro';
+import OcultarPasados from '../components/OcultarPasados.astro';
 import Pared from '../components/Pared.astro';
+import TarjetaEvento from '../components/TarjetaEvento.astro';
 import Base from '../layouts/Base.astro';
-import { config, estadoProTemploInicial as pt, fotos, ministerios, predicas, primeraVez } from '../data/sitio';
+import { config, estadoProTemploInicial as pt, eventos, fotos, ministerios, predicas, primeraVez } from '../data/sitio';
+import { proximosEventos } from '../lib/eventos';
 import { fechaLarga, usd } from '../lib/formato';
 
 const ultimaPredica = predicas[0];
+const destacados = proximosEventos(eventos.filter((e) => e.destacado)).slice(0, 3);
 const flecha = 'M5 12h14M13 6l6 6-6 6';
 
 const jsonLd = {
@@ -174,6 +178,22 @@ const jsonLd = {
     </div>
   </section>
 
+  {
+    destacados.length > 0 && (
+      <section class="linea">
+        <div class="wrap flex flex-col gap-10 py-30">
+          <div class="flex flex-wrap items-end justify-between gap-4">
+            <h2 class="d h2">Próximos <span class="text-amarillo">eventos</span></h2>
+            <a href="/eventos" class="btn b-borde">Ver todos los eventos</a>
+          </div>
+          <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,340px),1fr))] gap-3">
+            {destacados.map((o) => <TarjetaEvento evento={o.evento} inicio={o.inicio} fin={o.fin} />)}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
   <section class="linea">
     <div class="wrap flex flex-wrap items-center gap-10 py-30">
       <div class="flex min-w-0 flex-[1_1_420px] flex-col gap-[22px]">
@@ -207,4 +227,5 @@ const jsonLd = {
   </section>
 
   <ContadorEnVivo />
+  <OcultarPasados />
 </Base>

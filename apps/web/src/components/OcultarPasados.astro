@@ -1,0 +1,15 @@
+---
+// Las páginas se generan al compilar: este script esconde los eventos que ya
+// terminaron sin esperar a la próxima compilación.
+---
+
+<script>
+  const ahora = Date.now();
+  document.querySelectorAll<HTMLElement>('[data-fin]').forEach((el) => {
+    if (Number(el.dataset.fin) < ahora) el.hidden = true;
+  });
+  document.querySelectorAll<HTMLElement>('[data-sin-eventos]').forEach((vacio) => {
+    const lista = document.querySelector(vacio.dataset.sinEventos!);
+    if (lista && !lista.querySelector('article:not([hidden])')) vacio.hidden = false;
+  });
+</script>

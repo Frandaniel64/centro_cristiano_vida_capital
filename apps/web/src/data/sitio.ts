@@ -137,7 +137,7 @@ export const ministerios: Ministerio[] = [
     slug: 'bautismo',
     nombre: 'Bautismo',
     edad: 'Para quienes decidieron seguir a Jesús',
-    horario: 'Próximo: domingo 14 de diciembre',
+    horario: 'Próximo: domingo 13 de diciembre',
     corto: 'Una decisión puede cambiar tu historia.',
     texto:
       'El bautismo es una forma de contar en público que decidiste seguir a Jesús. Antes hacemos un encuentro para responder tus preguntas y acompañarte en este paso.',
@@ -267,10 +267,78 @@ export const visita = {
   intereses: ['Kids Vida', 'Jóvenes', 'Matrimonios', 'Bautismo', 'Pro Templo'],
 };
 
+// Equivale a la colección "eventos". Horarios en Buenos Aires (UTC-3).
+export interface Evento {
+  slug: string;
+  titulo: string;
+  inicio: string; // ISO con zona horaria
+  fin: string;
+  repeticion: 'ninguna' | 'semanal' | 'mensual';
+  lugar: string;
+  resumen: string;
+  descripcion: string[];
+  ministerio?: string; // slug de un ministerio
+  foto: Foto;
+  destacado: boolean;
+  linkInscripcion?: string;
+}
+
+export const eventos: Evento[] = [
+  {
+    slug: 'encuentro-de-matrimonios-noviembre',
+    titulo: 'Encuentro de matrimonios',
+    inicio: '2026-11-29T12:00:00-03:00',
+    fin: '2026-11-29T15:00:00-03:00',
+    repeticion: 'ninguna',
+    lugar: 'Camarones 2201, CABA',
+    resumen: 'Una charla para parejas y un almuerzo compartido después de la reunión.',
+    descripcion: [
+      'Después de la reunión del domingo nos quedamos a almorzar juntos y a charlar sobre cómo cuidar el matrimonio en lo cotidiano.',
+      'Pueden venir parejas de novios y matrimonios, sean o no de la iglesia. Los chicos quedan en Kids Vida.',
+    ],
+    ministerio: 'matrimonios',
+    foto: { src: matrimonio, alt: 'Una pareja abrazada sonriendo' },
+    destacado: true,
+  },
+  {
+    slug: 'bautismo-diciembre',
+    titulo: 'Bautismo de fin de año',
+    inicio: '2026-12-13T10:00:00-03:00',
+    fin: '2026-12-13T13:00:00-03:00',
+    repeticion: 'ninguna',
+    lugar: 'Camarones 2201, CABA',
+    resumen: 'Celebramos juntos a quienes decidieron seguir a Jesús.',
+    descripcion: [
+      'Durante la reunión del domingo celebramos los bautismos del año. Podés invitar a tu familia y a tus amigos.',
+      'Si te querés bautizar, antes hacemos un encuentro de preparación para responder tus preguntas y acompañarte en este paso.',
+    ],
+    ministerio: 'bautismo',
+    foto: { src: bautismo, alt: 'Personas celebrando un bautismo en el agua' },
+    destacado: true,
+    linkInscripcion: '/visitanos',
+  },
+  {
+    slug: 'jovenes-sabados',
+    titulo: 'Encuentro de Jóvenes',
+    inicio: '2026-10-31T19:00:00-03:00',
+    fin: '2026-10-31T21:30:00-03:00',
+    repeticion: 'semanal',
+    lugar: 'Camarones 2201, CABA',
+    resumen: 'Música, charla sin vueltas y algo rico para comer. De 15 a 30 años.',
+    descripcion: [
+      'Nos juntamos a cantar, charlar sobre la vida y la fe, y comer algo rico. Si llegás sin conocer a nadie, en una hora ya tenés amigos.',
+    ],
+    ministerio: 'jovenes',
+    foto: { src: jovenes, alt: 'Jóvenes riendo al aire libre' },
+    destacado: true,
+  },
+];
+
 export const nav = [
   { href: '/', label: 'Inicio' },
   { href: '/nosotros', label: 'Nosotros' },
   { href: '/ministerios', label: 'Ministerios' },
+  { href: '/eventos', label: 'Eventos' },
   { href: '/pro-templo', label: 'Pro Templo' },
   { href: '/en-vivo', label: 'En vivo' },
 ];

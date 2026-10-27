@@ -5,7 +5,7 @@
 
 <script>
   import type { EstadoProTemplo } from '@ccvida/shared';
-  import { API_URL } from '../lib/api';
+  import { API_URL, DEMO } from '../lib/api';
   import { usd } from '../lib/formato';
   import { colorAporte, descripcionPared, fondosLadrillos } from '../lib/pared';
 
@@ -69,7 +69,7 @@
     }
   }
 
-  if (document.querySelector('[data-pt]')) {
+  if (!DEMO && document.querySelector('[data-pt]')) {
     actualizar();
     setInterval(actualizar, INTERVALO_MS);
     document.addEventListener('visibilitychange', () => {

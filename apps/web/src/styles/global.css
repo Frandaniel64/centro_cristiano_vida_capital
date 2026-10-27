@@ -283,13 +283,16 @@
   }
 }
 
-@media (max-width: 860px) {
+@media (max-width: 1024px) {
   .nav-links {
     display: none;
   }
   .menu-btn {
     display: inline-flex;
   }
+}
+
+@media (max-width: 860px) {
   .cta-movil {
     display: flex;
     position: sticky;
