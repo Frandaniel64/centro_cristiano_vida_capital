@@ -20,6 +20,9 @@ COPY --from=build /repo/apps/api/package.json /repo/apps/api/prisma.config.ts ap
 COPY --from=build /repo/apps/api/prisma apps/api/prisma
 COPY --from=build /repo/apps/api/dist apps/api/dist
 WORKDIR /repo/apps/api
+# Carpeta de las fotos cuando no hay R2. Se crea a nombre de `node` para que un
+# volumen montado acá herede el dueño y la API pueda escribir.
+RUN mkdir -p /repo/apps/api/medios && chown node:node /repo/apps/api/medios
 USER node
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
