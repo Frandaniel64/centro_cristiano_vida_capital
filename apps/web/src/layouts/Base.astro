@@ -1,0 +1,67 @@
+---
+import '../styles/global.css';
+import { getImage } from 'astro:assets';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { config, fotos } from '../data/sitio';
+import { DEMO as demo } from '../lib/api';
+
+interface Props {
+  titulo: string;
+  descripcion: string;
+  imagen?: ImageMetadata;
+  // Datos estructurados (schema.org) propios de la página.
+  jsonLd?: Record<string, unknown>;
+}
+
+const { titulo, descripcion, imagen = fotos.alabanza.src, jsonLd } = Astro.props;
+const tituloCompleto = Astro.url.pathname === '/' ? `${config.nombreCorto} · ${config.lema}` : `${titulo} · ${config.nombreCorto}`;
+const canonica = new URL(Astro.url.pathname, Astro.site);
+const og = await getImage({ src: imagen, width: 1200, height: 630, fit: 'cover', format: 'jpg' });
+const ogUrl = new URL(og.src, Astro.site);
+---
+
+<!doctype html>
+<html lang="es-AR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{tituloCompleto}</title>
+    <meta name="description" content={descripcion} />
+    <link rel="canonical" href={canonica} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta name="theme-color" content="#000000" />
+    {demo && <meta name="robots" content="noindex, nofollow" />}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_AR" />
+    <meta property="og:site_name" content={config.nombreCorto} />
+    <meta property="og:title" content={tituloCompleto} />
+    <meta property="og:description" content={descripcion} />
+    <meta property="og:url" content={canonica} />
+    <meta property="og:image" content={ogUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+  </head>
+  <body>
+    {
+      demo && (
+        <p class="m-0 bg-amarillo px-4 py-2 text-center text-sm font-bold text-black">
+          Versión de muestra: los textos, fotos y montos son de ejemplo y los formularios no guardan datos.
+        </p>
+      )
+    }
+    <Header />
+    <main>
+      <slot />
+    </main>
+    <a href="/visitanos" class="cta-movil btn b-verde mx-4 mb-4 min-h-14 w-[calc(100%-32px)] shadow-[0_8px_24px_rgba(0,0,0,.5)]">
+      Planeá tu visita
+    </a>
+    <Footer />
+  </body>
+</html>

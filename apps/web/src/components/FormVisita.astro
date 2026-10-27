@@ -1,0 +1,134 @@
+---
+import { visita } from '../data/sitio';
+import AntiSpam from './AntiSpam.astro';
+
+const pill = 'opcion inline-flex min-h-11 items-center rounded-full px-5 text-[15px] font-bold has-[:checked]:bg-texto has-[:checked]:text-black';
+const errorClase = 'm-0 text-sm font-semibold text-error';
+---
+
+<div class="min-w-0 flex-[1_1_480px] rounded-[28px] border border-linea bg-panel p-[clamp(24px,4vw,40px)]">
+  <div data-visita-ok hidden role="status" tabindex="-1" class="claro flex flex-col gap-3.5 rounded-[20px] bg-verde-hoja p-8 text-black outline-none">
+    <p class="d text-4xl leading-[1.05]">¡Gracias, <span data-ok="nombre"></span>!</p>
+    <p class="m-0 text-[17px]" data-ok="mensaje"></p>
+    <button type="button" data-cambiar class="min-h-11 cursor-pointer self-start border-0 bg-transparent p-0 font-extrabold text-black underline">Cambiar mis datos</button>
+  </div>
+
+  <form id="form-visita" novalidate class="flex flex-col gap-[18px]">
+    <h2 class="d h3">Avisanos que venís</h2>
+    <p class="muted m-0 text-sm">Los campos con * son obligatorios.</p>
+
+    <div class="flex flex-col gap-1.5">
+      <label for="visita-nombre" class="text-[15px] font-semibold">Tu nombre *</label>
+      <input id="visita-nombre" name="nombre" type="text" autocomplete="name" placeholder="Nombre y apellido" class="campo" aria-describedby="error-visita-nombre" />
+      <p id="error-visita-nombre" data-error="nombre" class={errorClase} hidden></p>
+    </div>
+
+    <fieldset class="m-0 flex flex-col gap-2.5 border-0 p-0">
+      <legend class="mb-2.5 p-0 text-[15px] font-semibold">¿Cómo te escribimos? *</legend>
+      <div class="inline-flex gap-1 self-start rounded-full border border-borde-control p-1">
+        <label class={pill}><input type="radio" name="contactoTipo" value="whatsapp" checked />WhatsApp</label>
+        <label class={pill}><input type="radio" name="contactoTipo" value="email" />Email</label>
+      </div>
+      <label for="visita-contacto" class="text-[15px] font-semibold" data-etiqueta-contacto>Tu WhatsApp *</label>
+      <input id="visita-contacto" name="contacto" type="tel" inputmode="tel" autocomplete="tel" placeholder="11 5555 1234" class="campo" aria-describedby="error-visita-contacto" />
+      <p id="error-visita-contacto" data-error="contacto" class={errorClase} hidden></p>
+    </fieldset>
+
+    <fieldset class="m-0 border-0 p-0">
+      <legend class="mb-2.5 p-0 text-[15px] font-semibold">¿Qué te interesa? <span class="muted font-medium">(opcional)</span></legend>
+      <div class="flex flex-wrap gap-2">
+        {
+          visita.intereses.map((i) => (
+            <label class="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full border-[1.5px] border-borde-control px-4 text-[15px] font-semibold">
+              <input type="checkbox" name="intereses" value={i} class="size-[18px] accent-verde-hoja" />
+              {i}
+            </label>
+          ))
+        }
+      </div>
+    </fieldset>
+
+    <AntiSpam />
+
+    <div class="flex flex-col gap-1.5">
+      <label class="flex cursor-pointer items-start gap-2.5 text-[15px]">
+        <input type="checkbox" name="aceptaPrivacidad" class="mt-1 size-[18px] shrink-0 accent-verde-hoja" aria-describedby="error-visita-privacidad" />
+        <span>Acepto la <a href="/privacidad">política de privacidad</a>. *</span>
+      </label>
+      <p id="error-visita-privacidad" data-error="aceptaPrivacidad" class={errorClase} hidden></p>
+    </div>
+
+    <p data-error="general" role="alert" class={errorClase} hidden></p>
+
+    <button type="submit" class="btn b-verde min-h-15 self-start text-[17px]">Enviar mis datos</button>
+  </form>
+</div>
+
+<script>
+  import type { CrearVisita } from '@ccvida/shared';
+  import { ErrorDeApi, enviar } from '../lib/api';
+  import { conectarContacto, enfocarPrimerError, limpiarErrores, mostrarError, valorDe } from '../lib/formularios';
+  import { errorContacto } from '../lib/validar';
+
+  const form = document.querySelector<HTMLFormElement>('#form-visita');
+  const ok = document.querySelector<HTMLElement>('[data-visita-ok]');
+
+  if (form && ok) {
+    const boton = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    conectarContacto(form);
+
+    const validar = () => {
+      limpiarErrores(form);
+      if (!valorDe(form, 'nombre').trim()) mostrarError(form, 'nombre', 'Escribí tu nombre para que sepamos a quién recibir.');
+      const tipo = valorDe(form, 'contactoTipo') as 'whatsapp' | 'email';
+      mostrarError(form, 'contacto', errorContacto(tipo, valorDe(form, 'contacto')));
+      if (!form.querySelector<HTMLInputElement>('input[name="aceptaPrivacidad"]')!.checked) {
+        mostrarError(form, 'aceptaPrivacidad', 'Para guardar tus datos necesitamos que aceptes la política de privacidad.');
+      }
+      return !form.querySelector('[aria-invalid="true"]');
+    };
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!validar()) {
+        enfocarPrimerError(form);
+        return;
+      }
+      const tipo = valorDe(form, 'contactoTipo') as 'whatsapp' | 'email';
+      const datos: CrearVisita = {
+        nombre: valorDe(form, 'nombre').trim(),
+        contactoTipo: tipo,
+        contacto: valorDe(form, 'contacto').trim(),
+        intereses: [...form.querySelectorAll<HTMLInputElement>('input[name="intereses"]:checked')].map((i) => i.value),
+        aceptaPrivacidad: true,
+        turnstileToken: valorDe(form, 'cf-turnstile-response') || undefined,
+        sitioWeb: valorDe(form, 'sitioWeb') || undefined,
+      };
+
+      boton.disabled = true;
+      try {
+        await enviar('/api/visitas', datos);
+        ok.querySelector('[data-ok="nombre"]')!.textContent = datos.nombre.split(' ')[0];
+        ok.querySelector('[data-ok="mensaje"]')!.textContent =
+          `Te escribimos por ${tipo === 'whatsapp' ? 'WhatsApp' : 'email'} antes del domingo. Nos vemos a las 10 en Camarones 2201.`;
+        form.hidden = true;
+        ok.hidden = false;
+        ok.focus();
+      } catch (err) {
+        if (err instanceof ErrorDeApi) {
+          Object.entries(err.campos).forEach(([campo, msg]) => mostrarError(form, campo, msg));
+          mostrarError(form, 'general', err.message);
+        }
+        enfocarPrimerError(form);
+      } finally {
+        boton.disabled = false;
+      }
+    });
+
+    ok.querySelector('[data-cambiar]')!.addEventListener('click', () => {
+      ok.hidden = true;
+      form.hidden = false;
+      form.querySelector<HTMLInputElement>('input[name="nombre"]')?.focus();
+    });
+  }
+</script>

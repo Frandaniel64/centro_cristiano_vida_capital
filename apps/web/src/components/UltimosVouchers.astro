@@ -1,0 +1,27 @@
+---
+import type { EstadoProTemplo } from '@ccvida/shared';
+import { usd } from '../lib/formato';
+import { colorAporte } from '../lib/pared';
+
+interface Props {
+  vouchers: EstadoProTemplo['ultimosVouchers'];
+}
+const { vouchers } = Astro.props;
+---
+
+<div class="flex flex-col gap-2.5 border-t border-linea pt-5" data-pt="ultimos-bloque" hidden={vouchers.length === 0}>
+  <p class="m-0 text-sm font-bold">Últimos vouchers</p>
+  <ul class="m-0 flex list-none flex-col gap-2.5 p-0" data-pt="ultimos">
+    {
+      vouchers.map((v) => (
+        <li class="flex items-center justify-between gap-3 text-[15px]">
+          <span class="inline-flex items-center gap-2.5">
+            <span class="size-2.5 rounded-[3px]" style={`background: ${colorAporte(v.montoUsd)}`} />
+            {v.nombre}
+          </span>
+          {v.montoUsd !== null && <span class="font-extrabold tabular-nums">USD {usd(v.montoUsd)}</span>}
+        </li>
+      ))
+    }
+  </ul>
+</div>

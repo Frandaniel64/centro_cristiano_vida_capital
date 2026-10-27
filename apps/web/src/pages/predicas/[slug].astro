@@ -1,0 +1,89 @@
+---
+import Foto from '../../components/Foto.astro';
+import TarjetaPredica from '../../components/TarjetaPredica.astro';
+import Base from '../../layouts/Base.astro';
+import { predicas, type Predica } from '../../data/sitio';
+import { fechaLarga } from '../../lib/formato';
+
+export function getStaticPaths() {
+  return predicas.map((predica) => ({ params: { slug: predica.slug }, props: { predica } }));
+}
+
+interface Props {
+  predica: Predica;
+}
+const { predica: p } = Astro.props;
+const deLaSerie = predicas.filter((o) => o.serie === p.serie && o.slug !== p.slug).slice(0, 3);
+
+// Acepta links de YouTube (watch?v=, youtu.be/, /live/) y devuelve el id del video.
+const idYoutube = p.urlVideo.match(/(?:v=|youtu\.be\/|\/live\/|\/embed\/)([\w-]{11})/)?.[1];
+---
+
+<Base titulo={p.titulo} descripcion={p.resumen} imagen={p.foto.src}>
+  <article class="wrap flex flex-col gap-8 pt-8 pb-24">
+    <a href="/en-vivo" class="self-start text-sm font-bold">← Todas las prédicas</a>
+    <header class="flex flex-col gap-4">
+      <p class="m-0 text-sm font-bold text-verde-hoja">{p.serie}</p>
+      <h1 class="d h2">{p.titulo}</h1>
+      <p class="muted m-0">{fechaLarga(p.fecha)} · {p.predicador} · {p.duracion}</p>
+    </header>
+
+    <div class="relative aspect-video overflow-hidden rounded-3xl border border-linea bg-panel" data-video>
+      <Foto foto={p.foto} sizes="(max-width: 1408px) 100vw, 1360px" class="absolute inset-0" prioridad />
+      {
+        idYoutube ? (
+          <button type="button" class="btn b-blanco absolute top-1/2 left-1/2 size-26 -translate-1/2 p-0" aria-label={`Reproducir ${p.titulo}`} data-youtube={idYoutube}>
+            <svg aria-hidden="true" width="36" height="36" viewBox="0 0 24 24" fill="#000000"><path d="M8 5l11 7-11 7z" /></svg>
+          </button>
+        ) : (
+          p.urlVideo && (
+            <a href={p.urlVideo} class="btn b-blanco absolute bottom-5 left-5">
+              Ver la prédica
+            </a>
+          )
+        )
+      }
+    </div>
+
+    <div class="flex flex-wrap gap-12">
+      <p class="lead flex-[2_1_480px]">{p.resumen}</p>
+      {
+        p.versiculos.length > 0 && (
+          <div class="flex-[1_1_280px]">
+            <h2 class="m-0 mb-2 text-sm font-bold">Versículos</h2>
+            <ul class="m-0 flex list-none flex-col gap-2 p-0">
+              {p.versiculos.map((v) => (
+                <li class="self-start rounded-lg bg-amarillo px-3 py-1 font-semibold text-black">{v}</li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+    </div>
+  </article>
+
+  {
+    deLaSerie.length > 0 && (
+      <section class="linea">
+        <div class="wrap flex flex-col gap-8 py-24">
+          <h2 class="d h3">Más de “{p.serie}”</h2>
+          <div class="grid grid-cols-[repeat(auto-fill,minmax(min(100%,360px),1fr))] gap-x-5 gap-y-8">
+            {deLaSerie.map((o) => <TarjetaPredica predica={o} />)}
+          </div>
+        </div>
+      </section>
+    )
+  }
+</Base>
+
+<script>
+  const play = document.querySelector<HTMLButtonElement>('[data-youtube]');
+  play?.addEventListener('click', () => {
+    const iframe = document.createElement('iframe');
+    iframe.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(play.dataset.youtube!)}?autoplay=1`;
+    iframe.title = 'Video de la prédica';
+    iframe.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+    iframe.className = 'absolute inset-0 size-full border-0';
+    play.closest('[data-video]')?.replaceChildren(iframe);
+  });
+</script>

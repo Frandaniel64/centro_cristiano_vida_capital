@@ -1,0 +1,111 @@
+---
+import CuentaRegresiva from '../components/CuentaRegresiva.astro';
+import Foto from '../components/Foto.astro';
+import TarjetaPredica from '../components/TarjetaPredica.astro';
+import Base from '../layouts/Base.astro';
+import { config, fotos, predicas, series } from '../data/sitio';
+
+const canalId = config.youtube.canalId;
+const redes = [
+  { red: 'YouTube', nombre: config.youtube.nombre, url: config.youtube.url },
+  { red: 'Facebook', nombre: config.facebook.nombre, url: config.facebook.url },
+  { red: 'Instagram', nombre: config.instagram.usuario, url: config.instagram.url },
+];
+const pill =
+  'inline-flex min-h-11 cursor-pointer items-center rounded-full border-[1.5px] border-borde-control bg-transparent px-[18px] text-sm font-bold text-texto aria-pressed:border-texto aria-pressed:bg-texto aria-pressed:text-black';
+---
+
+<Base titulo="En vivo y prédicas" descripcion="Mirá la reunión en vivo cada domingo a las 10 h y el archivo de prédicas por serie." imagen={fotos.transmision.src}>
+  <section class="wrap flex flex-col gap-8 pt-14 pb-24">
+    <div class="flex flex-wrap items-end justify-between gap-6">
+      <div class="flex flex-[1_1_560px] flex-col gap-4">
+        <span data-solo-en-vivo hidden class="chip self-start bg-rojo-vivo text-white"><span class="size-2 rounded-full bg-white"></span>EN VIVO AHORA</span>
+        <h1 class="d h1 text-[clamp(54px,9vw,140px)]">En vivo cada domingo</h1>
+      </div>
+      <CuentaRegresiva />
+    </div>
+
+    <div class="relative aspect-video overflow-hidden rounded-3xl border border-linea bg-panel" data-reproductor>
+      <Foto foto={fotos.transmision} sizes="(max-width: 1408px) 100vw, 1360px" class="absolute inset-0" prioridad />
+      <div class="absolute inset-0 bg-black/50"></div>
+      <span data-solo-en-vivo hidden class="chip absolute top-5 left-5 rounded-lg bg-rojo-vivo text-white">EN VIVO</span>
+      {
+        canalId && (
+          <button type="button" class="btn b-blanco absolute top-1/2 left-1/2 size-26 -translate-1/2 p-0" aria-label="Reproducir la transmisión" data-reproducir={canalId}>
+            <svg aria-hidden="true" width="36" height="36" viewBox="0 0 24 24" fill="#000000"><path d="M8 5l11 7-11 7z" /></svg>
+          </button>
+        )
+      }
+      <p class="absolute bottom-5 left-6 m-0 font-semibold">
+        <span data-solo-en-vivo hidden>Transmisión en vivo desde {config.direccion}</span>
+        <span data-solo-sin-vivo>La transmisión arranca el domingo a las 10 h</span>
+      </p>
+    </div>
+
+    <div class="flex flex-wrap border-y border-linea">
+      {
+        redes.map((r) =>
+          r.url ? (
+            <a href={r.url} class="dato">
+              <span class="muted block text-[13px]">{r.red}</span>
+              <span class="text-lg font-bold">{r.nombre}</span>
+            </a>
+          ) : (
+            <div class="dato">
+              <span class="muted block text-[13px]">{r.red}</span>
+              <span class="text-lg font-bold">{r.nombre}</span>
+            </div>
+          ),
+        )
+      }
+    </div>
+  </section>
+
+  <section class="linea">
+    <div class="wrap flex flex-col gap-8 pt-24 pb-30">
+      <div class="flex flex-wrap items-end justify-between gap-5">
+        <h2 class="d h2">Prédicas</h2>
+        <div role="group" aria-label="Filtrar por serie" class="flex flex-wrap gap-2" data-filtro-series hidden>
+          {
+            ['Todas', ...series].map((s, i) => (
+              <button type="button" class={pill} aria-pressed={i === 0 ? 'true' : 'false'} data-serie={s}>
+                {s}
+              </button>
+            ))
+          }
+        </div>
+      </div>
+      <div class="grid grid-cols-[repeat(auto-fill,minmax(min(100%,360px),1fr))] gap-x-5 gap-y-8" data-lista-predicas>
+        {predicas.map((p) => <TarjetaPredica predica={p} />)}
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  // Filtro por serie: sin JavaScript se ven todas las prédicas.
+  const filtro = document.querySelector<HTMLElement>('[data-filtro-series]');
+  const tarjetas = document.querySelectorAll<HTMLElement>('[data-lista-predicas] > article');
+  if (filtro) {
+    filtro.hidden = false;
+    const botones = filtro.querySelectorAll<HTMLButtonElement>('button');
+    botones.forEach((b) =>
+      b.addEventListener('click', () => {
+        const serie = b.dataset.serie;
+        botones.forEach((o) => o.setAttribute('aria-pressed', String(o === b)));
+        tarjetas.forEach((t) => (t.hidden = serie !== 'Todas' && t.dataset.serie !== serie));
+      }),
+    );
+  }
+
+  // El reproductor de YouTube se carga recién al tocar Play, para no pesar en la página.
+  const play = document.querySelector<HTMLButtonElement>('[data-reproducir]');
+  play?.addEventListener('click', () => {
+    const iframe = document.createElement('iframe');
+    iframe.src = `https://www.youtube-nocookie.com/embed/live_stream?channel=${encodeURIComponent(play.dataset.reproducir!)}&autoplay=1`;
+    iframe.title = 'Transmisión en vivo de CCVida Capital';
+    iframe.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+    iframe.className = 'absolute inset-0 size-full border-0';
+    play.closest('[data-reproductor]')?.replaceChildren(iframe);
+  });
+</script>

@@ -1,0 +1,31 @@
+---
+import type { Ministerio } from '../data/sitio';
+import Foto from './Foto.astro';
+
+interface Props {
+  ministerio: Ministerio;
+  invertido?: boolean;
+  // En la ficha propia el nombre es el h1 de la página.
+  nivel?: 'h1' | 'h2';
+}
+const { ministerio: m, invertido = false, nivel = 'h2' } = Astro.props;
+const Titulo = nivel;
+---
+
+<article class="linea" id={m.slug}>
+  <div class:list={['wrap flex flex-wrap items-center gap-12 py-18', invertido && 'flex-row-reverse']}>
+    <div class="h-[460px] min-w-0 flex-[1_1_460px] overflow-hidden rounded-3xl" style={`background: ${m.color}`}>
+      <Foto foto={m.foto} sizes="(max-width: 860px) 100vw, 50vw" prioridad={nivel === 'h1'} />
+    </div>
+    <div class="flex min-w-0 flex-[1_1_440px] flex-col gap-[18px]">
+      <span class="chip self-start" style={`background: ${m.color}; color: ${m.colorTexto}`}>{m.edad}</span>
+      <Titulo class="d h2">{m.nombre}</Titulo>
+      <p class="lead muted">{m.texto}</p>
+      <ul class="m-0 flex list-none flex-col border-t border-linea p-0">
+        {m.actividades.map((a) => <li class="border-b border-linea py-3">{a}</li>)}
+      </ul>
+      <p class="m-0 font-bold text-amarillo">{m.horario}</p>
+      <a href="/visitanos" class="btn b-verde self-start">Quiero sumarme</a>
+    </div>
+  </div>
+</article>

@@ -1,0 +1,16 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base titulo="Página no encontrada" descripcion="Esta página no existe.">
+  <section class="wrap flex flex-col items-start gap-8 pt-14 pb-30">
+    <h1 class="d h1">Acá no <span class="text-amarillo">hay nada.</span></h1>
+    <p class="lead muted max-w-[560px] border-t border-linea pt-6">
+      La página que buscás no existe o cambió de lugar. Pero el domingo a las 10 seguro estamos.
+    </p>
+    <div class="flex flex-wrap gap-2.5">
+      <a href="/" class="btn b-verde">Ir al inicio</a>
+      <a href="/visitanos" class="btn b-borde">Planeá tu visita</a>
+    </div>
+  </section>
+</Base>

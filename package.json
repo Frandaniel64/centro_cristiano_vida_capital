@@ -1,0 +1,28 @@
+{
+  "name": "ccvida-capital",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev:api": "npm run start:dev -w @ccvida/api",
+    "dev:web": "npm run dev -w @ccvida/web",
+    "dev:admin": "npm run start -w @ccvida/admin",
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test -w @ccvida/api"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true,
+    "@parcel/watcher": false,
+    "lmdb": false,
+    "msgpackr-extract": false,
+    "prisma@7.10.1": true,
+    "@prisma/engines@7.10.1": true,
+    "workerd@1.20261019.1": true,
+    "workerd@1.20261023.1": true
+  }
+}

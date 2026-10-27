@@ -1,0 +1,28 @@
+---
+import { Image } from 'astro:assets';
+import type { Foto } from '../data/sitio';
+
+interface Props {
+  foto: Foto;
+  // Ancho que ocupa en pantalla, para que el navegador elija el tamaño justo.
+  sizes: string;
+  // Solo las fotos del primer pantallazo cargan de inmediato.
+  prioridad?: boolean;
+  class?: string;
+}
+
+const { foto, sizes, prioridad = false, class: clase } = Astro.props;
+const anchos = [400, 640, 960, 1280, 1600].filter((w) => w <= foto.src.width);
+---
+
+<Image
+  src={foto.src}
+  alt={foto.alt}
+  widths={anchos.length ? anchos : [foto.src.width]}
+  sizes={sizes}
+  format="webp"
+  quality={70}
+  loading={prioridad ? 'eager' : 'lazy'}
+  fetchpriority={prioridad ? 'high' : 'auto'}
+  class:list={['foto', clase]}
+/>

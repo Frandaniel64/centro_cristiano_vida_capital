@@ -1,0 +1,36 @@
+---
+import MinisterioArticulo from '../../components/MinisterioArticulo.astro';
+import Base from '../../layouts/Base.astro';
+import { ministerios, type Ministerio } from '../../data/sitio';
+
+export function getStaticPaths() {
+  return ministerios.map((ministerio) => ({ params: { slug: ministerio.slug }, props: { ministerio } }));
+}
+
+interface Props {
+  ministerio: Ministerio;
+}
+const { ministerio } = Astro.props;
+const otros = ministerios.filter((m) => m.slug !== ministerio.slug);
+---
+
+<Base titulo={ministerio.nombre} descripcion={`${ministerio.corto} ${ministerio.horario}.`} imagen={ministerio.foto.src}>
+  <nav aria-label="Ruta" class="wrap pt-8">
+    <a href="/ministerios" class="text-sm font-bold">← Todos los ministerios</a>
+  </nav>
+  <MinisterioArticulo ministerio={ministerio} nivel="h1" />
+  <section class="linea">
+    <div class="wrap flex flex-col gap-6 py-18">
+      <h2 class="d h3">Otros ministerios</h2>
+      <ul class="m-0 flex list-none flex-wrap gap-2 p-0">
+        {
+          otros.map((m) => (
+            <li>
+              <a href={`/ministerios/${m.slug}`} class="btn b-borde">{m.nombre}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+</Base>

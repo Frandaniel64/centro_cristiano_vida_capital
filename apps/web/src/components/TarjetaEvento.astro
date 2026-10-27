@@ -1,0 +1,55 @@
+---
+import type { Evento } from '../data/sitio';
+import { ministerios } from '../data/sitio';
+import { fechaEvento } from '../lib/eventos';
+import Foto from './Foto.astro';
+
+interface Props {
+  evento: Evento;
+  inicio: number;
+  fin: number;
+}
+const { evento: e, inicio, fin } = Astro.props;
+const f = fechaEvento(e, inicio);
+const ministerio = ministerios.find((m) => m.slug === e.ministerio);
+---
+
+<article
+  class="relative flex flex-col overflow-hidden rounded-3xl border border-linea bg-panel"
+  data-fin={e.repeticion === 'ninguna' ? fin : undefined}
+>
+  <div class="relative aspect-[16/10]">
+    <Foto foto={{ ...e.foto, alt: '' }} sizes="(max-width: 860px) 100vw, 33vw" class="absolute inset-0" />
+    {
+      ministerio && (
+        <span class="chip absolute top-4 left-4" style={`background: ${ministerio.color}; color: ${ministerio.colorTexto}`}>
+          {ministerio.nombre}
+        </span>
+      )
+    }
+  </div>
+  <div class="flex grow gap-5 p-6">
+    <div class="flex w-16 flex-none flex-col items-center border-r border-linea pr-5 text-center" aria-hidden="true">
+      {
+        e.repeticion === 'ninguna' ? (
+          <>
+            <span class="d text-5xl leading-none tracking-[-.04em] text-amarillo">{f.dia}</span>
+            <span class="mt-1 text-sm font-bold uppercase">{f.mes}</span>
+          </>
+        ) : (
+          <>
+            <span class="d text-[28px] leading-none text-verde-hoja uppercase">{f.diaCorto}</span>
+            <span class="mt-1 text-sm font-bold">{f.hora}</span>
+          </>
+        )
+      }
+    </div>
+    <div class="flex min-w-0 flex-col gap-1.5">
+      <h3 class="d text-[26px] leading-[1.1] tracking-[-.02em]">
+        <a href={`/eventos/${e.slug}`} class="text-texto no-underline after:absolute after:inset-0 hover:underline">{e.titulo}</a>
+      </h3>
+      <p class="m-0 text-[15px] font-bold first-letter:uppercase">{f.cuando} · {f.hora}</p>
+      <p class="muted m-0 text-[15px]">{e.resumen}</p>
+    </div>
+  </div>
+</article>

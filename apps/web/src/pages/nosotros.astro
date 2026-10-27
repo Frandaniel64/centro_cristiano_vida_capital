@@ -1,0 +1,83 @@
+---
+import Foto from '../components/Foto.astro';
+import Base from '../layouts/Base.astro';
+import { fotos, nosotros } from '../data/sitio';
+---
+
+<Base titulo="Nosotros" descripcion="Somos una iglesia cristiana evangélica en Buenos Aires: una familia que se recibe, se acompaña y comparte la mesa." imagen={fotos.grupoCiudad.src}>
+  <section class="wrap flex flex-col gap-10 pt-14">
+    <h1 class="d h1">Somos <span class="text-verde-hoja">familia</span></h1>
+    <div class="flex flex-wrap justify-between gap-6 border-t border-linea pt-6">
+      <p class="lead muted flex-[0_1_560px]">{nosotros.intro} <span class="text-texto">sos vos.</span></p>
+      <p class="d flex-[0_1_320px] text-[22px] leading-[1.2]">{nosotros.datos}</p>
+    </div>
+    <div class="h-[clamp(280px,40vw,580px)] overflow-hidden rounded-3xl">
+      <Foto foto={fotos.grupoCiudad} sizes="(max-width: 1408px) 100vw, 1360px" prioridad />
+    </div>
+  </section>
+
+  <section class="wrap flex flex-wrap items-center gap-14 py-30">
+    <div class="flex min-w-0 flex-[1_1_480px] flex-col gap-5">
+      <h2 class="d h2">Nuestra historia</h2>
+      <p class="lead muted">{nosotros.historia[0]}</p>
+      <p class="lead muted">{nosotros.historia[1]} <span class="text-texto">{nosotros.historiaDestacado}</span></p>
+    </div>
+    <div class="h-[440px] min-w-0 flex-[1_1_420px] overflow-hidden rounded-3xl">
+      <Foto foto={fotos.amigosMesa} sizes="(max-width: 860px) 100vw, 50vw" />
+    </div>
+  </section>
+
+  <section class="linea">
+    <div class="wrap flex flex-col gap-10 py-30">
+      <h2 class="d h2">Lo que nos mueve</h2>
+      <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,260px),1fr))] gap-3">
+        {
+          nosotros.pilares.map((p) => (
+            <div class="flex min-h-[300px] flex-col justify-end gap-2.5 rounded-3xl border border-linea p-7" style={`background: ${p.bg}; color: ${p.fg}`}>
+              <h3 class="d h3 text-[34px]">{p.titulo}</h3>
+              <p class="m-0">{p.texto}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="claro bg-amarillo text-black">
+    <div class="wrap flex flex-wrap-reverse items-center gap-14 py-30">
+      <div class="h-[480px] min-w-0 flex-[1_1_380px] overflow-hidden rounded-[999px_999px_24px_24px] bg-black">
+        <Foto foto={fotos.pastor} sizes="(max-width: 860px) 100vw, 45vw" />
+      </div>
+      <div class="flex min-w-0 flex-[1_1_480px] flex-col gap-5">
+        <h2 class="d h2">Nuestros pastores</h2>
+        <p class="d text-[30px] leading-[1.15]">{nosotros.pastores.nombres}</p>
+        <p class="lead">{nosotros.pastores.texto}</p>
+        <p class="d text-[26px] leading-[1.2] font-bold">{nosotros.pastores.cita}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap flex flex-wrap gap-12 py-30">
+    <h2 class="d h2 flex-[1_1_360px]">Lo que creemos</h2>
+    <div class="grid flex-[2_1_560px] grid-cols-[repeat(auto-fit,minmax(min(100%,260px),1fr))] gap-x-10 gap-y-7">
+      {
+        nosotros.creemos.map((c) => (
+          <div class="border-t-2 border-texto pt-4">
+            <h3 class="d mb-1.5 text-2xl leading-[1.2]">{c.titulo}</h3>
+            <p class="muted m-0">{c.texto}</p>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <section aria-label="Galería" class="wrap grid auto-rows-[260px] grid-cols-[repeat(auto-fit,minmax(min(100%,240px),1fr))] gap-3 pb-30">
+    {
+      nosotros.galeria.map((f) => (
+        <div class="overflow-hidden rounded-3xl">
+          <Foto foto={f} sizes="(max-width: 860px) 100vw, 25vw" />
+        </div>
+      ))
+    }
+  </section>
+</Base>
