@@ -1,0 +1,15 @@
+---
+import MinisterioArticulo from '../../components/MinisterioArticulo.astro';
+import Base from '../../layouts/Base.astro';
+import { fotos, ministerios } from '../../data/sitio';
+---
+
+<Base titulo="Ministerios" descripcion="Kids Vida, Jóvenes, Matrimonios y Bautismo: hay un lugar para cada etapa de la vida." imagen={fotos.kidsVida.src}>
+  <section class="wrap flex flex-col gap-8 pt-14 pb-18">
+    <h1 class="d h1">Crecemos <span class="text-azul-link">juntos</span></h1>
+    <p class="lead muted max-w-[560px] border-t border-linea pt-6">
+      Hay un lugar para cada etapa de la vida. Encontrá el tuyo y sumate cuando quieras: no hace falta anotarse para venir la primera vez.
+    </p>
+  </section>
+  {ministerios.map((m, i) => <MinisterioArticulo ministerio={m} invertido={i % 2 === 1} />)}
+</Base>

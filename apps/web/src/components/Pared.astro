@@ -1,0 +1,20 @@
+---
+import type { EstadoProTemplo } from '@ccvida/shared';
+import { usd } from '../lib/formato';
+import { descripcionPared, fondosLadrillos } from '../lib/pared';
+
+interface Props {
+  estado: EstadoProTemplo;
+}
+const { estado } = Astro.props;
+const fondos = fondosLadrillos(estado.recaudadoUsd, estado.metaUsd);
+---
+
+<div
+  role="img"
+  data-pt="pared"
+  class="pared"
+  aria-label={descripcionPared(estado.ladrillos, usd(estado.recaudadoUsd), usd(estado.metaUsd), estado.porcentaje)}
+>
+  {fondos.map((fondo) => <span class="ladrillo" style={`background: ${fondo}`} />)}
+</div>

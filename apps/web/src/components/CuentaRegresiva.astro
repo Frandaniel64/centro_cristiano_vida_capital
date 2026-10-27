@@ -1,0 +1,49 @@
+---
+import { cuentaRegresiva } from '../lib/envivo';
+
+const c = cuentaRegresiva();
+const celdas = [
+  { campo: 'dias', etiqueta: 'días', valor: String(c.dias) },
+  { campo: 'horas', etiqueta: 'horas', valor: String(c.horas).padStart(2, '0') },
+  { campo: 'min', etiqueta: 'min', valor: String(c.min).padStart(2, '0') },
+  { campo: 'seg', etiqueta: 'seg', valor: String(c.seg).padStart(2, '0') },
+];
+---
+
+<div data-cuenta data-solo-sin-vivo class="flex items-end tabular-nums">
+  <p class="sr-only">Próxima transmisión: domingo a las 10 h.</p>
+  {
+    celdas.map((celda, i) => (
+      <div class:list={['px-3.5 sm:px-4', i === 0 ? 'pl-0 sm:pl-0' : 'border-l border-linea']} aria-hidden="true">
+        <p
+          class:list={['d text-[clamp(40px,5vw,72px)] leading-[.9]', celda.campo === 'seg' && 'text-verde-hoja']}
+          data-c={celda.campo}
+        >
+          {celda.valor}
+        </p>
+        <p class="muted mt-1.5 mb-0 text-[13px]">{celda.etiqueta}</p>
+      </div>
+    ))
+  }
+</div>
+
+<script>
+  import { cuentaRegresiva, estaEnVivo } from '../lib/envivo';
+
+  const dos = (n: number) => String(n).padStart(2, '0');
+
+  // Muestra u oculta lo que depende de la transmisión y mueve la cuenta regresiva.
+  function tic() {
+    const vivo = estaEnVivo();
+    document.querySelectorAll<HTMLElement>('[data-solo-sin-vivo]').forEach((el) => (el.hidden = vivo));
+    document.querySelectorAll<HTMLElement>('[data-solo-en-vivo]').forEach((el) => (el.hidden = !vivo));
+    const c = cuentaRegresiva();
+    const valores: Record<string, string> = { dias: String(c.dias), horas: dos(c.horas), min: dos(c.min), seg: dos(c.seg) };
+    document.querySelectorAll<HTMLElement>('[data-cuenta] [data-c]').forEach((el) => {
+      el.textContent = valores[el.dataset.c!];
+    });
+  }
+
+  tic();
+  setInterval(tic, 1000);
+</script>

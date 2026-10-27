@@ -1,0 +1,54 @@
+---
+// BORRADOR: el spec pide revisarlo con alguien de confianza en temas legales
+// antes del lanzamiento (Ley 25.326 de Protección de Datos Personales).
+import Base from '../layouts/Base.astro';
+import { config } from '../data/sitio';
+
+const secciones = [
+  {
+    titulo: 'Qué datos guardamos',
+    texto: [
+      'Cuando pedís un voucher de Pro Templo: tu nombre y apellido, tu WhatsApp o email, el monto, la forma de pago, cómo querés aparecer en la web y el mensaje, si dejaste uno.',
+      'Cuando nos avisás que venís: tu nombre, tu WhatsApp o email y lo que te interesa.',
+    ],
+  },
+  {
+    titulo: 'Para qué los usamos',
+    texto: [
+      'Para registrar tu voucher, avisarte cómo pagarlo y confirmarte cuando lo recibimos, y para recibirte el domingo si nos avisaste que venías. No los usamos para otra cosa ni los vendemos. Solo los procesan los servicios que usamos para guardarlos y enviar los emails.',
+    ],
+  },
+  {
+    titulo: 'Quién los ve',
+    texto: [
+      'Solo las personas del equipo que los necesitan: tesorería ve los datos de los vouchers y recepción, los de las visitas.',
+      'En la web nunca mostramos tu nombre real si no lo elegiste. Si elegiste “Anónimo”, aparecés como “Alguien de la familia”.',
+    ],
+  },
+  {
+    titulo: 'Tus derechos',
+    texto: [
+      'Podés pedirnos ver, corregir o borrar tus datos cuando quieras, escribiéndonos por WhatsApp. Te respondemos dentro de los plazos de la Ley 25.326 de Protección de Datos Personales.',
+      'La Agencia de Acceso a la Información Pública es el órgano de control de esa ley y recibe denuncias y reclamos sobre el uso de datos personales.',
+    ],
+  },
+];
+---
+
+<Base titulo="Política de privacidad" descripcion="Qué datos guarda CCVida Capital cuando completás un formulario y para qué los usa.">
+  <section class="wrap flex max-w-[860px] flex-col gap-10 pt-14 pb-30">
+    <h1 class="d h2">Política de privacidad</h1>
+    {
+      secciones.map((s) => (
+        <div class="flex flex-col gap-3 border-t border-linea pt-6">
+          <h2 class="d text-2xl">{s.titulo}</h2>
+          {s.texto.map((t) => <p class="muted m-0">{t}</p>)}
+        </div>
+      ))
+    }
+    <p class="m-0 border-t border-linea pt-6">
+      {config.nombre} · {config.direccion}, {config.barrio} ·
+      <a href={`https://wa.me/${config.whatsapp.numero}`}>WhatsApp {config.whatsapp.visible}</a>
+    </p>
+  </section>
+</Base>

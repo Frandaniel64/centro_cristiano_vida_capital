@@ -1,0 +1,79 @@
+---
+// Actualiza los datos de Pro Templo de la página consultando la API cada 15 s.
+// Cada dato que cambia se marca con data-pt="<campo>" en cualquier parte de la página.
+---
+
+<script>
+  import type { EstadoProTemplo } from '@ccvida/shared';
+  import { API_URL } from '../lib/api';
+  import { usd } from '../lib/formato';
+  import { colorAporte, descripcionPared, fondosLadrillos } from '../lib/pared';
+
+  const INTERVALO_MS = 15_000;
+  let ladrillosPrevios: number | null = null;
+
+  const campos = (nombre: string) => document.querySelectorAll<HTMLElement>(`[data-pt="${nombre}"]`);
+  const texto = (nombre: string, valor: string | number) =>
+    campos(nombre).forEach((el) => (el.textContent = String(valor)));
+
+  function filaVoucher(v: EstadoProTemplo['ultimosVouchers'][number]) {
+    const li = document.createElement('li');
+    li.className = 'flex items-center justify-between gap-3 text-[15px]';
+    const nombre = document.createElement('span');
+    nombre.className = 'inline-flex items-center gap-2.5';
+    const marca = document.createElement('span');
+    marca.className = 'size-2.5 rounded-[3px]';
+    marca.style.background = colorAporte(v.montoUsd);
+    nombre.append(marca, v.nombre);
+    li.append(nombre);
+    if (v.montoUsd !== null) {
+      const monto = document.createElement('span');
+      monto.className = 'font-extrabold tabular-nums';
+      monto.textContent = `USD ${usd(v.montoUsd)}`;
+      li.append(monto);
+    }
+    return li;
+  }
+
+  function pintar(e: EstadoProTemplo) {
+    texto('recaudado', usd(e.recaudadoUsd));
+    texto('meta', usd(e.metaUsd));
+    texto('falta', usd(Math.max(0, e.metaUsd - e.recaudadoUsd)));
+    texto('porcentaje', e.porcentaje);
+    texto('ladrillos', e.ladrillos);
+    texto('personas', e.personas);
+    texto('valor-ladrillo', usd(e.metaUsd / 100));
+
+    const fondos = fondosLadrillos(e.recaudadoUsd, e.metaUsd);
+    const subieron = ladrillosPrevios !== null && e.ladrillos > ladrillosPrevios;
+    campos('pared').forEach((pared) => {
+      pared.setAttribute('aria-label', descripcionPared(e.ladrillos, usd(e.recaudadoUsd), usd(e.metaUsd), e.porcentaje));
+      pared.querySelectorAll<HTMLElement>('.ladrillo').forEach((l, i) => {
+        l.style.background = fondos[i];
+        l.classList.toggle('nuevo', subieron && i === e.ladrillos - 1);
+      });
+    });
+    ladrillosPrevios = e.ladrillos;
+
+    campos('ultimos-bloque').forEach((el) => (el.hidden = e.ultimosVouchers.length === 0));
+    campos('ultimos').forEach((lista) => lista.replaceChildren(...e.ultimosVouchers.map(filaVoucher)));
+  }
+
+  async function actualizar() {
+    if (document.hidden) return;
+    try {
+      const res = await fetch(`${API_URL}/api/pro-templo/estado`);
+      if (res.ok) pintar((await res.json()) as EstadoProTemplo);
+    } catch {
+      // Sin conexión con la API: queda lo último que se mostró.
+    }
+  }
+
+  if (document.querySelector('[data-pt]')) {
+    actualizar();
+    setInterval(actualizar, INTERVALO_MS);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) actualizar();
+    });
+  }
+</script>

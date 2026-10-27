@@ -1,0 +1,17 @@
+---
+// Cloudflare Turnstile (solo si hay clave configurada) y un campo trampa que
+// las personas no ven. La API rechaza el envío si el campo trampa llega con valor.
+const claveTurnstile = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
+---
+
+<div aria-hidden="true" class="absolute -left-[9999px] h-px w-px overflow-hidden">
+  <label>No completar este campo <input type="text" name="sitioWeb" tabindex="-1" autocomplete="off" /></label>
+</div>
+{
+  claveTurnstile && (
+    <>
+      <div class="cf-turnstile" data-sitekey={claveTurnstile} data-appearance="interaction-only" data-language="es" />
+      <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer />
+    </>
+  )
+}

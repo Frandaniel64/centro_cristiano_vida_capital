@@ -1,0 +1,247 @@
+---
+import type { FormaPago } from '@ccvida/shared';
+import { proTemplo } from '../data/sitio';
+import AntiSpam from './AntiSpam.astro';
+
+const MONTO_INICIAL = 20;
+const formasPago: Record<FormaPago, { titulo: string; texto: string }> = {
+  efectivo: { titulo: 'Efectivo en la mesa Pro Templo', texto: 'El domingo después de la reunión, con tu número.' },
+  transferencia: { titulo: 'Transferencia en dólares', texto: 'Te mostramos los datos bancarios al terminar.' },
+  mercadopago: { titulo: 'Mercado Pago en pesos', texto: 'Al tipo de cambio que fija la iglesia.' },
+};
+const radioPill =
+  'opcion inline-flex min-h-11 items-center rounded-full border-2 border-black px-4 text-[15px] font-bold has-[:checked]:bg-black has-[:checked]:text-amarillo';
+const errorClase = 'm-0 text-sm font-bold text-[#7a1a10]';
+---
+
+<div class="claro flex flex-[2_1_380px] min-w-0 flex-col gap-[18px] rounded-[28px] bg-amarillo p-[clamp(24px,3.5vw,40px)] text-black">
+  <form id="form-voucher" novalidate class="flex flex-col gap-[18px]" data-maximo={proTemplo.montoMaximoUsd}>
+    <div>
+      <h2 class="d text-[38px] leading-none tracking-[-.02em]">Tu voucher, tu ladrillo</h2>
+      <p class="mt-1.5 mb-0">Desde USD 1 hasta lo que el corazón te diga.</p>
+    </div>
+
+    <fieldset class="m-0 border-0 p-0">
+      <legend class="sr-only">Monto del voucher</legend>
+      <div class="grid grid-cols-3 gap-2">
+        {
+          proTemplo.montosSugeridos.map((m) => (
+            <label class="opcion flex min-h-14 cursor-pointer items-center justify-center rounded-2xl border-2 border-black text-lg font-extrabold has-[:checked]:bg-black has-[:checked]:text-amarillo">
+              <input type="radio" name="monto" value={m} checked={m === MONTO_INICIAL} />
+              USD {m}
+            </label>
+          ))
+        }
+      </div>
+    </fieldset>
+
+    <div class="flex flex-col gap-1.5">
+      <label for="otro-monto" class="text-sm font-bold">Otro monto en dólares</label>
+      <input id="otro-monto" name="otroMonto" type="number" min="1" max={proTemplo.montoMaximoUsd} step="1" inputmode="numeric" placeholder="Ej.: 250" class="campo" aria-describedby="error-otro-monto" />
+      <p id="error-otro-monto" data-error="otroMonto" class={errorClase} hidden></p>
+    </div>
+
+    <div aria-hidden="true" class="relative flex items-center justify-between gap-4 overflow-hidden rounded-[18px] bg-black px-6 py-5 text-texto">
+      <span class="absolute top-1/2 -left-3 -mt-3 size-6 rounded-full bg-amarillo"></span>
+      <span class="absolute top-1/2 -right-3 -mt-3 size-6 rounded-full bg-amarillo"></span>
+      <span>
+        <span class="block text-xs font-bold tracking-[.08em] text-verde-hoja">VOUCHER PRO TEMPLO</span>
+        <span class="d block text-[42px] leading-none text-amarillo">USD <span data-v="monto">{MONTO_INICIAL}</span></span>
+      </span>
+      <span class="muted border-l-[1.5px] border-dashed border-borde-control pl-4 text-right text-[13px]">
+        Nº ····<br /><span data-v="ladrillos">parte de un ladrillo</span>
+      </span>
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <label for="voucher-nombre" class="text-[15px] font-bold">Nombre y apellido *</label>
+      <input id="voucher-nombre" name="nombre" type="text" autocomplete="name" class="campo" aria-describedby="ayuda-voucher-nombre error-voucher-nombre" />
+      <p id="ayuda-voucher-nombre" class="m-0 text-sm">Solo lo ve tesorería.</p>
+      <p id="error-voucher-nombre" data-error="nombre" class={errorClase} hidden></p>
+    </div>
+
+    <fieldset class="m-0 flex flex-col gap-2.5 border-0 p-0">
+      <legend class="mb-2.5 p-0 text-[15px] font-bold">¿Cómo querés aparecer en la web?</legend>
+      <div class="flex flex-wrap gap-2">
+        <label class={radioPill}><input type="radio" name="mostrarComo" value="anonimo" checked />Anónimo</label>
+        <label class={radioPill}><input type="radio" name="mostrarComo" value="nombre" />Mi nombre</label>
+        <label class={radioPill}><input type="radio" name="mostrarComo" value="apodo" />Un apodo o familia</label>
+      </div>
+      <div data-apodo hidden class="flex flex-col gap-1.5">
+        <label for="voucher-apodo" class="text-sm font-bold">Apodo o familia *</label>
+        <input id="voucher-apodo" name="apodo" type="text" maxlength="60" placeholder="Ej.: Familia Gómez" class="campo" aria-describedby="ayuda-apodo error-apodo" />
+        <p id="ayuda-apodo" class="m-0 text-sm">Lo revisamos antes de mostrarlo.</p>
+        <p id="error-apodo" data-error="apodo" class={errorClase} hidden></p>
+      </div>
+    </fieldset>
+
+    <fieldset class="m-0 flex flex-col gap-2.5 border-0 p-0">
+      <legend class="mb-2.5 p-0 text-[15px] font-bold">¿Cómo te avisamos? *</legend>
+      <div class="inline-flex gap-1 self-start rounded-full border-2 border-black p-1">
+        <label class="opcion inline-flex min-h-11 items-center rounded-full px-5 text-[15px] font-bold has-[:checked]:bg-black has-[:checked]:text-amarillo"><input type="radio" name="contactoTipo" value="whatsapp" checked />WhatsApp</label>
+        <label class="opcion inline-flex min-h-11 items-center rounded-full px-5 text-[15px] font-bold has-[:checked]:bg-black has-[:checked]:text-amarillo"><input type="radio" name="contactoTipo" value="email" />Email</label>
+      </div>
+      <label for="voucher-contacto" class="text-[15px] font-bold" data-etiqueta-contacto>Tu WhatsApp *</label>
+      <input id="voucher-contacto" name="contacto" type="tel" inputmode="tel" autocomplete="tel" placeholder="11 5555 1234" class="campo" aria-describedby="error-voucher-contacto" />
+      <p id="error-voucher-contacto" data-error="contacto" class={errorClase} hidden></p>
+    </fieldset>
+
+    <fieldset class="m-0 flex flex-col gap-2 border-0 p-0">
+      <legend class="mb-2.5 p-0 text-[15px] font-bold">¿Cómo lo vas a pagar? *</legend>
+      {
+        proTemplo.formasPago.map((f, i) => (
+          <label class="opcion flex cursor-pointer flex-col rounded-2xl border-2 border-black px-[18px] py-3 has-[:checked]:bg-black has-[:checked]:text-amarillo">
+            <input type="radio" name="formaPago" value={f} checked={i === 0} />
+            <span class="font-bold">{formasPago[f].titulo}</span>
+            <span class="text-sm">{formasPago[f].texto}</span>
+          </label>
+        ))
+      }
+    </fieldset>
+
+    <div class="flex flex-col gap-1.5">
+      <label for="voucher-mensaje" class="text-[15px] font-bold">Mensaje <span class="font-medium">(opcional)</span></label>
+      <textarea id="voucher-mensaje" name="mensaje" maxlength="500" class="campo"></textarea>
+    </div>
+
+    <AntiSpam />
+
+    <div class="flex flex-col gap-1.5">
+      <label class="flex cursor-pointer items-start gap-2.5 text-[15px]">
+        <input type="checkbox" name="aceptaPrivacidad" class="mt-1 size-[18px] shrink-0 accent-black" aria-describedby="error-voucher-privacidad" />
+        <span>Acepto la <a href="/privacidad" class="font-bold text-black">política de privacidad</a>. *</span>
+      </label>
+      <p id="error-voucher-privacidad" data-error="aceptaPrivacidad" class={errorClase} hidden></p>
+    </div>
+
+    <p data-error="general" role="alert" class={errorClase} hidden></p>
+
+    <button type="submit" class="btn b-negro min-h-15 text-lg text-amarillo">
+      <span>Quiero mi voucher de USD <span data-v="monto">{MONTO_INICIAL}</span></span>
+    </button>
+    <p class="m-0 text-[13px]">Tu voucher suma a la pared cuando tesorería confirma el pago.</p>
+  </form>
+
+  <div data-voucher-ok hidden role="status" tabindex="-1" class="flex flex-col gap-3.5 outline-none">
+    <span class="inline-flex size-14 items-center justify-center rounded-full bg-black">
+      <svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#f5d547" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"></path></svg>
+    </span>
+    <p class="d text-[32px] leading-[1.05]">¡Gracias! Tu voucher Nº <span data-ok="numero"></span> de USD <span data-ok="monto"></span> quedó registrado.</p>
+    <p class="m-0">Está <strong>pendiente de pago</strong>. Suma a la pared cuando tesorería lo confirme.</p>
+    <p class="m-0 rounded-2xl bg-black px-5 py-4 whitespace-pre-line text-texto" data-ok="instrucciones"></p>
+    <p class="m-0 text-sm">Guardá tu número: lo vas a necesitar para pagar.</p>
+    <button type="button" data-otro-voucher class="min-h-11 cursor-pointer self-start border-0 bg-transparent p-0 font-extrabold text-black underline">Dar otro voucher</button>
+  </div>
+</div>
+
+<script>
+  import type { CrearVoucher, FormaPago, MostrarComo, VoucherCreado } from '@ccvida/shared';
+  import { ErrorDeApi, enviar } from '../lib/api';
+  import { numeroVoucher, usd } from '../lib/formato';
+  import { conectarContacto, enfocarPrimerError, limpiarErrores, mostrarError, valorDe } from '../lib/formularios';
+  import { errorContacto } from '../lib/validar';
+
+  const form = document.querySelector<HTMLFormElement>('#form-voucher');
+  const ok = document.querySelector<HTMLElement>('[data-voucher-ok]');
+
+  if (form && ok) {
+    const maximo = Number(form.dataset.maximo);
+    const otro = form.querySelector<HTMLInputElement>('input[name="otroMonto"]')!;
+    const radiosMonto = form.querySelectorAll<HTMLInputElement>('input[name="monto"]');
+    const apodo = form.querySelector<HTMLElement>('[data-apodo]')!;
+    const boton = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+
+    const monto = () => (otro.value ? Number(otro.value) : Number(valorDe(form, 'monto')));
+
+    const actualizarVista = () => {
+      const m = monto();
+      const valido = Number.isInteger(m) && m >= 1;
+      form.querySelectorAll('[data-v="monto"]').forEach((el) => (el.textContent = valido ? usd(m) : '–'));
+      const ladrillos = Math.floor(m / 100);
+      form.querySelector('[data-v="ladrillos"]')!.textContent =
+        !valido || ladrillos === 0 ? 'parte de un ladrillo' : `${ladrillos} ${ladrillos === 1 ? 'ladrillo' : 'ladrillos'}`;
+    };
+
+    radiosMonto.forEach((r) =>
+      r.addEventListener('change', () => {
+        otro.value = '';
+        mostrarError(form, 'otroMonto', '');
+        actualizarVista();
+      }),
+    );
+    otro.addEventListener('input', () => {
+      if (otro.value) radiosMonto.forEach((r) => (r.checked = false));
+      actualizarVista();
+    });
+    form.querySelectorAll<HTMLInputElement>('input[name="mostrarComo"]').forEach((r) =>
+      r.addEventListener('change', () => (apodo.hidden = r.value !== 'apodo' || !r.checked)),
+    );
+    conectarContacto(form);
+
+    const validar = () => {
+      limpiarErrores(form);
+      const m = monto();
+      if (!Number.isInteger(m) || m < 1) mostrarError(form, 'otroMonto', 'Elegí un monto o escribí uno en dólares, sin centavos.');
+      else if (m > maximo) mostrarError(form, 'otroMonto', `El monto máximo por voucher es USD ${usd(maximo)}.`);
+      if (!valorDe(form, 'nombre').trim()) mostrarError(form, 'nombre', 'Escribí tu nombre y apellido.');
+      if (valorDe(form, 'mostrarComo') === 'apodo' && !valorDe(form, 'apodo').trim()) {
+        mostrarError(form, 'apodo', 'Escribí cómo querés aparecer.');
+      }
+      const tipo = valorDe(form, 'contactoTipo') as 'whatsapp' | 'email';
+      mostrarError(form, 'contacto', errorContacto(tipo, valorDe(form, 'contacto')));
+      const acepta = form.querySelector<HTMLInputElement>('input[name="aceptaPrivacidad"]')!.checked;
+      if (!acepta) mostrarError(form, 'aceptaPrivacidad', 'Para registrar tu voucher necesitamos que aceptes la política de privacidad.');
+      return !form.querySelector('[aria-invalid="true"]');
+    };
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!validar()) {
+        enfocarPrimerError(form);
+        return;
+      }
+      const mostrarComo = valorDe(form, 'mostrarComo') as MostrarComo;
+      const datos: CrearVoucher = {
+        montoUsd: monto(),
+        nombre: valorDe(form, 'nombre').trim(),
+        mostrarComo,
+        apodo: mostrarComo === 'apodo' ? valorDe(form, 'apodo').trim() : undefined,
+        contactoTipo: valorDe(form, 'contactoTipo') as 'whatsapp' | 'email',
+        contacto: valorDe(form, 'contacto').trim(),
+        formaPago: valorDe(form, 'formaPago') as FormaPago,
+        mensaje: valorDe(form, 'mensaje').trim() || undefined,
+        aceptaPrivacidad: true,
+        turnstileToken: valorDe(form, 'cf-turnstile-response') || undefined,
+        sitioWeb: valorDe(form, 'sitioWeb') || undefined,
+      };
+
+      boton.disabled = true;
+      try {
+        const v = await enviar<VoucherCreado>('/api/vouchers', datos);
+        ok.querySelector('[data-ok="numero"]')!.textContent = numeroVoucher(v.numero);
+        ok.querySelector('[data-ok="monto"]')!.textContent = usd(v.montoUsd);
+        ok.querySelector('[data-ok="instrucciones"]')!.textContent = v.instrucciones;
+        form.hidden = true;
+        ok.hidden = false;
+        ok.focus();
+      } catch (err) {
+        if (err instanceof ErrorDeApi) {
+          Object.entries(err.campos).forEach(([campo, msg]) => mostrarError(form, campo, msg));
+          mostrarError(form, 'general', err.message);
+        }
+        enfocarPrimerError(form);
+      } finally {
+        boton.disabled = false;
+      }
+    });
+
+    ok.querySelector('[data-otro-voucher]')!.addEventListener('click', () => {
+      form.reset();
+      apodo.hidden = true;
+      actualizarVista();
+      ok.hidden = true;
+      form.hidden = false;
+      form.querySelector<HTMLInputElement>('input[name="monto"]:checked')?.focus();
+    });
+  }
+</script>

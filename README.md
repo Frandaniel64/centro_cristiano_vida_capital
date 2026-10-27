@@ -18,6 +18,7 @@ Requiere Node 24 o superior.
 ```bash
 npm install
 cp apps/api/.env.example apps/api/.env
+cp apps/web/.env.example apps/web/.env
 docker compose up -d                       # Postgres de desarrollo en el puerto 5434
 npm run db:migrate -w @ccvida/api          # aplica las migraciones
 npm run db:seed -w @ccvida/api             # campaña Pro Templo y configuración

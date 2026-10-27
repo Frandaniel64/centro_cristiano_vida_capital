@@ -1,0 +1,25 @@
+---
+import type { Predica } from '../data/sitio';
+import { fechaLarga } from '../lib/formato';
+import Foto from './Foto.astro';
+
+interface Props {
+  predica: Predica;
+}
+const { predica: p } = Astro.props;
+---
+
+<article class="relative flex flex-col gap-4" data-serie={p.serie}>
+  <div class="relative aspect-[16/10] overflow-hidden rounded-[20px] bg-panel">
+    <Foto foto={p.foto} sizes="(max-width: 860px) 100vw, 33vw" class="absolute inset-0" />
+    <span class="chip absolute right-3.5 bottom-3.5 bg-black text-texto">{p.duracion}</span>
+  </div>
+  <div class="flex flex-col gap-1.5">
+    <p class="m-0 text-sm font-bold text-verde-hoja">{p.serie}</p>
+    <h3 class="d text-[28px] leading-[1.1] tracking-[-.02em]">
+      <a href={`/predicas/${p.slug}`} class="text-texto no-underline after:absolute after:inset-0 hover:underline">{p.titulo}</a>
+    </h3>
+    <p class="muted m-0">{p.resumen}</p>
+    <p class="muted mt-1 mb-0 text-sm">{fechaLarga(p.fecha)} · {p.predicador}</p>
+  </div>
+</article>

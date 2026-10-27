@@ -1,0 +1,20 @@
+---
+interface Props {
+  preguntas: { q: string; a: string }[];
+}
+const { preguntas } = Astro.props;
+---
+
+{
+  preguntas.map((f) => (
+    <details class="border-t border-linea">
+      <summary class="flex min-h-[68px] items-center justify-between gap-4 text-lg font-bold">
+        {f.q}
+        <svg class="mas shrink-0" aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f5f5f0" stroke-width="2" stroke-linecap="round">
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+      </summary>
+      <p class="muted mt-0 mb-[22px]">{f.a}</p>
+    </details>
+  ))
+}

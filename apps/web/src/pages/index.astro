@@ -1,16 +1,210 @@
 ---
-import '../styles/global.css';
+import ContadorEnVivo from '../components/ContadorEnVivo.astro';
+import CuentaRegresiva from '../components/CuentaRegresiva.astro';
+import Foto from '../components/Foto.astro';
+import Pared from '../components/Pared.astro';
+import Base from '../layouts/Base.astro';
+import { config, estadoProTemploInicial as pt, fotos, ministerios, predicas, primeraVez } from '../data/sitio';
+import { fechaLarga, usd } from '../lib/formato';
+
+const ultimaPredica = predicas[0];
+const flecha = 'M5 12h14M13 6l6 6-6 6';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Church',
+  name: config.nombre,
+  url: Astro.site?.href,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: config.direccion,
+    addressLocality: 'Ciudad Autónoma de Buenos Aires',
+    addressCountry: 'AR',
+  },
+  sameAs: [config.instagram.url, config.youtube.url, config.facebook.url].filter(Boolean),
+  event: {
+    '@type': 'Event',
+    name: 'Reunión del domingo',
+    eventSchedule: { '@type': 'Schedule', byDay: 'https://schema.org/Sunday', startTime: '10:00', scheduleTimezone: 'America/Argentina/Buenos_Aires' },
+    location: { '@type': 'Place', name: config.nombre, address: `${config.direccion}, ${config.barrio}` },
+  },
+};
 ---
 
-<html lang="es">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<title>CCVida Capital</title>
-	</head>
-	<body>
-		<h1 class="font-titulo text-6xl font-extrabold text-verde-hoja">CCVida Capital</h1>
-	</body>
-</html>
+<Base
+  titulo="Inicio"
+  descripcion={`Iglesia cristiana en Buenos Aires. Nos reunimos los domingos a las 10 h en ${config.direccion}, ${config.barrio}. Vení como estés.`}
+  jsonLd={jsonLd}
+>
+  <section class="wrap pt-14">
+    <div class="flex flex-wrap items-end gap-8">
+      <h1 class="d h1 min-w-0 flex-[1_1_640px]">La iglesia sos <span class="text-verde-hoja">vos.</span></h1>
+      <svg aria-hidden="true" viewBox="-120 -130 240 190" class="h-auto w-[280px] max-w-full flex-[0_1_280px]">
+        <rect x="-16" y="-16" width="32" height="76" rx="16" fill="#ffffff"></rect>
+        {[-78, -52, -26, 0, 26, 52, 78].map((g) => <path fill="#ffffff" transform={`rotate(${g})`} d="M0 -24 A72 72 0 0 1 0 -112 A72 72 0 0 1 0 -24 Z" />)}
+      </svg>
+    </div>
+
+    <div class="mt-12 flex flex-wrap border-y border-linea">
+      <div class="dato"><p class="muted m-0 text-[13px]">Reunión</p><p class="mt-0.5 mb-0 text-xl font-bold">{config.reunion}</p></div>
+      <div class="dato"><p class="muted m-0 text-[13px]">Dónde</p><p class="mt-0.5 mb-0 text-xl font-bold">{config.direccion}, {config.barrio}</p></div>
+      <a href="/pro-templo" class="dato">
+        <span class="muted block text-[13px]">Pro Templo</span>
+        <span class="mt-0.5 block text-xl font-bold"><span class="text-amarillo"><span data-pt="porcentaje">{pt.porcentaje}</span>%</span> de la meta</span>
+      </a>
+      <div class="acciones flex flex-[1_1_300px] flex-wrap items-center justify-end gap-2.5 py-4 pl-6">
+        <a href="/visitanos" class="btn b-verde min-h-14">
+          Planeá tu visita
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d={flecha}></path></svg>
+        </a>
+        <a href="/en-vivo" class="btn b-borde min-h-14"><span class="size-2 rounded-full bg-[#e5484d]"></span>En vivo</a>
+      </div>
+    </div>
+    <p class="lead muted mt-8 max-w-[560px] text-xl">
+      Una familia en Buenos Aires que se apoya, ora unida y camina junta en la fe. <span class="text-texto">Vení como estés.</span>
+    </p>
+  </section>
+
+  <section aria-label="Fotos de la comunidad" class="wrap mt-14 flex flex-wrap gap-3">
+    <div class="h-[clamp(300px,38vw,560px)] flex-[3_1_520px] overflow-hidden rounded-3xl">
+      <Foto foto={fotos.alabanza} sizes="(max-width: 860px) 100vw, 70vw" prioridad />
+    </div>
+    <div class="flex flex-[1_1_260px] flex-col gap-3">
+      <div class="flex-[1_1_200px] overflow-hidden rounded-3xl bg-verde-hoja"><Foto foto={fotos.amigas} sizes="(max-width: 860px) 100vw, 30vw" /></div>
+      <div class="flex-[1_1_200px] overflow-hidden rounded-3xl bg-amarillo"><Foto foto={fotos.kidsVida} sizes="(max-width: 860px) 100vw, 30vw" /></div>
+    </div>
+  </section>
+
+  <section class="wrap flex flex-col gap-12 py-30">
+    <h2 class="d h2">¿Primera vez? <span class="text-azul-link">Te esperamos.</span></h2>
+    <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,300px),1fr))] border-t border-l border-linea">
+      <div class="flex flex-col gap-2.5 border-r border-b border-linea p-8">
+        <p class="d text-[56px] leading-[.95] tracking-[-.04em] text-amarillo">10:00</p>
+        <p class="muted m-0">Cantamos juntos, escuchamos una prédica y nos quedamos a charlar. Terminamos cerca de las 11:45.</p>
+      </div>
+      {
+        primeraVez.map((p) => (
+          <div class="flex flex-col gap-2.5 border-r border-b border-linea p-8">
+            <p class="d h3">{p.titulo}</p>
+            <p class="muted m-0">{p.texto}</p>
+          </div>
+        ))
+      }
+      <div class="flex flex-col gap-3.5 border-r border-b border-linea p-8">
+        <p class="d h3">{config.direccion}</p>
+        <p class="muted m-0">{config.barrio} · Colectivos {config.colectivos}</p>
+        <a href="/visitanos#como-llegar" class="inline-flex min-h-11 items-center self-start font-bold no-underline">Cómo llegar</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-azul-vida text-white">
+    <div class="wrap flex flex-wrap items-center gap-12 py-30">
+      <div class="flex min-w-0 flex-[1_1_560px] flex-col gap-7">
+        <h2 class="d text-[clamp(36px,5vw,72px)] leading-[1.02] tracking-[-.035em] text-balance">
+          ¿Qué hace que un lugar sea un hogar? <span class="text-black">Las personas que viven en él.</span>
+        </h2>
+        <p class="lead max-w-[520px]">Con la iglesia pasa exactamente lo mismo. El templo es solo el punto de encuentro: la iglesia somos nosotros.</p>
+        <a href="/nosotros" class="btn b-negro self-start">Conocé nuestra historia</a>
+      </div>
+      <div class="h-[440px] min-w-0 flex-[1_1_360px] overflow-hidden rounded-[999px_999px_24px_24px]">
+        <Foto foto={fotos.abuelaNieta} sizes="(max-width: 860px) 100vw, 40vw" />
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap flex flex-col gap-10 py-30">
+    <div class="flex flex-wrap items-end justify-between gap-x-14 gap-y-5">
+      <h2 class="d text-[clamp(56px,9vw,144px)] leading-[.85] tracking-[-.05em]">Pro <span class="text-amarillo">Templo</span></h2>
+      <p class="lead muted flex-[0_1_440px]">
+        Hoy usamos un teatro solo 3 horas los domingos. Estamos juntando para alquilar <span class="font-bold text-texto">nuestro primer local</span>.
+      </p>
+    </div>
+    <div class="flex flex-wrap gap-3">
+      <div class="flex min-w-0 flex-[3_1_560px] flex-col gap-6 rounded-[28px] border border-linea bg-panel p-[clamp(24px,4vw,44px)]">
+        <div class="flex flex-wrap items-end justify-between gap-4">
+          <p class="d text-[clamp(56px,7.5vw,112px)] leading-[.88] tracking-[-.05em] text-amarillo tabular-nums">USD <span data-pt="recaudado">{usd(pt.recaudadoUsd)}</span></p>
+          <p class="muted m-0 inline-flex items-center gap-2 text-sm font-bold"><span class="pulso size-2.5 rounded-full bg-verde-hoja"></span>En tiempo real</p>
+        </div>
+        <Pared estado={pt} />
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <p class="muted m-0 text-[15px]">
+            de USD <span data-pt="meta">{usd(pt.metaUsd)}</span> · <span data-pt="ladrillos">{pt.ladrillos}</span> de 100 ladrillos ·
+            <strong class="text-texto"><span data-pt="porcentaje">{pt.porcentaje}</span>%</strong>
+          </p>
+          <a href="/pro-templo#voucher" class="btn b-amarillo">Quiero mi voucher</a>
+        </div>
+      </div>
+      <div class="relative min-h-[340px] flex-[2_1_360px] overflow-hidden rounded-[28px]">
+        <Foto foto={fotos.salonVacio} sizes="(max-width: 860px) 100vw, 40vw" class="absolute inset-0" />
+        <span class="chip absolute bottom-[18px] left-[18px] bg-black px-3.5 py-2 text-sm text-texto">Nuestro próximo hogar</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="linea">
+    <div class="wrap flex flex-col gap-10 py-30">
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <h2 class="d h2">Crecemos juntos</h2>
+        <a href="/ministerios" class="btn b-borde">Ver todos los ministerios</a>
+      </div>
+      <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,260px),1fr))] gap-3">
+        {
+          ministerios.map((m) => (
+            <a href={`/ministerios/${m.slug}`} class="fila flex min-h-[420px] flex-col overflow-hidden rounded-3xl no-underline" style={`background: ${m.color}; color: ${m.colorTexto}`}>
+              <span class="block h-[200px] w-full">
+                <Foto foto={{ ...m.foto, alt: '' }} sizes="(max-width: 860px) 100vw, 25vw" />
+              </span>
+              <span class="flex grow flex-col justify-between gap-4 p-6">
+                <span>
+                  <span class="d block text-4xl leading-none tracking-[-.03em]">{m.nombre}</span>
+                  <span class="mt-2 block text-[15px]">{m.corto}</span>
+                </span>
+                <span class="flex items-center justify-between gap-3">
+                  <span class="text-sm font-bold">{m.horario}</span>
+                  <span class="flecha inline-flex size-11 flex-none items-center justify-center rounded-full bg-black">
+                    <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f5f5f0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8" /></svg>
+                  </span>
+                </span>
+              </span>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="linea">
+    <div class="wrap flex flex-wrap items-center gap-10 py-30">
+      <div class="flex min-w-0 flex-[1_1_420px] flex-col gap-[22px]">
+        <span data-solo-en-vivo hidden class="chip self-start bg-rojo-vivo text-white"><span class="size-2 rounded-full bg-white"></span>EN VIVO AHORA</span>
+        <h2 class="d h2">En vivo cada domingo</h2>
+        <CuentaRegresiva />
+        <a href="/en-vivo" class="btn b-blanco self-start">Ir a En vivo y prédicas</a>
+      </div>
+      <a href={`/predicas/${ultimaPredica.slug}`} aria-label={`Ver la última prédica: ${ultimaPredica.titulo}`} class="relative aspect-[16/10] min-w-0 flex-[1_1_520px] overflow-hidden rounded-3xl border border-linea bg-panel">
+        <Foto foto={ultimaPredica.foto} sizes="(max-width: 860px) 100vw, 50vw" class="absolute inset-0" />
+        <span class="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,.92),rgba(0,0,0,.1))]"></span>
+        <span class="absolute top-[42%] left-1/2 inline-flex size-22 -translate-1/2 items-center justify-center rounded-full bg-texto">
+          <svg aria-hidden="true" width="32" height="32" viewBox="0 0 24 24" fill="#000000"><path d="M8 5l11 7-11 7z"></path></svg>
+        </span>
+        <span class="absolute right-6 bottom-[22px] left-6 text-left text-texto">
+          <span class="muted block text-sm">Última prédica · {fechaLarga(ultimaPredica.fecha)}</span>
+          <span class="d block text-[30px] leading-[1.1]">{ultimaPredica.titulo}</span>
+        </span>
+      </a>
+    </div>
+  </section>
+
+  <section class="claro bg-verde-hoja text-black">
+    <div class="wrap flex flex-wrap items-center justify-between gap-8 py-24">
+      <h2 class="d h2 flex-[1_1_560px]">Te esperamos este domingo.</h2>
+      <div class="flex flex-col items-start gap-3.5">
+        <p class="m-0 text-lg font-bold">{config.horaReunion} · {config.direccion}, {config.barrio}</p>
+        <a href="/visitanos" class="btn b-negro min-h-14">Planeá tu visita</a>
+      </div>
+    </div>
+  </section>
+
+  <ContadorEnVivo />
+</Base>

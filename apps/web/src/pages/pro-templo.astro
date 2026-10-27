@@ -1,0 +1,104 @@
+---
+import ContadorEnVivo from '../components/ContadorEnVivo.astro';
+import Faq from '../components/Faq.astro';
+import Foto from '../components/Foto.astro';
+import FormVoucher from '../components/FormVoucher.astro';
+import Pared from '../components/Pared.astro';
+import UltimosVouchers from '../components/UltimosVouchers.astro';
+import Base from '../layouts/Base.astro';
+import { estadoProTemploInicial as pt, fotos, proTemplo } from '../data/sitio';
+import { usd } from '../lib/formato';
+---
+
+<Base
+  titulo="Pro Templo"
+  descripcion={`Estamos juntando USD ${usd(proTemplo.metaUsd)} para alquilar nuestro primer local. Sumá tu voucher y mirá cómo sube la pared en tiempo real.`}
+  imagen={fotos.salonVacio.src}
+>
+  <section class="wrap flex flex-col gap-8 pt-14">
+    <h1 class="d h1">Pro <span class="text-amarillo">Templo</span></h1>
+    <div class="flex flex-wrap justify-between gap-6 border-t border-linea pt-6">
+      <p class="lead muted flex-[0_1_620px]">
+        Hoy nos reunimos en un teatro que podemos usar solo 3 horas los domingos. Queremos alquilar <span class="font-bold text-texto">nuestro primer local</span>: un lugar abierto toda la semana para Kids Vida, jóvenes, matrimonios y para recibirte cuando lo necesites.
+      </p>
+      <p class="muted m-0 inline-flex items-center gap-2 text-sm font-bold">
+        <span class="pulso size-2.5 rounded-full bg-verde-hoja"></span>En tiempo real · <span data-pt="personas">{pt.personas}</span> personas ya dieron
+      </p>
+    </div>
+  </section>
+
+  <section id="voucher" class="wrap flex scroll-mt-6 flex-wrap gap-3 pt-10 pb-24">
+    <div class="flex min-w-0 flex-[3_1_560px] flex-col gap-7 self-start rounded-[28px] border border-linea bg-panel p-[clamp(24px,4vw,48px)] lg:sticky lg:top-6">
+      <div>
+        <p class="d text-[clamp(60px,9vw,136px)] leading-[.86] tracking-[-.05em] text-amarillo tabular-nums">USD <span data-pt="recaudado">{usd(pt.recaudadoUsd)}</span></p>
+        <p class="muted mt-3 mb-0 text-[17px]">de USD <span data-pt="meta">{usd(pt.metaUsd)}</span> · faltan USD <span data-pt="falta">{usd(Math.max(0, pt.metaUsd - pt.recaudadoUsd))}</span></p>
+      </div>
+      <div>
+        <Pared estado={pt} />
+        <div class="muted mt-3.5 flex justify-between gap-3 text-sm tabular-nums">
+          <span><span data-pt="ladrillos">{pt.ladrillos}</span> de 100 ladrillos · cada ladrillo, USD <span data-pt="valor-ladrillo">{usd(pt.metaUsd / 100)}</span></span>
+          <span class="font-extrabold text-texto"><span data-pt="porcentaje">{pt.porcentaje}</span>%</span>
+        </div>
+      </div>
+      <UltimosVouchers vouchers={pt.ultimosVouchers} />
+    </div>
+
+    <FormVoucher />
+  </section>
+
+  <section class="wrap pb-30">
+    <div class="relative h-[clamp(260px,32vw,460px)] overflow-hidden rounded-3xl">
+      <Foto foto={fotos.salonVacio} sizes="(max-width: 1408px) 100vw, 1360px" class="absolute inset-0" />
+      <div class="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,.85),rgba(0,0,0,0)_70%)]"></div>
+      <p class="d absolute bottom-[clamp(24px,4vw,48px)] left-[clamp(24px,4vw,56px)] max-w-[520px] text-[clamp(32px,4vw,56px)] leading-none tracking-[-.03em]">
+        Así empieza nuestro <span class="text-verde-hoja">primer local.</span>
+      </p>
+    </div>
+  </section>
+
+  <section class="linea">
+    <div class="wrap flex flex-col gap-10 py-30">
+      <h2 class="d h2">¿Para qué son los USD {usd(proTemplo.metaUsd)}?</h2>
+      <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,300px),1fr))] gap-3">
+        {
+          proTemplo.destinos.map((d) => (
+            <div class="flex min-h-[260px] flex-col justify-between gap-2.5 rounded-3xl p-8" style={`background: ${d.bg}; color: ${d.fg}`}>
+              <p class="d text-[52px] leading-none tracking-[-.04em]">{d.monto}</p>
+              <div>
+                <h3 class="d mb-1.5 text-[26px] leading-[1.15]">{d.titulo}</h3>
+                <p class="m-0">{d.texto}</p>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="linea">
+    <div class="wrap flex flex-wrap gap-14 py-30">
+      <div class="flex min-w-0 flex-[1_1_420px] flex-col gap-7">
+        <h2 class="d h2">Cómo funciona</h2>
+        <ol class="m-0 flex list-none flex-col border-t border-linea p-0">
+          {
+            proTemplo.pasos.map((p) => (
+              <li class="flex items-start gap-5 border-b border-linea py-[22px]">
+                <span class="d inline-flex size-14 flex-none items-center justify-center rounded-full text-2xl" style={`background: ${p.bg}; color: ${p.fg}`}>{p.n}</span>
+                <span>
+                  <strong class="block text-xl">{p.titulo}</strong>
+                  <span class="muted">{p.texto}</span>
+                </span>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+      <div class="flex min-w-0 flex-[1_1_480px] flex-col">
+        <h2 class="d h3 mb-4">Preguntas frecuentes</h2>
+        <Faq preguntas={proTemplo.faq} />
+      </div>
+    </div>
+  </section>
+
+  <ContadorEnVivo />
+</Base>
