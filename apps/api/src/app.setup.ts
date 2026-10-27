@@ -13,7 +13,7 @@ export function configurarApp(app: NestExpressApplication) {
   if (!config.r2.cuenta) app.useStaticAssets(CARPETA_LOCAL, { prefix: '/medios/', maxAge: '1y', immutable: true });
   app.setGlobalPrefix('api', { exclude: ['health', 'health/ready'] });
   // credentials: el panel manda la cookie de sesión desde su propio origen.
-  app.enableCors({ origin: config.origenes, methods: ['GET', 'POST', 'PATCH', 'DELETE'], credentials: true });
+  app.enableCors({ origin: config.origenes, methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], credentials: true });
   app.useGlobalPipes(pipeDeValidacion());
   return app;
 }

@@ -85,6 +85,17 @@ describe('Contenido (e2e)', () => {
     expect(texto.body.campos.archivo).toBeDefined();
   });
 
+  it('el navegador del panel puede usar todos los métodos de edición (CORS)', async () => {
+    // El panel vive en otro origen: el navegador pregunta antes (preflight) si puede usar cada método.
+    const res = await request(app.getHttpServer())
+      .options('/api/admin/textos')
+      .set('Origin', 'http://localhost:4200')
+      .set('Access-Control-Request-Method', 'PUT');
+    const permitidos = String(res.headers['access-control-allow-methods']);
+    for (const metodo of ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']) expect(permitidos).toContain(metodo);
+    expect(res.headers['access-control-allow-credentials']).toBe('true');
+  });
+
   it('recepción y tesorería no editan contenido', async () => {
     const recepcion = await ingresar('recepcion');
     expect((await recepcion.get('/api/admin/ministerios')).status).toBe(403);
@@ -164,6 +175,29 @@ describe('Contenido (e2e)', () => {
     expect(res.headers['cache-control']).toContain('max-age=20');
     expect(res.body.textos.lema).toBeDefined();
     expect(res.body.campana.montosSugeridos.length).toBeGreaterThan(0);
+  });
+
+  it('Nosotros: las fotos elegidas llegan a la web y no se pueden borrar mientras se usan', async () => {
+    const editor = await ingresar('editor');
+    const f = await subirFoto(editor, 'Pastores saludando en la puerta');
+    const textos = (await editor.get('/api/admin/textos')).body;
+    expect(textos.pilares).toHaveLength(4);
+    const { fotos: _sinFotos, ...soloTextos } = textos;
+
+    const guardado = await editor.put('/api/admin/textos').send({ ...soloTextos, fotosNosotros: { portada: f.body.id, historia: null, pastores: f.body.id, galeria: [f.body.id] } });
+    expect(guardado.status).toBe(200);
+    expect(guardado.body.fotos[f.body.id].textoAlternativo).toBe('Pastores saludando en la puerta');
+
+    const nosotros = (await request(app.getHttpServer()).get('/api/contenido')).body.nosotros;
+    expect(nosotros.portada.alt).toBe('Pastores saludando en la puerta');
+    expect(nosotros.historia).toBeNull();
+    expect(nosotros.galeria).toHaveLength(1);
+
+    expect((await editor.delete(`/api/admin/medios/${f.body.id}`)).status).toBe(409);
+    const inexistente = await editor.put('/api/admin/textos').send({ ...soloTextos, fotosNosotros: { portada: 'no-existe', historia: null, pastores: null, galeria: [] } });
+    expect(inexistente.body.campos.fotosNosotros).toBeDefined();
+    // Se libera para que el afterAll la pueda borrar.
+    await editor.put('/api/admin/textos').send({ ...soloTextos });
   });
 
   it('los textos del sitio arrancan con los de la maqueta y se guardan', async () => {

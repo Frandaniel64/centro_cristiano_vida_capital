@@ -36,6 +36,7 @@ export const routes: Routes = [
       ...(
         [
           ['ministerios', 'Ministerios', () => import('./contenido/ministerios').then((m) => m.Ministerios)],
+          ['nosotros', 'Nosotros', () => import('./contenido/nosotros').then((m) => m.Nosotros)],
           ['eventos', 'Eventos', () => import('./contenido/eventos').then((m) => m.Eventos)],
           ['predicas', 'Prédicas', () => import('./contenido/predicas').then((m) => m.Predicas)],
           ['fotos', 'Fotos', () => import('./medios/medios').then((m) => m.Medios)],

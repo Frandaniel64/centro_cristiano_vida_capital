@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Put, UseGuards } from '@nestjs/common';
-import type { TextosSitio } from '@ccvida/shared';
+import type { TextosAdmin, TextosSitio } from '@ccvida/shared';
 import { Type } from 'class-transformer';
-import { ArrayMaxSize, IsArray, IsString, MaxLength, ValidateNested } from 'class-validator';
+import { ArrayMaxSize, IsArray, IsOptional, IsString, Matches, MaxLength, ValidateNested } from 'class-validator';
 import type { SesionActual } from '../auth/auth.service.js';
 import { Roles, Sesion, SesionGuard } from '../auth/sesion.guard.js';
 import { ErrorDeFormulario } from '../comun/validacion.js';
@@ -29,6 +29,17 @@ class PastoresDto {
   @IsString() @MaxLength(300) cita!: string;
 }
 
+class PilarDto extends ItemDto {
+  @Matches(/^#[0-9a-fA-F]{6}$/, { message: 'Elegí un color.' }) color!: string;
+}
+
+class FotosNosotrosDto {
+  @IsOptional() @IsString() portada!: string | null;
+  @IsOptional() @IsString() historia!: string | null;
+  @IsOptional() @IsString() pastores!: string | null;
+  @IsArray() @ArrayMaxSize(8) @IsString({ each: true }) galeria!: string[];
+}
+
 class TextosDto implements TextosSitio {
   @IsString() @MaxLength(80) lema!: string;
   @IsString() @MaxLength(400) bajadaInicio!: string;
@@ -49,6 +60,9 @@ class TextosDto implements TextosSitio {
   @IsString() @MaxLength(300) youtube!: string;
   @IsString() @MaxLength(300) facebook!: string;
   @IsString() @MaxLength(1000) datosTransferencia!: string;
+  @IsString() @MaxLength(600) nosotrosIntro!: string;
+  @IsArray() @ArrayMaxSize(6) @ValidateNested({ each: true }) @Type(() => PilarDto) pilares!: PilarDto[];
+  @ValidateNested() @Type(() => FotosNosotrosDto) fotosNosotros!: FotosNosotrosDto;
 }
 
 const esLink = (v: string) => !v || /^https:\/\//.test(v);
@@ -62,18 +76,23 @@ export class TextosController {
     private readonly contenido: ContenidoService,
   ) {}
 
+  /** Los textos y, para el panel, los datos de las fotos que nombran. */
   @Get()
-  ver(): Promise<TextosSitio> {
-    return this.contenido.textos();
+  async ver(): Promise<TextosAdmin> {
+    const textos = await this.contenido.textos();
+    return { ...textos, fotos: await this.contenido.fotosPorId(this.contenido.idsFotosNosotros(textos)) };
   }
 
   @Put()
-  async guardar(@Body() d: TextosDto, @Sesion() s: SesionActual): Promise<TextosSitio> {
+  async guardar(@Body() d: TextosDto, @Sesion() s: SesionActual): Promise<TextosAdmin> {
     const campos: Record<string, string> = {};
     for (const red of ['instagram', 'youtube', 'facebook'] as const) {
       if (!esLink(d[red].trim())) campos[red] = 'Pegá el link completo, que empieza con https://';
     }
     if (d.whatsapp && d.whatsapp.replace(/\D/g, '').length < 10) campos['whatsapp'] = 'Escribí el número con código de área, por ejemplo 11 5555 1234.';
+    const ids = this.contenido.idsFotosNosotros(d);
+    const existentes = await this.contenido.fotosPorId(ids);
+    if (ids.some((id) => !existentes[id])) campos['fotosNosotros'] = 'Alguna de las fotos ya no existe. Elegila de nuevo.';
     if (Object.keys(campos).length) throw new ErrorDeFormulario(campos);
 
     const textos = JSON.parse(JSON.stringify(d)) as Prisma.InputJsonValue;

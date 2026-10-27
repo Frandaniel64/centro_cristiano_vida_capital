@@ -53,4 +53,14 @@ export const TEXTOS_INICIALES: TextosSitio = {
   youtube: '',
   facebook: '',
   datosTransferencia: '',
+  nosotrosIntro:
+    'Centro Cristiano Vida Capital es una iglesia cristiana evangélica en el corazón de Buenos Aires. Creemos que la iglesia no es un edificio: sos vos.',
+  pilares: [
+    { titulo: 'Somos familia', texto: 'La comunidad es el corazón: nos recibimos por nombre y compartimos la mesa.', color: '#0c74b8' },
+    { titulo: 'Dios te acompaña', texto: 'En el desierto y en la fiesta, nadie camina solo.', color: '#f5d547' },
+    { titulo: 'Tu lugar está acá', texto: 'Cada persona suma. Tu presencia marca la diferencia.', color: '#8cc63f' },
+    { titulo: 'Crecemos juntos', texto: 'Hay un espacio para cada etapa: chicos, jóvenes, parejas y familias.', color: '#0a0a0a' },
+  ],
+  // Sin fotos cargadas, la web usa las de diseño.
+  fotosNosotros: { portada: null, historia: null, pastores: null, galeria: [] },
 };

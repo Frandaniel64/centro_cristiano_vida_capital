@@ -1,25 +1,27 @@
 ---
 import Foto from '../components/Foto.astro';
 import Base from '../layouts/Base.astro';
-import { fotos, pilares } from '../data/estaticos';
-import { contenido, parrafos } from '../lib/contenido';
+import { fotos } from '../data/estaticos';
+import { colorTexto, contenido, parrafos } from '../lib/contenido';
 
 export const prerender = false;
-const { textos } = await contenido();
+const { textos, nosotros } = await contenido();
+// Fotos elegidas en el panel; si falta alguna, la de diseño.
+const portada = nosotros.portada ?? fotos.grupoCiudad;
+const fotoHistoria = nosotros.historia ?? fotos.amigosMesa;
+const fotoPastores = nosotros.pastores ?? fotos.pastor;
+const galeria = nosotros.galeria.length ? nosotros.galeria : fotos.galeria;
 ---
 
-<Base titulo="Nosotros" descripcion="Somos una iglesia cristiana evangélica en Buenos Aires: una familia que se recibe, se acompaña y comparte la mesa." imagen={fotos.grupoCiudad}>
+<Base titulo="Nosotros" descripcion="Somos una iglesia cristiana evangélica en Buenos Aires: una familia que se recibe, se acompaña y comparte la mesa." imagen={portada}>
   <section class="wrap flex flex-col gap-10 pt-14">
     <h1 class="d h1">Somos <span class="text-verde-hoja">familia</span></h1>
     <div class="flex flex-wrap justify-between gap-6 border-t border-linea pt-6">
-      <p class="lead muted flex-[0_1_560px]">
-        Centro Cristiano Vida Capital es una iglesia cristiana evangélica en el corazón de Buenos Aires. Creemos que la iglesia no es un edificio:
-        <span class="text-texto">sos vos.</span>
-      </p>
+      <p class="lead muted flex-[0_1_560px]">{textos.nosotrosIntro}</p>
       <p class="d flex-[0_1_320px] text-[22px] leading-[1.2]">{textos.datosIglesia}</p>
     </div>
     <div class="h-[clamp(280px,40vw,580px)] overflow-hidden rounded-3xl">
-      <Foto foto={fotos.grupoCiudad} sizes="(max-width: 1408px) 100vw, 1360px" prioridad />
+      <Foto foto={portada} sizes="(max-width: 1408px) 100vw, 1360px" prioridad />
     </div>
   </section>
 
@@ -29,7 +31,7 @@ const { textos } = await contenido();
       {parrafos(textos.historia).map((p) => <p class="lead muted">{p}</p>)}
     </div>
     <div class="h-[440px] min-w-0 flex-[1_1_420px] overflow-hidden rounded-3xl">
-      <Foto foto={fotos.amigosMesa} sizes="(max-width: 860px) 100vw, 50vw" />
+      <Foto foto={fotoHistoria} sizes="(max-width: 860px) 100vw, 50vw" />
     </div>
   </section>
 
@@ -38,8 +40,8 @@ const { textos } = await contenido();
       <h2 class="d h2">Lo que nos mueve</h2>
       <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,260px),1fr))] gap-3">
         {
-          pilares.map((p) => (
-            <div class="flex min-h-[300px] flex-col justify-end gap-2.5 rounded-3xl border border-linea p-7" style={`background: ${p.bg}; color: ${p.fg}`}>
+          textos.pilares.map((p) => (
+            <div class="flex min-h-[300px] flex-col justify-end gap-2.5 rounded-3xl border border-linea p-7" style={`background: ${p.color}; color: ${colorTexto(p.color)}`}>
               <h3 class="d h3 text-[34px]">{p.titulo}</h3>
               <p class="m-0">{p.texto}</p>
             </div>
@@ -52,7 +54,7 @@ const { textos } = await contenido();
   <section class="claro bg-amarillo text-black">
     <div class="wrap flex flex-wrap-reverse items-center gap-14 py-30">
       <div class="h-[480px] min-w-0 flex-[1_1_380px] overflow-hidden rounded-[999px_999px_24px_24px] bg-black">
-        <Foto foto={fotos.pastor} sizes="(max-width: 860px) 100vw, 45vw" />
+        <Foto foto={fotoPastores} sizes="(max-width: 860px) 100vw, 45vw" />
       </div>
       <div class="flex min-w-0 flex-[1_1_480px] flex-col gap-5">
         <h2 class="d h2">Nuestros pastores</h2>
@@ -79,7 +81,7 @@ const { textos } = await contenido();
 
   <section aria-label="Galería" class="wrap grid auto-rows-[260px] grid-cols-[repeat(auto-fit,minmax(min(100%,240px),1fr))] gap-3 pb-30">
     {
-      fotos.galeria.map((f) => (
+      galeria.map((f) => (
         <div class="overflow-hidden rounded-3xl">
           <Foto foto={f} sizes="(max-width: 860px) 100vw, 25vw" />
         </div>

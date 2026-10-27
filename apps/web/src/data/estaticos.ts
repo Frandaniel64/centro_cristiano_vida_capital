@@ -28,13 +28,6 @@ export const primeraVez = [
   { titulo: 'Vení como estés', texto: 'No hay código de vestimenta. Alguien te va a recibir en la puerta con un café.' },
 ];
 
-export const pilares = [
-  { titulo: 'Somos familia', texto: 'La comunidad es el corazón: nos recibimos por nombre y compartimos la mesa.', bg: '#0c74b8', fg: '#ffffff' },
-  { titulo: 'Dios te acompaña', texto: 'En el desierto y en la fiesta, nadie camina solo.', bg: '#f5d547', fg: '#000000' },
-  { titulo: 'Tu lugar está acá', texto: 'Cada persona suma. Tu presencia marca la diferencia.', bg: '#8cc63f', fg: '#000000' },
-  { titulo: 'Crecemos juntos', texto: 'Hay un espacio para cada etapa: chicos, jóvenes, parejas y familias.', bg: '#0a0a0a', fg: '#f5f5f0' },
-];
-
 export const proTemploDestinos = [
   { monto: 'USD 4.000', titulo: 'Depósito y garantía', texto: 'Para firmar el contrato del local.', bg: '#0c74b8', fg: '#ffffff' },
   { monto: 'USD 3.500', titulo: 'Primeros tres meses', texto: 'El alquiler cubierto mientras nos acomodamos.', bg: '#8cc63f', fg: '#000000' },

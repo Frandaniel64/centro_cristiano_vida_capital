@@ -96,28 +96,6 @@ import { Avisos } from '../avisos';
           <button matButton type="button" (click)="t.faqProTemplo.push({ pregunta: '', respuesta: '' })" style="align-self: flex-start"><mat-icon svgIcon="add" />Agregar pregunta</button>
         </section>
 
-        <section class="tarjeta pila" aria-labelledby="t-nosotros">
-          <h2 id="t-nosotros">Nosotros</h2>
-          <mat-form-field><mat-label>Datos de la iglesia</mat-label><input matInput name="datos" maxlength="200" [(ngModel)]="t.datosIglesia" placeholder="Más de 150 personas · Desde 2016 · Floresta, CABA" /></mat-form-field>
-          <mat-form-field>
-            <mat-label>Nuestra historia</mat-label>
-            <textarea matInput name="historia" rows="6" maxlength="4000" [(ngModel)]="t.historia"></textarea>
-            <mat-hint>Dejá una línea en blanco entre párrafos.</mat-hint>
-          </mat-form-field>
-          <mat-form-field><mat-label>Pastores</mat-label><input matInput name="pnombres" maxlength="120" [(ngModel)]="t.pastores.nombres" /></mat-form-field>
-          <mat-form-field><mat-label>Sobre los pastores</mat-label><textarea matInput name="ptexto" rows="4" maxlength="1500" [(ngModel)]="t.pastores.texto"></textarea></mat-form-field>
-          <mat-form-field><mat-label>Frase de los pastores</mat-label><input matInput name="pcita" maxlength="300" [(ngModel)]="t.pastores.cita" /></mat-form-field>
-          <h3 style="font-size: 15px">Lo que creemos</h3>
-          @for (c of t.creemos; track $index; let i = $index) {
-            <div class="renglon sin-hora">
-              <mat-form-field><mat-label>Título</mat-label><input matInput [name]="'kt' + i" maxlength="80" [(ngModel)]="c.titulo" /></mat-form-field>
-              <mat-form-field><mat-label>Texto</mat-label><input matInput [name]="'kx' + i" maxlength="400" [(ngModel)]="c.texto" /></mat-form-field>
-              <button matIconButton type="button" (click)="quitar(t.creemos, i)" aria-label="Quitar"><mat-icon svgIcon="delete" /></button>
-            </div>
-          }
-          <button matButton type="button" (click)="t.creemos.push({ titulo: '', texto: '' })" style="align-self: flex-start"><mat-icon svgIcon="add" />Agregar</button>
-        </section>
-
         <section class="tarjeta pila" aria-labelledby="t-contacto">
           <h2 id="t-contacto">Contacto y redes</h2>
           <div class="dos">

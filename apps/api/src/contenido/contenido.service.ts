@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import type { ContenidoPublico, EstadoContenido, FotoPublica, TextosSitio } from '@ccvida/shared';
+import type { ContenidoPublico, EstadoContenido, FotoPublica, FotoRef, TextosSitio } from '@ccvida/shared';
 import { ErrorDeFormulario } from '../comun/validacion.js';
 import type { Medio } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
@@ -40,6 +40,21 @@ export class ContenidoService {
     return { ...TEXTOS_INICIALES, ...((c?.textos ?? {}) as Partial<TextosSitio>) };
   }
 
+  /** Ids de las fotos que usa la página Nosotros. */
+  idsFotosNosotros(t: Pick<TextosSitio, 'fotosNosotros'>) {
+    const f = t.fotosNosotros;
+    return [...new Set([f.portada, f.historia, f.pastores, ...f.galeria].filter((id): id is string => !!id))];
+  }
+
+  /** Datos de varias fotos por id; las que no existen quedan afuera. */
+  async fotosPorId(ids: string[]): Promise<Record<string, FotoRef>> {
+    if (!ids.length) return {};
+    const medios = await this.prisma.medio.findMany({ where: { id: { in: ids } } });
+    return Object.fromEntries(
+      medios.map((m) => [m.id, { id: m.id, url: m.url, tamanos: (m.tamanos ?? {}) as Record<string, string>, textoAlternativo: m.textoAlternativo }]),
+    );
+  }
+
   /** Todo lo publicado que muestra la web. */
   async publico(ahora = Date.now()): Promise<ContenidoPublico> {
     if (this.cache && this.cache.hasta > ahora) return this.cache.datos;
@@ -63,8 +78,17 @@ export class ContenidoService {
       this.prisma.campana.findUnique({ where: { slug: 'pro-templo' } }),
     ]);
 
+    const fotos = await this.prisma.medio.findMany({ where: { id: { in: this.idsFotosNosotros(textos) } } });
+    const foto = (id: string | null) => fotoPublica(fotos.find((m) => m.id === id) ?? null);
+    const fn = textos.fotosNosotros;
     const datos: ContenidoPublico = {
       textos,
+      nosotros: {
+        portada: foto(fn.portada),
+        historia: foto(fn.historia),
+        pastores: foto(fn.pastores),
+        galeria: fn.galeria.map(foto).filter((f): f is FotoPublica => !!f),
+      },
       ministerios: ministerios.map((m) => ({
         slug: m.slug,
         nombre: m.nombre,

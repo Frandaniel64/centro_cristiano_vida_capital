@@ -276,6 +276,12 @@ export interface TextosSitio {
   datosIglesia: string; // "Más de 150 personas · Desde 2016 · Floresta, CABA"
   pastores: { nombres: string; texto: string; cita: string };
   creemos: { titulo: string; texto: string }[];
+  // Página Nosotros (sección "Nosotros" del panel).
+  nosotrosIntro: string;
+  // "Lo que nos mueve": bloques de color.
+  pilares: { titulo: string; texto: string; color: string }[];
+  // Fotos de Nosotros, por id de la biblioteca de fotos.
+  fotosNosotros: { portada: string | null; historia: string | null; pastores: string | null; galeria: string[] };
   whatsapp: string;
   instagram: string;
   youtube: string;
@@ -333,8 +339,15 @@ export interface PredicaPublica {
   foto: FotoPublica | null;
 }
 
+/** GET /api/admin/textos: los textos más los datos de las fotos que nombran, para mostrarlas en el panel. */
+export interface TextosAdmin extends TextosSitio {
+  fotos: Record<string, FotoRef>;
+}
+
 export interface ContenidoPublico {
   textos: TextosSitio;
+  // Fotos de Nosotros ya resueltas; null = la web usa la de diseño.
+  nosotros: { portada: FotoPublica | null; historia: FotoPublica | null; pastores: FotoPublica | null; galeria: FotoPublica[] };
   ministerios: MinisterioPublico[];
   // Solo los que no terminaron, más los que se repiten.
   eventos: EventoPublico[];

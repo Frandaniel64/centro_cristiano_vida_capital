@@ -30,6 +30,7 @@ const ICONOS = [
   'upload',
   'arrow_back',
   'close',
+  'diversity_3',
 ];
 
 /** Textos del paginador en castellano. */

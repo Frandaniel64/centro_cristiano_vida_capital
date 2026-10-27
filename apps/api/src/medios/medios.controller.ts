@@ -23,6 +23,7 @@ import type { SesionActual } from '../auth/auth.service.js';
 import { Roles, Sesion, SesionGuard } from '../auth/sesion.guard.js';
 import { ErrorDeFormulario } from '../comun/validacion.js';
 import type { Medio } from '../generated/prisma/client.js';
+import { ContenidoService } from '../contenido/contenido.service.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { Almacen } from './almacen.js';
 import { PESO_MAXIMO, TIPOS_ACEPTADOS, procesarFoto } from './procesar.js';
@@ -71,6 +72,7 @@ export class MediosController {
   constructor(
     private readonly prisma: PrismaService,
     private readonly almacen: Almacen,
+    private readonly contenido: ContenidoService,
   ) {}
 
   @Get()
@@ -140,7 +142,8 @@ export class MediosController {
       include: { _count: { select: { publicaciones: true, eventos: true, predicas: true, series: true, ministerios: true, paginas: true } } },
     });
     if (!m) throw new NotFoundException({ mensaje: 'No encontramos esa foto.' });
-    const usos = Object.values(m._count).reduce((a, b) => a + b, 0);
+    const enNosotros = this.contenido.idsFotosNosotros(await this.contenido.textos()).includes(id) ? 1 : 0;
+    const usos = Object.values(m._count).reduce((a, b) => a + b, 0) + enNosotros;
     if (usos > 0) throw new ConflictException({ mensaje: `Esta foto se usa en ${usos} contenido${usos === 1 ? '' : 's'}. Cambiala ahí antes de borrarla.` });
     // Cada variante se guardó como <clave>/<archivo>: el nombre sale del final de su URL.
     for (const url of Object.values((m.tamanos ?? {}) as Record<string, string>)) {

@@ -21,6 +21,7 @@ const SECCIONES: Seccion[] = [
   { ruta: '/eventos', texto: 'Eventos', icono: 'event', roles: ['administrador', 'editor'] },
   { ruta: '/predicas', texto: 'Prédicas', icono: 'mic', roles: ['administrador', 'editor'] },
   { ruta: '/ministerios', texto: 'Ministerios', icono: 'groups', roles: ['administrador', 'editor'] },
+  { ruta: '/nosotros', texto: 'Nosotros', icono: 'diversity_3', roles: ['administrador', 'editor'] },
   { ruta: '/fotos', texto: 'Fotos', icono: 'photo_library', roles: ['administrador', 'editor'] },
   { ruta: '/textos', texto: 'Textos del sitio', icono: 'edit_note', roles: ['administrador', 'editor'] },
   { ruta: '/usuarios', texto: 'Usuarios', icono: 'badge', roles: ['administrador'] },
