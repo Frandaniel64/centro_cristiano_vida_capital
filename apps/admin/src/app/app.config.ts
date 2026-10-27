@@ -8,7 +8,29 @@ import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { interceptorApi } from './api';
 import { routes } from './app.routes';
 
-const ICONOS = ['home', 'confirmation_number', 'foundation', 'waving_hand', 'badge', 'logout', 'visibility', 'visibility_off', 'search', 'person_add'];
+const ICONOS = [
+  'home',
+  'confirmation_number',
+  'foundation',
+  'waving_hand',
+  'badge',
+  'logout',
+  'visibility',
+  'visibility_off',
+  'search',
+  'person_add',
+  'groups',
+  'event',
+  'mic',
+  'photo_library',
+  'edit_note',
+  'add',
+  'edit',
+  'delete',
+  'upload',
+  'arrow_back',
+  'close',
+];
 
 /** Textos del paginador en castellano. */
 function paginadorEnCastellano() {
