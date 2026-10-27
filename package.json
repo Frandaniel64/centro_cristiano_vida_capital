@@ -19,6 +19,10 @@
     "esbuild@0.28.2": true,
     "@parcel/watcher": false,
     "lmdb": false,
-    "msgpackr-extract": false
+    "msgpackr-extract": false,
+    "prisma@7.10.1": true,
+    "@prisma/engines@7.10.1": true,
+    "workerd@1.20261019.1": true,
+    "workerd@1.20261023.1": true
   }
 }

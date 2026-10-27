@@ -1,0 +1,347 @@
+// Modelo de datos del spec (sección "Modelo de datos").
+// Montos en USD como enteros; lo recibido puede venir en pesos, por eso es decimal.
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Rol {
+  administrador
+  editor
+  tesoreria
+  recepcion
+}
+
+enum EstadoContenido {
+  borrador
+  publicado
+}
+
+enum Repeticion {
+  ninguna
+  semanal
+  mensual
+}
+
+enum MostrarComo {
+  nombre
+  apodo
+  anonimo
+}
+
+enum ContactoTipo {
+  whatsapp
+  email
+}
+
+enum FormaPago {
+  efectivo
+  transferencia
+  mercadopago
+}
+
+enum EstadoVoucher {
+  pendiente
+  confirmado
+  anulado
+  vencido
+}
+
+enum Moneda {
+  USD
+  ARS
+}
+
+enum EstadoVisita {
+  nueva
+  contactada
+  vino
+}
+
+model Usuario {
+  id           String   @id @default(uuid(7))
+  nombre       String
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  rol          Rol
+  activo       Boolean  @default(true)
+  // Secreto TOTP; obligatorio para administración y tesorería.
+  totpSecreto  String?  @map("totp_secreto")
+  creado       DateTime @default(now())
+  actualizado  DateTime @updatedAt
+
+  vouchersConfirmados Voucher[]        @relation("VoucherConfirmadoPor")
+  ajustesCargados     AjusteCampana[]
+  visitasAtendidas    Visita[]
+
+  @@map("usuarios")
+}
+
+model Medio {
+  id               String   @id @default(uuid(7))
+  // Clave del objeto en R2.
+  clave            String   @unique
+  url              String
+  textoAlternativo String   @map("texto_alternativo")
+  credito          String?
+  mime             String
+  ancho            Int?
+  alto             Int?
+  // Variantes generadas: { "sm": "clave", "md": "clave", ... }
+  tamanos          Json?
+  creado           DateTime @default(now())
+  actualizado      DateTime @updatedAt
+  actualizadoPorId String?  @map("actualizado_por_id")
+
+  publicaciones Publicacion[]
+  eventos       Evento[]
+  predicas      Predica[]
+  series        Serie[]
+  ministerios   Ministerio[]
+  paginas       Pagina[]
+
+  @@map("medios")
+}
+
+model Publicacion {
+  id               String          @id @default(uuid(7))
+  titulo           String
+  slug             String          @unique
+  fotoId           String?         @map("foto_id")
+  foto             Medio?          @relation(fields: [fotoId], references: [id], onDelete: SetNull)
+  resumen          String?
+  cuerpo           Json
+  categoria        String?
+  destacada        Boolean         @default(false)
+  estado           EstadoContenido @default(borrador)
+  publicarDesde    DateTime?       @map("publicar_desde")
+  creado           DateTime        @default(now())
+  actualizado      DateTime        @updatedAt
+  actualizadoPorId String?         @map("actualizado_por_id")
+
+  @@index([estado, publicarDesde])
+  @@map("publicaciones")
+}
+
+model Evento {
+  id               String          @id @default(uuid(7))
+  titulo           String
+  slug             String          @unique
+  inicio           DateTime
+  fin              DateTime?
+  repeticion       Repeticion      @default(ninguna)
+  lugar            String?
+  fotoId           String?         @map("foto_id")
+  foto             Medio?          @relation(fields: [fotoId], references: [id], onDelete: SetNull)
+  descripcion      Json?
+  ministerioId     String?         @map("ministerio_id")
+  ministerio       Ministerio?     @relation(fields: [ministerioId], references: [id], onDelete: SetNull)
+  destacado        Boolean         @default(false)
+  linkInscripcion  String?         @map("link_inscripcion")
+  estado           EstadoContenido @default(borrador)
+  creado           DateTime        @default(now())
+  actualizado      DateTime        @updatedAt
+  actualizadoPorId String?         @map("actualizado_por_id")
+
+  @@index([estado, inicio])
+  @@map("eventos")
+}
+
+model Serie {
+  id               String          @id @default(uuid(7))
+  nombre           String
+  slug             String          @unique
+  descripcion      String?
+  fotoId           String?         @map("foto_id")
+  foto             Medio?          @relation(fields: [fotoId], references: [id], onDelete: SetNull)
+  estado           EstadoContenido @default(publicado)
+  creado           DateTime        @default(now())
+  actualizado      DateTime        @updatedAt
+  actualizadoPorId String?         @map("actualizado_por_id")
+
+  predicas Predica[]
+
+  @@map("series")
+}
+
+model Predica {
+  id               String          @id @default(uuid(7))
+  titulo           String
+  slug             String          @unique
+  fecha            DateTime        @db.Date
+  predicador       String
+  serieId          String?         @map("serie_id")
+  serie            Serie?          @relation(fields: [serieId], references: [id], onDelete: SetNull)
+  urlVideo         String?         @map("url_video")
+  duracionMin      Int?            @map("duracion_min")
+  resumen          String?
+  versiculos       String[]
+  fotoId           String?         @map("foto_id")
+  foto             Medio?          @relation(fields: [fotoId], references: [id], onDelete: SetNull)
+  destacada        Boolean         @default(false)
+  estado           EstadoContenido @default(borrador)
+  creado           DateTime        @default(now())
+  actualizado      DateTime        @updatedAt
+  actualizadoPorId String?         @map("actualizado_por_id")
+
+  @@index([estado, fecha(sort: Desc)])
+  @@map("predicas")
+}
+
+model Ministerio {
+  id               String          @id @default(uuid(7))
+  nombre           String
+  slug             String          @unique
+  edades           String?
+  horario          String?
+  descripcion      String?
+  actividades      String[]
+  fotoId           String?         @map("foto_id")
+  foto             Medio?          @relation(fields: [fotoId], references: [id], onDelete: SetNull)
+  color            String?
+  orden            Int             @default(0)
+  estado           EstadoContenido @default(borrador)
+  creado           DateTime        @default(now())
+  actualizado      DateTime        @updatedAt
+  actualizadoPorId String?         @map("actualizado_por_id")
+
+  eventos Evento[]
+
+  @@map("ministerios")
+}
+
+model Campana {
+  id                  String      @id @default(uuid(7))
+  nombre              String
+  slug                String      @unique
+  // El valor del ladrillo no se guarda: es metaUsd / 100.
+  metaUsd             Int         @map("meta_usd")
+  montoMaximoUsd      Int         @default(10000) @map("monto_maximo_usd")
+  activa              Boolean     @default(true)
+  mostrarMontos       Boolean     @default(true) @map("mostrar_montos")
+  mensajeMetaCumplida String?     @map("mensaje_meta_cumplida")
+  montosSugeridos     Int[]       @map("montos_sugeridos")
+  formasPagoActivas   FormaPago[] @map("formas_pago_activas")
+  diasVencimiento     Int         @default(30) @map("dias_vencimiento")
+  creado              DateTime    @default(now())
+  actualizado         DateTime    @updatedAt
+  actualizadoPorId    String?     @map("actualizado_por_id")
+
+  vouchers Voucher[]
+  ajustes  AjusteCampana[]
+
+  @@map("campanas")
+}
+
+model Voucher {
+  id               String        @id @default(uuid(7))
+  // Correlativo público (Nº 0348).
+  numero           Int           @unique @default(autoincrement())
+  campanaId        String        @map("campana_id")
+  campana          Campana       @relation(fields: [campanaId], references: [id])
+  montoUsd         Int           @map("monto_usd")
+  nombre           String
+  mostrarComo      MostrarComo   @default(anonimo) @map("mostrar_como")
+  apodo            String?
+  // El apodo se revisa antes de mostrarse en la web.
+  apodoAprobado    Boolean       @default(false) @map("apodo_aprobado")
+  contactoTipo     ContactoTipo  @map("contacto_tipo")
+  contacto         String
+  formaPago        FormaPago     @map("forma_pago")
+  mensaje          String?       @db.VarChar(500)
+  estado           EstadoVoucher @default(pendiente)
+  montoRecibido    Decimal?      @map("monto_recibido") @db.Decimal(12, 2)
+  monedaRecibida   Moneda?       @map("moneda_recibida")
+  tipoCambio       Decimal?      @map("tipo_cambio") @db.Decimal(12, 2)
+  // Clave en el bucket privado de R2; los comprobantes no son públicos.
+  comprobanteClave String?       @map("comprobante_clave")
+  nota             String?
+  confirmadoPorId  String?       @map("confirmado_por_id")
+  confirmadoPor    Usuario?      @relation("VoucherConfirmadoPor", fields: [confirmadoPorId], references: [id])
+  confirmadoEn     DateTime?     @map("confirmado_en")
+  motivoAnulacion  String?       @map("motivo_anulacion")
+  idPagoExterno    String?       @unique @map("id_pago_externo")
+  creado           DateTime      @default(now())
+  actualizado      DateTime      @updatedAt
+  actualizadoPorId String?       @map("actualizado_por_id")
+
+  @@index([campanaId, estado])
+  @@index([estado, creado])
+  @@map("vouchers")
+}
+
+model AjusteCampana {
+  id          String   @id @default(uuid(7))
+  campanaId   String   @map("campana_id")
+  campana     Campana  @relation(fields: [campanaId], references: [id])
+  // Puede ser negativo.
+  montoUsd    Int      @map("monto_usd")
+  motivo      String
+  cargadoPorId String  @map("cargado_por_id")
+  cargadoPor  Usuario  @relation(fields: [cargadoPorId], references: [id])
+  creado      DateTime @default(now())
+
+  @@index([campanaId])
+  @@map("ajustes_campana")
+}
+
+model Visita {
+  id               String       @id @default(uuid(7))
+  nombre           String
+  contactoTipo     ContactoTipo @map("contacto_tipo")
+  contacto         String
+  intereses        String[]
+  estado           EstadoVisita @default(nueva)
+  notas            String?
+  atendidoPorId    String?      @map("atendido_por_id")
+  atendidoPor      Usuario?     @relation(fields: [atendidoPorId], references: [id])
+  creado           DateTime     @default(now())
+  actualizado      DateTime     @updatedAt
+  actualizadoPorId String?      @map("actualizado_por_id")
+
+  @@index([estado, creado])
+  @@map("visitas")
+}
+
+model Pagina {
+  id               String          @id @default(uuid(7))
+  titulo           String
+  slug             String          @unique
+  // Lista de bloques del diseño: [{ "tipo": "hero", ... }, ...]
+  bloques          Json            @default("[]")
+  seoTitulo        String?         @map("seo_titulo")
+  seoDescripcion   String?         @map("seo_descripcion")
+  seoImagenId      String?         @map("seo_imagen_id")
+  seoImagen        Medio?          @relation(fields: [seoImagenId], references: [id], onDelete: SetNull)
+  estado           EstadoContenido @default(borrador)
+  creado           DateTime        @default(now())
+  actualizado      DateTime        @updatedAt
+  actualizadoPorId String?         @map("actualizado_por_id")
+
+  @@map("paginas")
+}
+
+// Fila única (id = 1).
+model Configuracion {
+  id                 Int      @id @default(1)
+  horarioReunion     String?  @map("horario_reunion")
+  direccion          String?
+  latitud            Decimal? @db.Decimal(9, 6)
+  longitud           Decimal? @db.Decimal(9, 6)
+  redes              Json     @default("{}")
+  whatsapp           String?
+  canalYoutube       String?  @map("canal_youtube")
+  datosTransferencia String?  @map("datos_transferencia")
+  textosPie          Json     @default("{}") @map("textos_pie")
+  actualizado        DateTime @updatedAt
+  actualizadoPorId   String?  @map("actualizado_por_id")
+
+  @@map("configuracion")
+}
