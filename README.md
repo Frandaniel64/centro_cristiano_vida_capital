@@ -75,14 +75,20 @@ dependen de si panel y API comparten dominio (ver `apps/api/.env.example`).
 
 ## Despliegue
 
-| Pieza | Dónde |
-|---|---|
-| API | Coolify, con `apps/api/Dockerfile` (contexto: raíz del repo) |
-| Base de datos | PostgreSQL en Coolify, con backup diario a R2 |
-| Sitio público | Cloudflare Workers (`apps/web/wrangler.jsonc`) |
-| Panel | Cloudflare Pages (salida de `apps/admin/dist/admin/browser`) |
-| Archivos | Cloudflare R2 |
-| Emails | Resend |
+Cuatro servicios separados en Coolify, todos con build pack **Dockerfile** y contexto `/` (raíz del repo):
+
+| Servicio | Dockerfile | Puerto | Variables de build |
+|---|---|---|---|
+| Base de datos | PostgreSQL 17 de Coolify, sin puerto público, backup diario | 5432 | — |
+| API | `apps/api/Dockerfile` | 3000 | — (todo en runtime, ver abajo) |
+| Web pública | `apps/web/Dockerfile` | 4321 | `PUBLIC_API_URL`, `SITE_URL`, `PUBLIC_DEMO=false`, opcional `PUBLIC_TURNSTILE_SITE_KEY` |
+| Panel | `apps/admin/Dockerfile` (nginx) | 80 | `API_URL` |
+
+La web y el panel fijan la URL de la API al compilar: si cambia el dominio de la API, hay que
+volver a desplegarlos. Archivos en Cloudflare R2 y emails con Resend (opcionales al principio).
+
+La demo publicada en Cloudflare Workers sigue funcionando con `PUBLIC_DEMO=true` (sin
+`ASTRO_ADAPTER`, la web usa el adapter de Cloudflare).
 
 ### API en Coolify
 
