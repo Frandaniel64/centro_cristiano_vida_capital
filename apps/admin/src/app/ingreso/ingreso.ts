@@ -21,7 +21,7 @@ type Paso = 'credenciales' | 'codigo' | 'configurar-2fa';
     <main class="contenedor">
       <div class="tarjeta pila caja">
         <div class="marca">
-          <img src="logo.png" alt="" width="48" height="48" />
+          <img src="logo.svg" alt="" width="48" height="48" />
           <div>
             <h1>Panel CCVida</h1>
             <p class="suave">Centro Cristiano Vida Capital</p>

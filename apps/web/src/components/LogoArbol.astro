@@ -1,32 +1,80 @@
 ---
-// Árbol del hero. Cada hoja brota al cargar la página y después se mece
-// despacio, cada una a su ritmo, con aire entre una y otra.
+// Isotipo oficial del árbol de CCVida (5 hojas principales + 4 brotes intercalados + tronco).
+// Cada hoja brota al cargar la página desde su base en la copa y después se mece despacio.
 interface Props {
   class?: string;
 }
 const { class: clase } = Astro.props;
 
-// Hoja más corta y angosta que la de la maqueta: deja unos 9° de separación
-// entre hojas vecinas (están cada 26°).
-const HOJA = 'M0 -30 A73.45 73.45 0 0 1 0 -104 A73.45 73.45 0 0 1 0 -30 Z';
+const TRONCO =
+  'M87.24,106.56c-.15,5.68-.1,11.37-.1,17.05v.87c0,.17,0,3.25,0,3.25h-20.29c0-2.19.01-4.39.02-6.58,0-2.85.02-5.71.03-8.56,0-1.9-.02-3.79,0-5.69.02-1.8.03-3.6.7-5.3.73-1.84,2-3.45,3.62-4.58,2.05-1.44,4.6-2.07,7.09-1.77,4.02.49,7.45,3.43,8.55,7.34.37,1.3.4,2.64.37,3.99Z';
 
-const hojas = [-78, -52, -26, 0, 26, 52, 78].map((giro, i) => ({
-  giro,
-  // Duraciones distintas para que no se muevan todas al mismo tiempo.
-  duracion: [6.2, 5.4, 6.8, 5.8, 6.5, 5.2, 7][i],
-  retraso: i * 0.08,
-}));
+// Las 9 hojas de izquierda a derecha, con su coordenada de origen (base de la hoja).
+const hojas = [
+  {
+    d: 'M62.96,99.25c-7.44,5.88-16.81,9.39-27,9.39s-19.41-3.45-26.81-9.25c7.44-5.88,16.81-9.39,27-9.39s19.41,3.45,26.82,9.25Z',
+    origen: '62.96px 99.25px',
+    duracion: 6.2,
+    retraso: 0,
+  },
+  {
+    d: 'M34.08,81.89c-2.49-3.93-6.2-6.93-10.79-8.27s-9.25-.84-13.45,1.08c2.49,3.93,6.2,6.92,10.79,8.27,4.55,1.34,9.25.84,13.45-1.08Z',
+    origen: '34.08px 81.89px',
+    duracion: 5.1,
+    retraso: 0.06,
+  },
+  {
+    d: 'M66.19,88.81c-9.4-1.29-18.42-5.61-25.48-12.96-7-7.28-10.96-16.38-11.91-25.74,9.39,1.29,18.42,5.62,25.48,12.96,7,7.28,10.96,16.38,11.92,25.74Z',
+    origen: '66.19px 88.81px',
+    duracion: 5.6,
+    retraso: 0.12,
+  },
+  {
+    d: 'M59.75,57.13c1.21-4.49.91-9.25-1.21-13.55s-5.64-7.38-9.89-9.17c-1.21,4.49-.9,9.25,1.21,13.54,2.1,4.26,5.64,7.38,9.89,9.17Z',
+    origen: '59.75px 57.13px',
+    duracion: 4.9,
+    retraso: 0.18,
+  },
+  {
+    d: 'M76.83,30.15c5.87,7.45,9.36,16.83,9.35,27.02-.02,10.1-3.48,19.4-9.3,26.8-5.87-7.45-9.36-16.83-9.34-27.02.02-10.1,3.48-19.4,9.29-26.8Z',
+    origen: '76.88px 83.97px',
+    duracion: 6.6,
+    retraso: 0.24,
+  },
+  {
+    d: 'M94.12,57.11c-1.21-4.49-.91-9.25,1.21-13.55,2.1-4.26,5.64-7.38,9.89-9.17,1.21,4.49.9,9.25-1.21,13.54-2.1,4.26-5.64,7.38-9.89,9.17Z',
+    origen: '94.12px 57.11px',
+    duracion: 5.3,
+    retraso: 0.3,
+  },
+  {
+    d: 'M125.83,51.18c-1.31,9.39-5.66,18.41-13.02,25.45-7.3,6.98-16.41,10.92-25.77,11.85,1.31-9.39,5.66-18.41,13.02-25.45,7.3-6.98,16.41-10.92,25.77-11.85Z',
+    origen: '87.04px 88.48px',
+    duracion: 6.0,
+    retraso: 0.36,
+  },
+  {
+    d: 'M119.75,81.96c2.49-3.93,6.2-6.93,10.79-8.27,4.55-1.34,9.25-.84,13.45,1.08-2.49,3.93-6.2,6.92-10.79,8.27-4.55,1.34-9.25.84-13.45-1.08Z',
+    origen: '119.75px 81.96px',
+    duracion: 5.5,
+    retraso: 0.42,
+  },
+  {
+    d: 'M144.5,99.32c-7.44,5.88-16.81,9.39-27,9.39s-19.41-3.45-26.81-9.25c7.44-5.88,16.81-9.39,27-9.39s19.41,3.45,26.82,9.25Z',
+    origen: '90.69px 99.46px',
+    duracion: 6.8,
+    retraso: 0.48,
+  },
+];
 ---
 
-<svg aria-hidden="true" viewBox="-120 -130 240 190" class:list={['arbol', clase]}>
-  <rect x="-16" y="-16" width="32" height="76" rx="16" fill="#ffffff"></rect>
+<svg aria-hidden="true" viewBox="4 24 146 106" class:list={['arbol', clase]}>
+  <path d={TRONCO} fill="#ffffff"></path>
   {
     hojas.map((h) => (
-      <g transform={`rotate(${h.giro})`}>
-        <g class="brote" style={`animation-delay: ${h.retraso}s`}>
-          <g class="hoja" style={`animation-duration: ${h.duracion}s; animation-delay: ${-h.duracion * h.retraso * 4}s`}>
-            <path d={HOJA} fill="#ffffff" />
-          </g>
+      <g class="brote" style={`--origen: ${h.origen}; animation-delay: ${h.retraso}s`}>
+        <g class="hoja" style={`--origen: ${h.origen}; animation-duration: ${h.duracion}s; animation-delay: ${-h.duracion * h.retraso * 4}s`}>
+          <path d={h.d} fill="#ffffff" />
         </g>
       </g>
     ))
@@ -36,9 +84,8 @@ const hojas = [-78, -52, -26, 0, 26, 52, 78].map((giro, i) => ({
 <style>
   .brote,
   .hoja {
-    transform-box: fill-box;
-    /* La base de la hoja, donde se une al tronco. */
-    transform-origin: 50% 100%;
+    transform-box: view-box;
+    transform-origin: var(--origen);
   }
 
   .brote {

@@ -35,7 +35,7 @@ const SECCIONES: Seccion[] = [
     <div class="marco">
       <aside class="lateral">
         <a routerLink="/" class="marca">
-          <img src="logo.png" alt="" width="36" height="36" />
+          <img src="logo.svg" alt="" width="36" height="36" />
           <span>Panel CCVida</span>
         </a>
         <nav aria-label="Secciones del panel">
