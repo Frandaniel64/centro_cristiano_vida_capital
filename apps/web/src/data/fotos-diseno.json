@@ -2,31 +2,31 @@
   "abuela-nieta": {
     "480": "/fotos/abuela-nieta/480.webp",
     "960": "/fotos/abuela-nieta/960.webp",
-    "1200": "/fotos/abuela-nieta/1200.webp",
+    "1600": "/fotos/abuela-nieta/1600.webp",
     "compartir": "/fotos/abuela-nieta/compartir.jpg"
   },
   "alabanza": {
     "480": "/fotos/alabanza/480.webp",
     "960": "/fotos/alabanza/960.webp",
-    "1600": "/fotos/alabanza/1600.webp",
+    "1448": "/fotos/alabanza/1448.webp",
     "compartir": "/fotos/alabanza/compartir.jpg"
   },
   "amigas": {
     "480": "/fotos/amigas/480.webp",
     "960": "/fotos/amigas/960.webp",
-    "1200": "/fotos/amigas/1200.webp",
+    "1600": "/fotos/amigas/1600.webp",
     "compartir": "/fotos/amigas/compartir.jpg"
   },
   "amigos-mesa": {
     "480": "/fotos/amigos-mesa/480.webp",
     "960": "/fotos/amigos-mesa/960.webp",
-    "1200": "/fotos/amigos-mesa/1200.webp",
+    "1600": "/fotos/amigos-mesa/1600.webp",
     "compartir": "/fotos/amigos-mesa/compartir.jpg"
   },
   "atardecer": {
     "480": "/fotos/atardecer/480.webp",
     "960": "/fotos/atardecer/960.webp",
-    "1400": "/fotos/atardecer/1400.webp",
+    "1600": "/fotos/atardecer/1600.webp",
     "compartir": "/fotos/atardecer/compartir.jpg"
   },
   "bautismo": {
@@ -44,7 +44,7 @@
   "comida-familias": {
     "480": "/fotos/comida-familias/480.webp",
     "960": "/fotos/comida-familias/960.webp",
-    "1400": "/fotos/comida-familias/1400.webp",
+    "1600": "/fotos/comida-familias/1600.webp",
     "compartir": "/fotos/comida-familias/compartir.jpg"
   },
   "grupo-ciudad": {
@@ -72,7 +72,7 @@
   "manos-en-alto": {
     "480": "/fotos/manos-en-alto/480.webp",
     "960": "/fotos/manos-en-alto/960.webp",
-    "1400": "/fotos/manos-en-alto/1400.webp",
+    "1600": "/fotos/manos-en-alto/1600.webp",
     "compartir": "/fotos/manos-en-alto/compartir.jpg"
   },
   "matrimonio": {
@@ -84,13 +84,13 @@
   "pastor": {
     "480": "/fotos/pastor/480.webp",
     "960": "/fotos/pastor/960.webp",
-    "1200": "/fotos/pastor/1200.webp",
+    "1600": "/fotos/pastor/1600.webp",
     "compartir": "/fotos/pastor/compartir.jpg"
   },
   "predica-desierto": {
     "480": "/fotos/predica-desierto/480.webp",
     "960": "/fotos/predica-desierto/960.webp",
-    "1200": "/fotos/predica-desierto/1200.webp",
+    "1600": "/fotos/predica-desierto/1600.webp",
     "compartir": "/fotos/predica-desierto/compartir.jpg"
   },
   "salon-vacio": {

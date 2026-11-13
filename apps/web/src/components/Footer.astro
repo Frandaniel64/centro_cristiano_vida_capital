@@ -1,6 +1,6 @@
 ---
 import type { TextosSitio } from '@ccvida/shared';
-import { fotos, navCompleta } from '../data/estaticos';
+import { navCompleta } from '../data/estaticos';
 import { linkWhatsapp } from '../lib/formato';
 
 interface Props {
@@ -22,7 +22,7 @@ const link = 'inline-flex min-h-9 items-center text-[15px] text-texto no-underli
 <footer class="border-t border-linea">
   <div class="wrap grid grid-cols-2 gap-x-10 gap-y-12 pt-16 pb-12 lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
     <div class="col-span-2 flex flex-col items-start gap-5 lg:col-span-1">
-      <img src={fotos.logo.url} alt="CCVida Capital" width="88" height="88" class="size-22 rounded-full" loading="lazy" />
+      <img src="/logo.svg" alt="CCVida Capital" width="88" height="88" class="size-22 rounded-full" loading="lazy" />
       <p class="d text-[32px] leading-[1.05] tracking-[-.02em]">¡La iglesia sos <span class="text-verde-hoja">vos</span>!</p>
     </div>
 
