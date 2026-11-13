@@ -1,0 +1,29 @@
+---
+// Página única que se muestra mientras EN_CONSTRUCCION=true (ver middleware.ts).
+// No consulta la API: tiene que funcionar aunque la API todavía no esté arriba.
+import '../styles/global.css';
+---
+
+<!doctype html>
+<html lang="es-AR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CCVida Capital · Sitio en construcción</title>
+    <meta name="description" content="Centro Cristiano Vida Capital. Estamos construyendo nuestra nueva web." />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#000000" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <main class="wrap flex min-h-dvh flex-col items-center justify-center gap-8 py-16 text-center">
+      <img src="/logo.svg" alt="" width="128" height="128" class="size-32 rounded-full" />
+      <div class="flex flex-col items-center gap-4">
+        <p class="m-0 text-[13px] font-bold tracking-[.08em] text-texto-suave uppercase">Centro Cristiano Vida Capital</p>
+        <h1 class="d h1 m-0">Estamos <span class="text-verde-hoja">construyendo</span> nuestra casa en la web.</h1>
+        <p class="lead muted m-0 max-w-[560px]">Muy pronto vas a encontrar acá nuestras reuniones, prédicas, eventos y ministerios.</p>
+      </div>
+      <p class="d m-0 border-t border-linea pt-6 text-[24px]">¡La iglesia sos <span class="text-verde-hoja">vos</span>!</p>
+    </main>
+  </body>
+</html>
