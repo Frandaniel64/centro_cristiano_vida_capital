@@ -27,6 +27,8 @@ RUN if [ "$PUBLIC_DEMO" != "true" ] && [ -z "$PUBLIC_API_URL" ]; then \
 
 FROM node:24-alpine
 WORKDIR /repo
+# EN_CONSTRUCCION=true (variable del servicio en Coolify, no hace falta reconstruir)
+# muestra solo la página "en construcción" (ver src/middleware.ts).
 ENV NODE_ENV=production HOST=0.0.0.0 PORT=4321
 COPY --from=build /repo/node_modules node_modules
 COPY --from=build /repo/packages/shared packages/shared
