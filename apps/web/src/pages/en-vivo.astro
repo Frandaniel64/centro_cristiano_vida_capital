@@ -8,7 +8,7 @@ import { contenido } from '../lib/contenido';
 
 export const prerender = false;
 
-const { textos, predicas } = await contenido();
+const { textos, predicas } = await contenido(Astro.locals);
 const series = [...new Set(predicas.map((p) => p.serie).filter((s): s is string => !!s))];
 const youtube = textos.youtube.replace(/\/$/, '');
 // Con el id del canal (/channel/UC…) se puede incrustar el vivo; con un @usuario,

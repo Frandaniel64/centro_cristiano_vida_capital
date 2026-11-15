@@ -5,7 +5,7 @@ import { fotos } from '../data/estaticos';
 import { colorTexto, contenido, parrafos } from '../lib/contenido';
 
 export const prerender = false;
-const { textos, nosotros } = await contenido();
+const { textos, nosotros } = await contenido(Astro.locals);
 // Fotos elegidas en el panel; si falta alguna, la de diseño.
 const portada = nosotros.portada ?? fotos.grupoCiudad;
 const fotoHistoria = nosotros.historia ?? fotos.amigosMesa;

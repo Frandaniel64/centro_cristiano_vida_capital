@@ -15,9 +15,33 @@ let ultimo: { datos: ContenidoPublico; hasta: number } | null = null;
 /**
  * Todo el contenido publicado del sitio. Se pide a la API como mucho cada 20 s
  * (spec: lo que se publica en el panel aparece en menos de 1 minuto).
+ *
+ * Con `locals.vistaPrevia` (cookie del panel) se piden también los borradores,
+ * sin leer ni escribir la caché. Si el permiso no sirve (401) o la API no tiene
+ * el secreto (503) no se lanza nada, porque Astro transmite la página y un error
+ * a mitad de render no llega al middleware: se marca `vistaPreviaVencida` y se
+ * devuelve el contenido público de siempre.
  */
-export async function contenido(): Promise<ContenidoPublico> {
+export async function contenido(locals?: App.Locals): Promise<ContenidoPublico> {
   if (DEMO) return CONTENIDO_EJEMPLO;
+  if (locals?.vistaPrevia) {
+    try {
+      const res = await fetch(`${API_URL}/api/contenido/vista-previa`, {
+        headers: { Authorization: `Bearer ${locals.vistaPrevia}` },
+        signal: AbortSignal.timeout(ESPERA_MS),
+      });
+      if (res.ok) return (await res.json()) as ContenidoPublico;
+      if (res.status !== 401 && res.status !== 503) throw new Error(`La API respondió ${res.status}`);
+      locals.vistaPrevia = undefined;
+      locals.vistaPreviaVencida = true;
+    } catch (e) {
+      if (locals.vistaPrevia) throw e;
+    }
+  }
+  return publico();
+}
+
+async function publico(): Promise<ContenidoPublico> {
   if (ultimo && ultimo.hasta > Date.now()) return ultimo.datos;
   try {
     const res = await fetch(`${API_URL}/api/contenido`, { signal: AbortSignal.timeout(ESPERA_MS) });

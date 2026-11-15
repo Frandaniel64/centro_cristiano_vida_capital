@@ -8,7 +8,7 @@ import { imagenCompartir } from '../../lib/fotos';
 export const prerender = false;
 
 const NOMBRE = 'Centro Cristiano Vida Capital';
-const { eventos, ministerios } = await contenido();
+const { eventos, ministerios } = await contenido(Astro.locals);
 const e = eventos.find((x) => x.slug === Astro.params.slug);
 if (!e) {
   Astro.response.status = 404;
