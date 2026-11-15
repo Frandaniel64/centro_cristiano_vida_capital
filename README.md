@@ -102,7 +102,8 @@ La demo publicada en Cloudflare Workers sigue funcionando con `PUBLIC_DEMO=true`
 - Puerto: `3000`. Healthcheck: `GET /health` (no consulta la base).
 - Monitor de caídas: `GET /health/ready` (responde 503 si la base no responde).
 - Al arrancar, el contenedor corre `prisma migrate deploy`; si la base no está disponible, la API no levanta.
-- Variables: las de `apps/api/.env.example`, más `VISTA_PREVIA_SECRETO` (generar con `openssl rand -base64 32`; ver "Sitio público y contenido").
+- Variables: las de `apps/api/.env.example`, incluida `VISTA_PREVIA_SECRETO` (generar con `openssl rand -base64 32`; ver "Sitio público y contenido").
+- `VISTA_PREVIA_SECRETO` tiene que estar cargada en el servicio de la API en Coolify: sin ella, la vista previa de borradores responde 503.
 - No publicar cambios el domingo de 9 a 13 h.
 
 Para construir la imagen en local:
