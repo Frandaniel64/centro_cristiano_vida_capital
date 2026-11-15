@@ -7,9 +7,10 @@ import { MinisteriosController } from './ministerios.controller.js';
 import { ContenidoPublicoController } from './publico.controller.js';
 import { PredicasController, SeriesController } from './predicas.controller.js';
 import { TextosController } from './textos.controller.js';
+import { VistaPreviaController } from './vista-previa.controller.js';
 
 @Module({
-  controllers: [ContenidoPublicoController, MediosController, MinisteriosController, EventosController, PredicasController, SeriesController, TextosController],
+  controllers: [ContenidoPublicoController, MediosController, MinisteriosController, EventosController, PredicasController, SeriesController, TextosController, VistaPreviaController],
   providers: [ContenidoService, Almacen],
   exports: [ContenidoService],
 })
