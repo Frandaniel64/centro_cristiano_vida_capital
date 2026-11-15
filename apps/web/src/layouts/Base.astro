@@ -21,7 +21,7 @@ interface Props {
 const NOMBRE = 'CCVida Capital';
 const { titulo, descripcion, imagen, jsonLd, noindex = false } = Astro.props;
 const { textos } = await contenido(Astro.locals);
-// Después de contenido(): si el permiso no servía, ya se limpió.
+// Sólo está si el middleware validó el permiso y trajo los borradores.
 const vistaPrevia = Boolean(Astro.locals.vistaPrevia);
 const tituloCompleto = Astro.url.pathname === '/' ? `${NOMBRE} · ${textos.lema}` : `${titulo} · ${NOMBRE}`;
 const canonica = new URL(Astro.url.pathname, Astro.site);

@@ -16,29 +16,39 @@ let ultimo: { datos: ContenidoPublico; hasta: number } | null = null;
  * Todo el contenido publicado del sitio. Se pide a la API como mucho cada 20 s
  * (spec: lo que se publica en el panel aparece en menos de 1 minuto).
  *
- * Con `locals.vistaPrevia` (cookie del panel) se piden también los borradores,
- * sin leer ni escribir la caché. Si el permiso no sirve (401) o la API no tiene
- * el secreto (503) no se lanza nada, porque Astro transmite la página y un error
- * a mitad de render no llega al middleware: se marca `vistaPreviaVencida` y se
- * devuelve el contenido público de siempre.
+ * En vista previa el middleware ya trajo el contenido con borradores
+ * (`cargarVistaPrevia`) y lo dejó en `locals`: se devuelve ese, sin otra
+ * llamada y sin tocar la caché del contenido público.
  */
 export async function contenido(locals?: App.Locals): Promise<ContenidoPublico> {
   if (DEMO) return CONTENIDO_EJEMPLO;
-  if (locals?.vistaPrevia) {
-    try {
-      const res = await fetch(`${API_URL}/api/contenido/vista-previa`, {
-        headers: { Authorization: `Bearer ${locals.vistaPrevia}` },
-        signal: AbortSignal.timeout(ESPERA_MS),
-      });
-      if (res.ok) return (await res.json()) as ContenidoPublico;
-      if (res.status !== 401 && res.status !== 503) throw new Error(`La API respondió ${res.status}`);
-      locals.vistaPrevia = undefined;
-      locals.vistaPreviaVencida = true;
-    } catch (e) {
-      if (locals.vistaPrevia) throw e;
-    }
+  return locals?.contenidoVistaPrevia ?? publico();
+}
+
+export type VistaPrevia =
+  | { estado: 'ok'; datos: ContenidoPublico }
+  /** El permiso no sirve (401) o la API no tiene el secreto (503): se borra la cookie. */
+  | { estado: 'rechazado' }
+  /** La API no respondió: se sigue con el sitio público, pero la cookie queda (el permiso puede servir). */
+  | { estado: 'error' };
+
+/**
+ * Contenido con borradores para un permiso de vista previa. Lo llama el
+ * middleware antes de armar la página, así decide a tiempo qué mostrar.
+ */
+export async function cargarVistaPrevia(permiso: string): Promise<VistaPrevia> {
+  if (DEMO) return { estado: 'error' };
+  try {
+    const res = await fetch(`${API_URL}/api/contenido/vista-previa`, {
+      headers: { Authorization: `Bearer ${permiso}` },
+      signal: AbortSignal.timeout(ESPERA_MS),
+    });
+    if (res.ok) return { estado: 'ok', datos: (await res.json()) as ContenidoPublico };
+    if (res.status === 401 || res.status === 503) return { estado: 'rechazado' };
+  } catch {
+    // Sin respuesta de la API: se trata como un error, no como permiso inválido.
   }
-  return publico();
+  return { estado: 'error' };
 }
 
 async function publico(): Promise<ContenidoPublico> {

@@ -6,13 +6,17 @@ export const prerender = false;
 // Misma hora de vigencia que el permiso de la API (la API es la que valida de verdad).
 const MAX_AGE_S = 60 * 60;
 
-export const GET: APIRoute = ({ url, cookies, redirect }) => {
+// Las respuestas llevan Set-Cookie: nunca se cachean.
+const ir = (destino: string) =>
+  new Response(null, { status: 302, headers: { Location: destino, 'Cache-Control': 'no-store' } });
+
+export const GET: APIRoute = ({ url, cookies }) => {
   if (url.searchParams.has('salir')) {
     cookies.delete(COOKIE_VISTA_PREVIA, { path: '/' });
-    return redirect('/');
+    return ir('/');
   }
   const permiso = url.searchParams.get('permiso');
-  if (!permiso) return redirect('/');
+  if (!permiso) return ir('/');
 
   cookies.set(COOKIE_VISTA_PREVIA, permiso, {
     path: '/',
@@ -21,6 +25,6 @@ export const GET: APIRoute = ({ url, cookies, redirect }) => {
     secure: import.meta.env.PROD,
     maxAge: MAX_AGE_S,
   });
-  const ir = url.searchParams.get('ir');
-  return redirect(rutaInterna(ir) ? ir : '/');
+  const destino = url.searchParams.get('ir');
+  return ir(rutaInterna(destino) ? destino : '/');
 };
