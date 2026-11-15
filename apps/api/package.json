@@ -28,6 +28,7 @@
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
     "crear-admin": "tsx prisma/crear-admin.ts",
+    "crear-token-mcp": "tsx prisma/crear-token-mcp.ts",
     "db:seed-ejemplo": "tsx prisma/seed-ejemplo.ts",
     "db:usuarios-prueba": "tsx prisma/usuarios-prueba.ts"
   },
