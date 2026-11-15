@@ -1,4 +1,8 @@
+import type { HttpClient } from '@angular/common/http';
 import type { EstadoContenido } from '@ccvida/shared';
+import { firstValueFrom } from 'rxjs';
+import { errorDe } from '../api';
+import type { Avisos } from '../avisos';
 
 export const ESTADOS_CONTENIDO: { valor: EstadoContenido; texto: string }[] = [
   { valor: 'borrador', texto: 'Borrador' },
@@ -31,3 +35,17 @@ export const COLORES_MARCA = [
   { valor: '#f5d547', texto: 'Amarillo' },
   { valor: '#f5f5f0', texto: 'Blanco' },
 ];
+
+/** Abre la web con los borradores visibles en una pestaña nueva. */
+export async function abrirVistaPrevia(http: HttpClient, avisos: Avisos, ruta: string) {
+  // Se abre ya, de forma sincrónica, para que el navegador no la bloquee.
+  const pestana = window.open('', '_blank');
+  try {
+    const { url } = await firstValueFrom(http.post<{ url: string }>('/api/admin/vista-previa', { ruta }));
+    if (pestana) pestana.location.href = url;
+    else window.location.href = url;
+  } catch (e) {
+    pestana?.close();
+    avisos.error(errorDe(e).mensaje);
+  }
+}

@@ -17,7 +17,7 @@ import { Avisos } from '../avisos';
 import { confirmar } from '../comun/confirmar';
 import { fecha } from '../formato';
 import { SelectorFoto } from '../medios/selector-foto';
-import { ESTADOS_CONTENIDO, aFechaHoraLocal, deFechaHoraLocal } from './comun';
+import { abrirVistaPrevia, ESTADOS_CONTENIDO, aFechaHoraLocal, deFechaHoraLocal } from './comun';
 
 interface Formulario extends Omit<Guardar<EventoAdmin>, 'inicio' | 'fin'> {
   inicio: string; // datetime-local
@@ -86,6 +86,7 @@ const REPETICIONES: { valor: Repeticion; texto: string }[] = [
               @if (e.destacado) { <span class="etiqueta info">En el inicio</span> }
             </div>
           </div>
+          <button matIconButton type="button" (click)="vistaPrevia(e)" [attr.aria-label]="'Vista previa de ' + e.titulo"><mat-icon svgIcon="visibility" /></button>
           <button matIconButton type="button" (click)="editar(e)" [attr.aria-label]="'Editar ' + e.titulo"><mat-icon svgIcon="edit" /></button>
         </div>
       </ng-template>
@@ -173,10 +174,14 @@ const REPETICIONES: { valor: Repeticion; texto: string }[] = [
             <button matButton type="button" class="peligro" (click)="borrar()"><mat-icon svgIcon="delete" />Borrar</button>
           } @else { <span></span> }
           <div class="fila">
+            @if (editando()) {
+              <button matButton type="button" [disabled]="cambiado()" (click)="vistaPreviaGuardada()"><mat-icon svgIcon="visibility" />Vista previa</button>
+            }
             <button matButton type="button" (click)="volver()">Cancelar</button>
             <button matButton="filled" type="submit" [disabled]="guardando()">{{ f.estado === 'publicado' ? 'Guardar y publicar' : 'Guardar borrador' }}</button>
           </div>
         </div>
+        @if (editando() && cambiado()) { <p class="ayuda" style="text-align: right">Guardá para ver la vista previa</p> }
       </form>
     }
   `,
@@ -195,6 +200,9 @@ export class Eventos {
   protected readonly campos = signal<Record<string, string>>({});
   protected f: Formulario = { ...VACIO };
   protected foto: FotoRef = null;
+  // Slug y foto del formulario tal como se guardó: la vista previa mira lo guardado, no lo que se está tipeando.
+  private slugGuardado = '';
+  private instantanea = '';
 
   private readonly vigente = (e: EventoAdmin) => e.repeticion !== 'ninguna' || new Date(e.fin ?? e.inicio).getTime() >= Date.now();
   protected readonly proximos = computed(() =>
@@ -251,7 +259,25 @@ export class Eventos {
     };
     this.foto = e.foto;
     this.campos.set({});
+    this.slugGuardado = e.slug;
+    this.instantanea = this.huella();
     this.editando.set(e.id);
+  }
+
+  private huella() {
+    return JSON.stringify([this.f, this.foto?.id ?? null]);
+  }
+
+  protected cambiado() {
+    return this.huella() !== this.instantanea;
+  }
+
+  protected vistaPrevia(e: { slug: string }) {
+    return abrirVistaPrevia(this.http, this.avisos, `/eventos/${e.slug}`);
+  }
+
+  protected vistaPreviaGuardada() {
+    return abrirVistaPrevia(this.http, this.avisos, `/eventos/${this.slugGuardado}`);
   }
 
   protected volver() {
