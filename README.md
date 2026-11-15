@@ -52,6 +52,12 @@ Si la API no responde, la web sigue mostrando la última versión que recibió.
 - `PUBLIC_DEMO=true`: versión de muestra con el contenido de la maqueta, sin API.
 - Fotos de diseño (hero, galería): van en `apps/web/src/assets/fotos` y se optimizan con
   `node apps/web/scripts/optimizar-fotos.mjs`, que genera `public/fotos`.
+- Vista previa de borradores: desde el panel (ministerios, eventos y prédicas) se abre el sitio
+  real con borradores y publicado, aunque `EN_CONSTRUCCION=true`. La API firma un permiso de
+  1 hora con `VISTA_PREVIA_SECRETO`; la web lo guarda en la cookie `ccvida_vista_previa`, muestra
+  una barra amarilla para salir y responde con `noindex` y `no-store`. Sin `VISTA_PREVIA_SECRETO`
+  en la API la vista previa queda desactivada (los endpoints responden 503). Editar algo ya
+  publicado lo cambia en el sitio al guardar: no hay versiones.
 
 ## Panel de administración
 
@@ -96,7 +102,7 @@ La demo publicada en Cloudflare Workers sigue funcionando con `PUBLIC_DEMO=true`
 - Puerto: `3000`. Healthcheck: `GET /health` (no consulta la base).
 - Monitor de caídas: `GET /health/ready` (responde 503 si la base no responde).
 - Al arrancar, el contenedor corre `prisma migrate deploy`; si la base no está disponible, la API no levanta.
-- Variables: las de `apps/api/.env.example`.
+- Variables: las de `apps/api/.env.example`, más `VISTA_PREVIA_SECRETO` (generar con `openssl rand -base64 32`; ver "Sitio público y contenido").
 - No publicar cambios el domingo de 9 a 13 h.
 
 Para construir la imagen en local:
