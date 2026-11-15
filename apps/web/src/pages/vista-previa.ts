@@ -3,8 +3,8 @@ import { COOKIE_VISTA_PREVIA, rutaInterna } from '../lib/vista-previa';
 
 export const prerender = false;
 
-// Mismo vencimiento que el permiso de la API (la API es la que valida de verdad).
-const MAX_AGE_S = 60 * 60 * 8;
+// Misma hora de vigencia que el permiso de la API (la API es la que valida de verdad).
+const MAX_AGE_S = 60 * 60;
 
 export const GET: APIRoute = ({ url, cookies, redirect }) => {
   if (url.searchParams.has('salir')) {

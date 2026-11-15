@@ -1,3 +1,4 @@
+import type { APIContext } from 'astro';
 import { defineMiddleware } from 'astro:middleware';
 import { COOKIE_VISTA_PREVIA } from './lib/vista-previa';
 
@@ -10,6 +11,13 @@ const PAGINA = '/en-construccion';
 function enConstruccion(): boolean {
   const valor = globalThis.process?.env?.EN_CONSTRUCCION ?? import.meta.env.EN_CONSTRUCCION;
   return valor === 'true';
+}
+
+async function enPaginaDeConstruccion(context: APIContext): Promise<Response> {
+  const respuesta = await context.rewrite(PAGINA);
+  respuesta.headers.set('X-Robots-Tag', 'noindex, nofollow');
+  respuesta.headers.set('Cache-Control', 'no-store');
+  return respuesta;
 }
 
 export const onRequest = defineMiddleware(async (context, next) => {
@@ -26,16 +34,17 @@ export const onRequest = defineMiddleware(async (context, next) => {
     const respuesta = await next();
     respuesta.headers.set('X-Robots-Tag', 'noindex, nofollow');
     respuesta.headers.set('Cache-Control', 'private, no-store');
-    // Esa página ya salió con contenido público y sin aviso: la próxima entra sin cookie.
-    if (context.locals.vistaPreviaVencida) context.cookies.delete(COOKIE_VISTA_PREVIA, { path: '/' });
+    if (context.locals.vistaPreviaVencida) {
+      // Permiso inválido o vencido: la próxima entra sin cookie.
+      context.cookies.delete(COOKIE_VISTA_PREVIA, { path: '/' });
+      // En construcción, el sitio no se abre con una cookie cualquiera.
+      if (enConstruccion() && !ARCHIVOS.test(ruta) && ruta !== PAGINA) return enPaginaDeConstruccion(context);
+    }
     return respuesta;
   }
 
   if (!enConstruccion()) return ruta === PAGINA ? context.rewrite('/404') : next();
   if (ruta === PAGINA || ARCHIVOS.test(ruta)) return next();
 
-  const respuesta = await context.rewrite(PAGINA);
-  respuesta.headers.set('X-Robots-Tag', 'noindex, nofollow');
-  respuesta.headers.set('Cache-Control', 'no-store');
-  return respuesta;
+  return enPaginaDeConstruccion(context);
 });
