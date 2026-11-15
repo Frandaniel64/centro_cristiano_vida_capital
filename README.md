@@ -79,6 +79,24 @@ npm run build -w @ccvida/admin -- --define "API_URL='https://api.ccvida.com.ar'"
 En la API, `CORS_ORIGINS` tiene que incluir la URL del panel y las variables `COOKIE_*`
 dependen de si panel y API comparten dominio (ver `apps/api/.env.example`).
 
+## MCP de contenido
+
+Un servidor MCP local (`apps/mcp`) deja que Claude cargue contenido del sitio: ministerios, eventos,
+prédicas, series, fotos y textos. Todo lo que crea queda en **borrador**; publicar se hace desde el panel.
+Los textos del sitio son la excepción: salen en la web al confirmar, y Claude tiene que pedir confirmación.
+
+1. Crear el token (se muestra una sola vez; crear otro anula el anterior): `npm run crear-token-mcp -w @ccvida/api -- [--dias 90]`
+2. Guardarlo en `C:\Users\frand\.secrets\ccvida-mcp.env`:
+   ```
+   CCVIDA_MCP_TOKEN=<token>
+   CCVIDA_API_URL=<url de la API, por defecto http://localhost:3000>
+   ```
+3. Compilar: `npm run build -w @ccvida/mcp`
+4. Registrarlo en Claude Code (una vez, en tu usuario):
+   `claude mcp add --scope user ccvida-contenido -- node <ruta absoluta>/apps/mcp/dist/index.js`
+
+Detalle de las herramientas en [`apps/mcp/README.md`](apps/mcp/README.md).
+
 ## Despliegue
 
 Cuatro servicios separados en Coolify, todos con build pack **Dockerfile** y contexto `/` (raíz del repo):
