@@ -36,5 +36,6 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   await prisma.$disconnect();
   console.log(`\nToken del MCP (se muestra una sola vez):\n${token}`);
   console.log(`Vence: ${expira.toISOString().slice(0, 10)}`);
-  console.log('Guardalo como CCVIDA_MCP_TOKEN=… en C:\Users\frand\.secrets\ccvida-mcp.env\n');
+  console.log(`Guardalo en ${String.raw`C:\Users\frand\.secrets\ccvida-mcp.env`} con esta línea:`);
+  console.log(`CCVIDA_MCP_TOKEN=${token}\n`);
 }

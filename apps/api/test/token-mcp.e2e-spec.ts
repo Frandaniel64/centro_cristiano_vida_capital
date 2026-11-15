@@ -6,7 +6,7 @@ import request from 'supertest';
 import { crearTokenMcp } from '../prisma/crear-token-mcp.js';
 import { AppModule } from '../src/app.module.js';
 import { configurarApp } from '../src/app.setup.js';
-import { hashToken } from '../src/auth/cripto.js';
+import { hashClave, hashToken } from '../src/auth/cripto.js';
 import { PrismaService } from '../src/prisma/prisma.service.js';
 
 const EMAIL = 'mcp@ccvidacapital.org';
@@ -55,6 +55,22 @@ describe('Token del MCP (e2e)', () => {
     const segundo = await crearTokenMcp(prisma);
     expect((await con(primero.token, '/api/admin/ministerios')).status).toBe(401);
     expect((await con(segundo.token, '/api/admin/ministerios')).status).toBe(200);
+  });
+
+  it('si vienen la cookie y el Bearer, manda la cookie', async () => {
+    const { token } = await crearTokenMcp(prisma);
+    const clave = 'clave-de-prueba-123';
+    const email = `recepcion-mcp-${Date.now()}@e2e.test`;
+    const u = await prisma.usuario.create({ data: { nombre: 'Recepción MCP', email, rol: 'recepcion', passwordHash: await hashClave(clave), debeCambiarClave: false } });
+    try {
+      const agente = request.agent(app.getHttpServer());
+      await agente.post('/api/auth/ingresar').set('X-Forwarded-For', '10.3.0.1').send({ email, clave });
+      // Solo con el Bearer del MCP (editor) /visitas da 403; con la cookie de recepción además, da 200.
+      expect((await con(token, '/api/admin/visitas')).status).toBe(403);
+      expect((await agente.get('/api/admin/visitas').set('Authorization', `Bearer ${token}`)).status).toBe(200);
+    } finally {
+      await prisma.usuario.delete({ where: { id: u.id } });
+    }
   });
 
   it('un token vencido da 401', async () => {
