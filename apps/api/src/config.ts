@@ -23,6 +23,8 @@ export const config = {
   emailRecepcion: process.env.RECEPCION_EMAIL ?? '',
   emailTesoreria: process.env.TESORERIA_EMAIL ?? '',
   turnstileSecreto: process.env.TURNSTILE_SECRET_KEY ?? '',
+  // Clave para firmar la vista previa de borradores. Vacía: vista previa desactivada.
+  vistaPreviaSecreto: process.env.VISTA_PREVIA_SECRETO ?? '',
   // Cookie de sesión del panel. Con panel y API en subdominios del mismo
   // dominio alcanza "lax"; si están en dominios distintos (demo), "none".
   cookie: {
