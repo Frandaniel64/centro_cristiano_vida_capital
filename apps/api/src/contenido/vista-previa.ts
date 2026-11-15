@@ -29,13 +29,18 @@ export function verificarPermiso(permiso: string, secreto: string, ahora = Date.
   }
 }
 
-/** Solo rutas del propio sitio: evita que el redirect de la vista previa saque al visitante afuera. */
+/**
+ * Solo rutas del propio sitio: evita que el redirect de la vista previa saque al
+ * visitante afuera. Sin caracteres de control (va a un header Location). Misma
+ * regla que la web (apps/web/src/lib/vista-previa.ts).
+ */
 export function rutaInterna(ruta: unknown): ruta is string {
   return (
     typeof ruta === 'string' &&
     ruta.length <= LARGO_MAXIMO_RUTA &&
     ruta.startsWith('/') &&
     !ruta.startsWith('//') &&
-    !ruta.includes('\\')
+    !ruta.includes('\\') &&
+    !/[\u0000-\u001f\u007f]/.test(ruta)
   );
 }

@@ -31,7 +31,7 @@ describe('rutaInterna', () => {
   });
 
   it('rechaza lo que podría sacar al visitante del sitio', () => {
-    for (const ruta of ['//evil.com', 'https://evil.com', 'ministerios', '/\\evil.com', '/' + 'a'.repeat(200), 42]) {
+    for (const ruta of ['//evil.com', 'https://evil.com', 'ministerios', '/\\evil.com', '/' + 'a'.repeat(200), '/a\nb', 42]) {
       expect(rutaInterna(ruta)).toBe(false);
     }
   });
