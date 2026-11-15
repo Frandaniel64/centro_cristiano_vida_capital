@@ -7,6 +7,7 @@ const actuales = {
   youtube: 'https://youtube.com/old',
   pastores: { nombres: 'Juan y Ana', texto: 'Texto', cita: 'vieja' },
   creemos: [{ titulo: 'A', texto: 'a' }],
+  fotosNosotros: { portada: 'f1', historia: null, pastores: null, galeria: ['f1'] },
   fotos: { f1: { id: 'f1', url: 'u' } },
 };
 
@@ -53,6 +54,7 @@ describe('textos', () => {
       youtube: 'https://youtube.com/old',
       pastores: { nombres: 'Juan y Ana', texto: 'Texto', cita: 'x' },
       creemos: [{ titulo: 'A', texto: 'a' }],
+      fotosNosotros: { portada: 'f1', historia: null, pastores: null, galeria: ['f1'] },
     });
     expect(r).toEqual({ guardado: true, cambios: [{ campo: 'pastores.cita', antes: 'vieja', despues: 'x' }] });
   });
@@ -76,5 +78,31 @@ describe('textos', () => {
     const r = await editarTextos(cliente, { lema: 'Una familia' }, true);
     expect(r).toEqual({ guardado: false, cambios: [] });
     expect(pedidos.some((p) => p.metodo === 'PUT')).toBe(false);
+  });
+
+  it('campo de primer nivel inexistente', async () => {
+    const { cliente, pedidos } = armar();
+    await expect(editarTextos(cliente, { youtub: 'x' }, true)).rejects.toThrow('No existe el campo "youtub".');
+    expect(pedidos.some((p) => p.metodo === 'PUT')).toBe(false);
+  });
+
+  it('campo anidado inexistente lista los válidos', async () => {
+    const { cliente, pedidos } = armar();
+    await expect(editarTextos(cliente, { pastores: { citaa: 'x' } }, true)).rejects.toThrow(
+      'No existe el campo "pastores.citaa". Los campos de pastores son: nombres, texto, cita.',
+    );
+    expect(pedidos.some((p) => p.metodo === 'PUT')).toBe(false);
+  });
+
+  it('formato distinto', async () => {
+    const { cliente } = armar();
+    await expect(editarTextos(cliente, { pastores: 'x' })).rejects.toThrow('El campo "pastores" tiene otro formato.');
+    await expect(editarTextos(cliente, { lema: { a: 1 } })).rejects.toThrow('El campo "lema" tiene otro formato.');
+  });
+
+  it('rechaza __proto__ y constructor', async () => {
+    const { cliente } = armar();
+    await expect(editarTextos(cliente, JSON.parse('{"__proto__":{"x":1}}'))).rejects.toThrow('No existe el campo');
+    await expect(editarTextos(cliente, { constructor: 'x' })).rejects.toThrow('No existe el campo');
   });
 });

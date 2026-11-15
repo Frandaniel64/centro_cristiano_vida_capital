@@ -62,6 +62,13 @@ describe('subirFoto', () => {
     expect(archivo.size).toBeGreaterThan(0);
   });
 
+  it('acepta extensión en mayúsculas', async () => {
+    const { cliente, pedidos } = armar();
+    const fs = { stat: async () => ({ size: 10 }), readFile: async () => Buffer.from('x') };
+    await subirFoto(cliente, { ruta: 'carpeta/A.JPG', textoAlternativo: 'Coro cantando' }, fs);
+    expect((pedidos[0].form.get('archivo') as File).type).toBe('image/jpeg');
+  });
+
   it('sin crédito no manda el campo', async () => {
     const { cliente, pedidos } = armar();
     await subirFoto(cliente, { ruta: fixture, textoAlternativo: 'Coro cantando' });

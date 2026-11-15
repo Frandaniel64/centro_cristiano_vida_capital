@@ -1,5 +1,5 @@
 import type { TextosAdmin, TextosSitio } from '@ccvida/shared';
-import type { ClienteApi } from './cliente.js';
+import { ErrorHerramienta, type ClienteApi } from './cliente.js';
 
 export interface CambioTexto {
   campo: string;
@@ -12,6 +12,25 @@ const AVISO = 'Al confirmar, esto sale en la web enseguida.';
 type Objeto = Record<string, unknown>;
 
 const esObjeto = (v: unknown): v is Objeto => typeof v === 'object' && v !== null && !Array.isArray(v);
+
+/** Rechaza campos que no existen o con otro formato: la API los descartaría en silencio. */
+function validar(base: unknown, cambios: unknown, ruta: string): void {
+  const baseObjeto = esObjeto(base);
+  if (baseObjeto !== esObjeto(cambios)) throw new ErrorHerramienta(`El campo "${ruta}" tiene otro formato.`);
+  if (!baseObjeto || !esObjeto(cambios)) return;
+  const lista = Object.keys(base).join(', ');
+  for (const [clave, valor] of Object.entries(cambios)) {
+    const camino = ruta ? `${ruta}.${clave}` : clave;
+    if (!Object.hasOwn(base, clave)) {
+      throw new ErrorHerramienta(
+        ruta
+          ? `No existe el campo "${camino}". Los campos de ${ruta} son: ${lista}.`
+          : `No existe el campo "${camino}". Los campos son: ${lista}.`,
+      );
+    }
+    validar(base[clave], valor, camino);
+  }
+}
 
 /** Objetos planos se mezclan; arrays y valores se reemplazan. */
 function mezclar(base: unknown, cambios: unknown): unknown {
@@ -43,6 +62,7 @@ export async function editarTextos(
   confirmar = false,
 ): Promise<{ guardado: boolean; cambios: CambioTexto[]; aviso?: string }> {
   const actuales = await verTextos(cliente);
+  validar(actuales, cambios, '');
   const nuevos = mezclar(actuales, cambios) as TextosSitio;
   const lista: CambioTexto[] = [];
   diferencias(actuales, nuevos, '', lista);
