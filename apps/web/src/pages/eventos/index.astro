@@ -8,7 +8,7 @@ import { proximosEventos } from '../../lib/eventos';
 
 export const prerender = false;
 
-const { eventos, ministerios } = await contenido();
+const { eventos, ministerios } = await contenido(Astro.locals);
 const proximos = proximosEventos(eventos);
 ---
 

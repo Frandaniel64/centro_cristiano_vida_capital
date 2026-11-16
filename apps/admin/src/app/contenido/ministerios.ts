@@ -13,7 +13,7 @@ import { errorDe } from '../api';
 import { Avisos } from '../avisos';
 import { confirmar } from '../comun/confirmar';
 import { SelectorFoto } from '../medios/selector-foto';
-import { COLORES_MARCA, ESTADOS_CONTENIDO, aLineas, deLineas } from './comun';
+import { abrirVistaPrevia, COLORES_MARCA, ESTADOS_CONTENIDO, aLineas, deLineas } from './comun';
 
 interface Formulario extends Omit<Guardar<MinisterioAdmin>, 'actividades'> {
   actividades: string;
@@ -49,6 +49,7 @@ const VACIO: Formulario = { nombre: '', slug: '', estado: 'borrador', edades: ''
               <span class="suave">{{ m.horario || 'Sin horario' }}</span>
               <span class="etiqueta" [class]="m.estado === 'publicado' ? 'success' : 'secondary'" style="align-self: flex-start">{{ m.estado === 'publicado' ? 'Publicado' : 'Borrador' }}</span>
             </div>
+            <button matIconButton type="button" (click)="vistaPrevia(m)" [attr.aria-label]="'Vista previa de ' + m.nombre"><mat-icon svgIcon="visibility" /></button>
             <button matIconButton type="button" (click)="editar(m)" [attr.aria-label]="'Editar ' + m.nombre"><mat-icon svgIcon="edit" /></button>
           </div>
         } @empty {
@@ -129,10 +130,14 @@ const VACIO: Formulario = { nombre: '', slug: '', estado: 'borrador', edades: ''
             <button matButton type="button" class="peligro" (click)="borrar()"><mat-icon svgIcon="delete" />Borrar</button>
           } @else { <span></span> }
           <div class="fila">
+            @if (editando()) {
+              <button matButton type="button" [disabled]="cambiado()" (click)="vistaPreviaGuardada()"><mat-icon svgIcon="visibility" />Vista previa</button>
+            }
             <button matButton type="button" (click)="volver()">Cancelar</button>
             <button matButton="filled" type="submit" [disabled]="guardando()">{{ f.estado === 'publicado' ? 'Guardar y publicar' : 'Guardar borrador' }}</button>
           </div>
         </div>
+        @if (editando() && cambiado()) { <p class="ayuda" style="text-align: right">Guardá para ver la vista previa</p> }
       </form>
     }
   `,
@@ -151,6 +156,9 @@ export class Ministerios {
   protected readonly campos = signal<Record<string, string>>({});
   protected f: Formulario = { ...VACIO };
   protected foto: FotoRef = null;
+  // Slug y foto del formulario tal como se guardó: la vista previa mira lo guardado, no lo que se está tipeando.
+  private slugGuardado = '';
+  private instantanea = '';
 
   constructor() {
     void this.cargar();
@@ -187,7 +195,25 @@ export class Ministerios {
     };
     this.foto = m.foto;
     this.campos.set({});
+    this.slugGuardado = m.slug;
+    this.instantanea = this.huella();
     this.editando.set(m.id);
+  }
+
+  private huella() {
+    return JSON.stringify([this.f, this.foto?.id ?? null]);
+  }
+
+  protected cambiado() {
+    return this.huella() !== this.instantanea;
+  }
+
+  protected vistaPrevia(m: { slug: string }) {
+    return abrirVistaPrevia(this.http, this.avisos, `/ministerios/${m.slug}`);
+  }
+
+  protected vistaPreviaGuardada() {
+    return abrirVistaPrevia(this.http, this.avisos, `/ministerios/${this.slugGuardado}`);
   }
 
   protected volver() {

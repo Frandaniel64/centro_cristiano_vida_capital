@@ -5,7 +5,7 @@ import { contenido } from '../../lib/contenido';
 
 export const prerender = false;
 
-const { ministerios } = await contenido();
+const { ministerios } = await contenido(Astro.locals);
 const ministerio = ministerios.find((m) => m.slug === Astro.params.slug);
 if (!ministerio) {
   Astro.response.status = 404;

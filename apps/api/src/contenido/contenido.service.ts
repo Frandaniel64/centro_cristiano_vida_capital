@@ -58,7 +58,18 @@ export class ContenidoService {
   /** Todo lo publicado que muestra la web. */
   async publico(ahora = Date.now()): Promise<ContenidoPublico> {
     if (this.cache && this.cache.hasta > ahora) return this.cache.datos;
-    const publicado = { estado: 'publicado' as const };
+    const datos = await this.armar(['publicado'], ahora);
+    this.cache = { datos, hasta: ahora + CACHE_MS };
+    return datos;
+  }
+
+  /** Lo mismo que la web, pero con los borradores; para la vista previa. Nunca usa la caché. */
+  conBorradores(ahora = Date.now()): Promise<ContenidoPublico> {
+    return this.armar(['borrador', 'publicado'], ahora);
+  }
+
+  private async armar(estados: EstadoContenido[], ahora: number): Promise<ContenidoPublico> {
+    const publicado = { estado: { in: estados } };
     // Un evento de una sola vez deja de mostrarse un día después de terminar.
     const desde = new Date(ahora - DIA_MS);
     const [textos, ministerios, eventos, predicas, campana] = await Promise.all([
@@ -110,7 +121,7 @@ export class ContenidoService {
         resumen: e.resumen,
         descripcion: e.descripcion,
         // Un ministerio en borrador no tiene página: no se enlaza.
-        ministerio: e.ministerio?.estado === 'publicado' ? e.ministerio.slug : null,
+        ministerio: e.ministerio && estados.includes(e.ministerio.estado) ? e.ministerio.slug : null,
         destacado: e.destacado,
         linkInscripcion: e.linkInscripcion,
         foto: fotoPublica(e.foto),
@@ -120,7 +131,7 @@ export class ContenidoService {
         titulo: p.titulo,
         fecha: p.fecha.toISOString().slice(0, 10),
         predicador: p.predicador,
-        serie: p.serie?.estado === 'publicado' ? p.serie.nombre : null,
+        serie: p.serie && estados.includes(p.serie.estado) ? p.serie.nombre : null,
         urlVideo: p.urlVideo,
         duracionMin: p.duracionMin,
         resumen: p.resumen,
@@ -135,7 +146,6 @@ export class ContenidoService {
         formasPago: campana?.formasPagoActivas ?? [],
       },
     };
-    this.cache = { datos, hasta: ahora + CACHE_MS };
     return datos;
   }
 }

@@ -8,6 +8,8 @@ import request from 'supertest';
 import { AppModule } from '../src/app.module.js';
 import { configurarApp } from '../src/app.setup.js';
 import { hashClave } from '../src/auth/cripto.js';
+import { config } from '../src/config.js';
+import { firmarPermiso } from '../src/contenido/vista-previa.js';
 import type { Rol } from '../src/generated/prisma/client.js';
 import { PrismaService } from '../src/prisma/prisma.service.js';
 
@@ -212,5 +214,77 @@ describe('Contenido (e2e)', () => {
     // Los datos de transferencia llegan a las instrucciones del voucher.
     const config = await prisma.configuracion.findUniqueOrThrow({ where: { id: 1 } });
     expect(config.datosTransferencia).toBe('CBU 0000');
+  });
+  describe('vista previa', () => {
+    const claveAntes = config.vistaPreviaSecreto;
+    beforeAll(() => {
+      config.vistaPreviaSecreto = 'secreto-e2e';
+    });
+    afterAll(() => {
+      config.vistaPreviaSecreto = claveAntes;
+    });
+
+    const permisoDe = (url: string) => new URL(url).searchParams.get('permiso') as string;
+
+    it('recepción no puede pedir vista previa', async () => {
+      const recepcion = await ingresar('recepcion');
+      expect((await recepcion.post('/api/admin/vista-previa').send({ ruta: '/' })).status).toBe(403);
+    });
+
+    it('editor pide la URL', async () => {
+      const editor = await ingresar('editor');
+      const res = await editor.post('/api/admin/vista-previa').send({ ruta: '/ministerios/x' });
+      expect(res.status).toBe(200);
+      expect(res.body.url.startsWith(`${config.sitioUrl}/vista-previa?permiso=`)).toBe(true);
+      expect(res.body.url.endsWith('&ir=%2Fministerios%2Fx')).toBe(true);
+    });
+
+    it('rechaza una ruta externa', async () => {
+      const editor = await ingresar('editor');
+      const res = await editor.post('/api/admin/vista-previa').send({ ruta: '//evil.com' });
+      expect(res.status).toBe(400);
+      expect(res.body.mensaje).toBe('Ruta inválida.');
+    });
+
+    it('la vista previa trae borradores y la web pública no', async () => {
+      const editor = await ingresar('editor');
+      const m = await editor.post('/api/admin/ministerios').send({ nombre: `M ${SUFIJO}`, estado: 'borrador', edades: null, horario: null, resumen: null, descripcion: null, actividades: [], color: null, orden: 99, fotoId: null });
+      expect(m.status).toBe(201);
+      borrar.ministerios.push(m.body.id);
+      const e = await editor.post('/api/admin/eventos').send({ titulo: `E ${SUFIJO}`, estado: 'borrador', inicio: '2099-01-01T13:00:00.000Z', fin: null, repeticion: 'ninguna', lugar: null, resumen: null, descripcion: null, ministerioId: m.body.id, destacado: false, linkInscripcion: null, fotoId: null });
+      expect(e.status).toBe(201);
+      borrar.eventos.push(e.body.id);
+
+      const url = (await editor.post('/api/admin/vista-previa').send({ ruta: '/' })).body.url as string;
+      const prev = await request(app.getHttpServer()).get('/api/contenido/vista-previa').set('Authorization', `Bearer ${permisoDe(url)}`);
+      expect(prev.status).toBe(200);
+      expect(prev.headers['cache-control']).toContain('no-store');
+      expect(prev.body.ministerios.map((x: { slug: string }) => x.slug)).toContain(m.body.slug);
+      expect(prev.body.eventos.find((x: { slug: string }) => x.slug === e.body.slug).ministerio).toBe(m.body.slug);
+
+      const publico = (await request(app.getHttpServer()).get('/api/contenido')).body;
+      expect(publico.ministerios.map((x: { slug: string }) => x.slug)).not.toContain(m.body.slug);
+      expect(publico.eventos.map((x: { slug: string }) => x.slug)).not.toContain(e.body.slug);
+    });
+
+    it('sin permiso o con permiso de otra clave responde 401', async () => {
+      const sin = await request(app.getHttpServer()).get('/api/contenido/vista-previa');
+      expect(sin.status).toBe(401);
+      const otra = await request(app.getHttpServer()).get('/api/contenido/vista-previa').set('Authorization', `Bearer ${firmarPermiso('u1', 'otra-clave')}`);
+      expect(otra.status).toBe(401);
+      const basura = await request(app.getHttpServer()).get('/api/contenido/vista-previa').set('Authorization', 'Bearer basura');
+      expect(basura.status).toBe(401);
+    });
+
+    it('sin clave configurada responde 503', async () => {
+      const editor = await ingresar('editor');
+      config.vistaPreviaSecreto = '';
+      try {
+        expect((await editor.post('/api/admin/vista-previa').send({ ruta: '/' })).status).toBe(503);
+        expect((await request(app.getHttpServer()).get('/api/contenido/vista-previa')).status).toBe(503);
+      } finally {
+        config.vistaPreviaSecreto = 'secreto-e2e';
+      }
+    });
   });
 });

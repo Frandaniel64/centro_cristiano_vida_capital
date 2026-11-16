@@ -6,7 +6,7 @@ import { contenido } from '../lib/contenido';
 import { linkWhatsapp } from '../lib/formato';
 
 export const prerender = false;
-const { textos } = await contenido();
+const { textos } = await contenido(Astro.locals);
 
 const secciones = [
   {
