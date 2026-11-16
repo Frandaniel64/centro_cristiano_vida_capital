@@ -11,7 +11,21 @@ Ver "MCP de contenido" en el [README raíz](../../README.md). Resumen:
 npm run crear-token-mcp -w @ccvida/api          # guardar el token en C:\Users\frand\.secrets\ccvida-mcp.env
 npm run build -w @ccvida/mcp
 claude mcp add --scope user ccvida-contenido -- node <ruta absoluta>/apps/mcp/dist/index.js
+# por ejemplo, en Windows:
+claude mcp add --scope user ccvida-contenido -- node C:/repos_franyer/centro_cristiano_vida_capital/apps/mcp/dist/index.js
 ```
+
+Contra producción el token se crea en la terminal del contenedor de la API con
+`npm run crear-token-mcp:prod -w @ccvida/api` (ver "API en Coolify" en el README raíz).
+
+## Seguridad del token
+
+- El token es una credencial de **editor**: fuera del MCP, usado directo contra la API, podría publicar o
+  borrar contenido. Las herramientas del MCP son la barrera (todo queda en borrador, no hay borrar ni
+  publicar). Guardalo solo en `C:\Users\frand\.secrets`, nunca en el repo, y si se filtra generá uno
+  nuevo (crear otro anula el anterior).
+- Correr las pruebas e2e de la API (`npm run test:e2e -w @ccvida/api`) borra el usuario del MCP de la base
+  local, así que el token local deja de andar: después generá uno nuevo.
 
 ## Configuración
 
@@ -28,7 +42,7 @@ responde con un error claro. El token nunca va al repo.
 
 | Herramienta | Qué hace |
 |---|---|
-| `listar_contenido` | Lista ministerios, eventos, prédicas, series o fotos |
+| `listar_contenido` | Lista ministerios, eventos, prédicas, series o fotos (de las fotos, las 40 más recientes) |
 | `ver_contenido` | Todos los campos de un elemento, por id o slug |
 | `crear_ministerio` / `crear_evento` / `crear_predica` / `crear_serie` | Crea un borrador (obligatorios: ministerio `nombre` y `orden`; evento `titulo` e `inicio`; prédica `titulo`, `fecha`, `predicador`; serie `nombre`) |
 | `editar_ministerio` / `editar_evento` / `editar_predica` / `editar_serie` | Edita solo los campos que se pasan; solo si está en borrador |

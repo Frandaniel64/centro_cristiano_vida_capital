@@ -15,6 +15,16 @@ describe('leerConfig', () => {
     expect(leerConfig({}, () => archivo)).toEqual({ apiUrl: 'https://api.ejemplo.org', token: 'abc123' });
   });
 
+  it('quita un par de comillas que envuelven el valor', () => {
+    const archivo = `CCVIDA_API_URL="https://api.ejemplo.org"\nCCVIDA_MCP_TOKEN='abc123'\n`;
+    expect(leerConfig({}, () => archivo)).toEqual({ apiUrl: 'https://api.ejemplo.org', token: 'abc123' });
+  });
+
+  it('deja las comillas que no hacen par', () => {
+    const archivo = `CCVIDA_MCP_TOKEN="abc123'\n`;
+    expect(leerConfig({}, () => archivo).token).toBe(`"abc123'`);
+  });
+
   it('las variables de entorno pisan al archivo', () => {
     const archivo = 'CCVIDA_API_URL=https://archivo.org\nCCVIDA_MCP_TOKEN=delarchivo\n';
     const cfg = leerConfig({ CCVIDA_API_URL: 'https://env.org', CCVIDA_MCP_TOKEN: 'delenv' }, () => archivo);

@@ -59,10 +59,15 @@ describe('ClienteApi', () => {
     expect(e.estado).toBe(400);
   });
 
-  it('401 devuelve el mensaje de la API', async () => {
+  it('401: el token venció o no es válido, con cómo generar otro y el estado', async () => {
     const fetchFn = vi.fn(async () => json(401, { mensaje: 'Sesión vencida' }));
     const c = new ClienteApi({ apiUrl: 'http://x', token: 't' }, fetchFn as unknown as typeof fetch);
-    await expect(c.get('/a')).rejects.toThrow('Sesión vencida');
+    const e = await c.get('/a').catch((x) => x);
+    expect(e).toBeInstanceOf(ErrorHerramienta);
+    expect(e.message).toBe(
+      `El token del MCP venció o no es válido: generá uno nuevo con npm run crear-token-mcp -w @ccvida/api y guardalo en ${RUTA_ENV_POR_DEFECTO}.`,
+    );
+    expect(e.estado).toBe(401);
   });
 
   it('fetch que rechaza: no se pudo conectar', async () => {

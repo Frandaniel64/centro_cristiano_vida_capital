@@ -60,6 +60,12 @@ export class ClienteApi {
       throw new ErrorHerramienta(`No se pudo conectar con la API en ${this.cfg.apiUrl}.`);
     }
 
+    if (res.status === 401) {
+      throw new ErrorHerramienta(
+        `El token del MCP venció o no es válido: generá uno nuevo con npm run crear-token-mcp -w @ccvida/api y guardalo en ${rutaEnv()}.`,
+        401,
+      );
+    }
     if (!res.ok) {
       const cuerpoError = (await res.json().catch(() => null)) as CuerpoError | null;
       throw new ErrorHerramienta(mensajeDeError(res.status, cuerpoError), res.status);

@@ -13,6 +13,13 @@ export function rutaEnv(env: Env = process.env): string {
   return env.CCVIDA_MCP_ENV || RUTA_ENV_POR_DEFECTO;
 }
 
+/** Quita un par de comillas que envuelven el valor ("…" o '…'). */
+function sinComillas(valor: string): string {
+  const q = valor[0];
+  if (valor.length >= 2 && (q === '"' || q === "'") && valor.endsWith(q)) return valor.slice(1, -1);
+  return valor;
+}
+
 function parsear(texto: string): Record<string, string> {
   const salida: Record<string, string> = {};
   for (const linea of texto.split(/\r?\n/)) {
@@ -20,7 +27,7 @@ function parsear(texto: string): Record<string, string> {
     if (!l || l.startsWith('#')) continue;
     const i = l.indexOf('=');
     if (i < 1) continue;
-    salida[l.slice(0, i).trim()] = l.slice(i + 1).trim();
+    salida[l.slice(0, i).trim()] = sinComillas(l.slice(i + 1).trim());
   }
   return salida;
 }
