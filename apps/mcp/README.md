@@ -16,7 +16,8 @@ claude mcp add --scope user ccvida-contenido -- node C:/repos_franyer/centro_cri
 ```
 
 Contra producción el token se crea en la terminal del contenedor de la API con
-`npm run crear-token-mcp:prod -w @ccvida/api` (ver "API en Coolify" en el README raíz).
+`npm run crear-token-mcp:prod -- --dias 90` (o `node dist/cli/crear-token-mcp.js --dias 90`), sin `-w`
+(ver "API en Coolify" en el README raíz).
 
 ## Seguridad del token
 

@@ -86,7 +86,7 @@ prédicas, series, fotos y textos. Todo lo que crea queda en **borrador**; publi
 Los textos del sitio son la excepción: salen en la web al confirmar, y Claude tiene que pedir confirmación.
 
 1. Crear el token (se muestra una sola vez; crear otro anula el anterior): `npm run crear-token-mcp -w @ccvida/api -- [--dias 90]`
-   en local, o `npm run crear-token-mcp:prod -w @ccvida/api` en el contenedor de la API (ver "API en Coolify")
+   en local, o `npm run crear-token-mcp:prod -- --dias 90` en la terminal del contenedor de la API (ver "API en Coolify")
 2. Guardarlo en `C:\Users\frand\.secrets\ccvida-mcp.env`:
    ```
    CCVIDA_MCP_TOKEN=<token>
@@ -127,8 +127,10 @@ La demo publicada en Cloudflare Workers sigue funcionando con `PUBLIC_DEMO=true`
 - `VISTA_PREVIA_SECRETO` tiene que estar cargada en el servicio de la API en Coolify: sin ella, la vista previa de borradores responde 503.
 - No publicar cambios el domingo de 9 a 13 h.
 - Token del MCP de contenido contra producción: la base no tiene puerto público, así que se crea desde la
-  terminal del contenedor de la API en Coolify con `npm run crear-token-mcp:prod -w @ccvida/api` (opcional
-  `-- --dias 90`). Usa el `dist` compilado y las variables del contenedor; muestra el token una sola vez.
+  terminal del contenedor de la API en Coolify (que ya arranca en `/repo/apps/api`) con
+  `npm run crear-token-mcp:prod -- --dias 90` o `node dist/cli/crear-token-mcp.js --dias 90`. Ahí no va
+  `-w @ccvida/api`: la imagen no tiene el package.json raíz. Usa el `dist` compilado y las variables del
+  contenedor; muestra el token una sola vez.
 
 Para construir la imagen en local:
 
