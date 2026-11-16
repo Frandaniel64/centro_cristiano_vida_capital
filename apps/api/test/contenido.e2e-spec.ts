@@ -209,6 +209,10 @@ describe('Contenido (e2e)', () => {
     const guardado = await editor.put('/api/admin/textos').send({ ...textos, lema: 'Vení como estés.', youtube: 'youtube.com/x' });
     expect(guardado.status).toBe(400);
     expect(guardado.body.campos.youtube).toBeDefined();
+    // Los errores anidados llegan con la ruta del campo.
+    const anidado = await editor.put('/api/admin/textos').send({ ...textos, pastores: { ...textos.pastores, cita: 'x'.repeat(301) } });
+    expect(anidado.status).toBe(400);
+    expect(anidado.body.campos['pastores.cita']).toBeDefined();
     const ok = await editor.put('/api/admin/textos').send({ ...textos, lema: 'Vení como estés.', datosTransferencia: 'CBU 0000' });
     expect(ok.body.lema).toBe('Vení como estés.');
     // Los datos de transferencia llegan a las instrucciones del voucher.

@@ -16,7 +16,9 @@ export const PermitePasoIncompleto = () => SetMetadata(CLAVE_PASO_INCOMPLETO, tr
 
 type RequestConSesion = Request & { sesion?: SesionActual };
 
-export const tokenDe = (req: Request): string | undefined => req.cookies?.[config.cookie.nombre];
+/** La cookie manda; si no hay, el MCP entra con `Authorization: Bearer <token>`. */
+export const tokenDe = (req: Request): string | undefined =>
+  req.cookies?.[config.cookie.nombre] ?? /^Bearer\s+(.+)$/i.exec(req.headers.authorization ?? '')?.[1]?.trim();
 
 export const Sesion = createParamDecorator((_: unknown, ctx: ExecutionContext) => ctx.switchToHttp().getRequest<RequestConSesion>().sesion!);
 
