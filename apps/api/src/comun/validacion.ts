@@ -8,11 +8,13 @@ export class ErrorDeFormulario extends BadRequestException {
   }
 }
 
-function aplanar(errores: ValidationError[]): Record<string, string> {
-  const campos: Record<string, string> = {};
+/** Un campo por error; los anidados con su ruta (`pastores.cita`, `creemos.0.texto`). */
+export function aplanar(errores: ValidationError[], prefijo = '', campos: Record<string, string> = {}): Record<string, string> {
   for (const e of errores) {
+    const ruta = prefijo ? `${prefijo}.${e.property}` : e.property;
     const primero = e.constraints && Object.values(e.constraints)[0];
-    if (primero) campos[e.property] = primero;
+    if (primero) campos[ruta] = primero;
+    if (e.children?.length) aplanar(e.children, ruta, campos);
   }
   return campos;
 }
