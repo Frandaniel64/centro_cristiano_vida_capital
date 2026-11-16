@@ -22,7 +22,7 @@ await prisma.campana.upsert({
 await prisma.configuracion.upsert({
   where: { id: 1 },
   update: {},
-  create: { id: 1, direccion: 'Camarones 2201' },
+  create: { id: 1, direccion: 'Teatro Metauro, Camarones 2201' },
 });
 
 await prisma.$disconnect();

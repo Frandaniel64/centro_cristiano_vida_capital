@@ -14,7 +14,7 @@ import { fechaLarga, usd } from '../lib/formato';
 
 export const prerender = false;
 
-const { textos, ministerios, eventos, predicas, campana } = await contenido();
+const { textos, ministerios, eventos, predicas, campana } = await contenido(Astro.locals);
 const pt = await estadoProTemplo(campana.metaUsd);
 const ultimaPredica = predicas.find((p) => p.destacada) ?? predicas[0];
 const destacados = proximosEventos(eventos.filter((e) => e.destacado)).slice(0, 3);

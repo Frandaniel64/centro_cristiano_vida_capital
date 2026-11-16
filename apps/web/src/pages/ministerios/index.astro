@@ -6,7 +6,7 @@ import { contenido } from '../../lib/contenido';
 
 export const prerender = false;
 
-const { ministerios } = await contenido();
+const { ministerios } = await contenido(Astro.locals);
 const nombres = ministerios.map((m) => m.nombre);
 const descripcion = nombres.length
   ? `${nombres.join(', ')}: hay un lugar para cada etapa de la vida.`

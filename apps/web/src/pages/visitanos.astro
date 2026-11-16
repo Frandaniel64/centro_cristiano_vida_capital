@@ -8,7 +8,7 @@ import { contenido } from '../lib/contenido';
 
 export const prerender = false;
 
-const { textos, ministerios } = await contenido();
+const { textos, ministerios } = await contenido(Astro.locals);
 const ACENTOS = ['#f5f5f0', '#4fa3e0', '#f5d547', '#8cc63f'];
 const mapa = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${textos.direccion}, ${textos.barrio}`)}`;
 const intereses = [...ministerios.map((m) => m.nombre), 'Pro Templo'];

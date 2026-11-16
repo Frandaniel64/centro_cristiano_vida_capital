@@ -20,7 +20,9 @@ interface Props {
 
 const NOMBRE = 'CCVida Capital';
 const { titulo, descripcion, imagen, jsonLd, noindex = false } = Astro.props;
-const { textos } = await contenido();
+const { textos } = await contenido(Astro.locals);
+// Sólo está si el middleware validó el permiso y trajo los borradores.
+const vistaPrevia = Boolean(Astro.locals.vistaPrevia);
 const tituloCompleto = Astro.url.pathname === '/' ? `${NOMBRE} · ${textos.lema}` : `${titulo} · ${NOMBRE}`;
 const canonica = new URL(Astro.url.pathname, Astro.site);
 const ogUrl = new URL(imagenCompartir(imagen ?? fotos.alabanza)!, Astro.site);
@@ -37,7 +39,7 @@ const ogUrl = new URL(imagenCompartir(imagen ?? fotos.alabanza)!, Astro.site);
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="sitemap" href="/sitemap.xml" />
     <meta name="theme-color" content="#000000" />
-    {(demo || noindex) && <meta name="robots" content="noindex, nofollow" />}
+    {(demo || noindex || vistaPrevia) && <meta name="robots" content="noindex, nofollow" />}
 
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="es_AR" />
@@ -53,6 +55,16 @@ const ogUrl = new URL(imagenCompartir(imagen ?? fotos.alabanza)!, Astro.site);
     {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
   </head>
   <body>
+    {
+      vistaPrevia && (
+        <p class="sticky top-0 z-50 m-0 bg-[#f5d547] px-4 py-2 text-center text-sm font-bold text-black">
+          Vista previa: estás viendo borradores.{' '}
+          <a href="/vista-previa?salir" class="underline">
+            Salir
+          </a>
+        </p>
+      )
+    }
     {
       demo && (
         <p class="m-0 bg-amarillo px-4 py-2 text-center text-sm font-bold text-black">

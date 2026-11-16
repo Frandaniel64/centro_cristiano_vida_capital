@@ -15,7 +15,7 @@ import { errorDe } from '../api';
 import { Avisos } from '../avisos';
 import { confirmar } from '../comun/confirmar';
 import { SelectorFoto } from '../medios/selector-foto';
-import { ESTADOS_CONTENIDO, aLineas, deLineas } from './comun';
+import { abrirVistaPrevia, ESTADOS_CONTENIDO, aLineas, deLineas } from './comun';
 
 interface Formulario extends Omit<Guardar<PredicaAdmin>, 'versiculos' | 'duracionMin'> {
   versiculos: string;
@@ -67,6 +67,7 @@ const VACIO = (): Formulario => ({
                   @if (!p.urlVideo) { <span class="etiqueta warn">Sin video</span> }
                 </div>
               </div>
+              <button matIconButton type="button" (click)="vistaPrevia(p)" [attr.aria-label]="'Vista previa de ' + p.titulo"><mat-icon svgIcon="visibility" /></button>
               <button matIconButton type="button" (click)="editar(p)" [attr.aria-label]="'Editar ' + p.titulo"><mat-icon svgIcon="edit" /></button>
             </div>
           } @empty {
@@ -171,10 +172,14 @@ const VACIO = (): Formulario => ({
             <button matButton type="button" class="peligro" (click)="borrar()"><mat-icon svgIcon="delete" />Borrar</button>
           } @else { <span></span> }
           <div class="fila">
+            @if (editando()) {
+              <button matButton type="button" [disabled]="cambiado()" (click)="vistaPreviaGuardada()"><mat-icon svgIcon="visibility" />Vista previa</button>
+            }
             <button matButton type="button" (click)="volver()">Cancelar</button>
             <button matButton="filled" type="submit" [disabled]="guardando()">{{ f.estado === 'publicado' ? 'Guardar y publicar' : 'Guardar borrador' }}</button>
           </div>
         </div>
+        @if (editando() && cambiado()) { <p class="ayuda" style="text-align: right">Guardá para ver la vista previa</p> }
       </form>
     }
   `,
@@ -192,6 +197,9 @@ export class Predicas {
   protected readonly campos = signal<Record<string, string>>({});
   protected f: Formulario = VACIO();
   protected foto: FotoRef = null;
+  // Slug y foto del formulario tal como se guardó: la vista previa mira lo guardado, no lo que se está tipeando.
+  private slugGuardado = '';
+  private instantanea = '';
   protected nuevaSerie = '';
 
   private readonly nombres = computed(() => new Map(this.series().map((s) => [s.id, s.nombre])));
@@ -240,7 +248,25 @@ export class Predicas {
     };
     this.foto = p.foto;
     this.campos.set({});
+    this.slugGuardado = p.slug;
+    this.instantanea = this.huella();
     this.editando.set(p.id);
+  }
+
+  private huella() {
+    return JSON.stringify([this.f, this.foto?.id ?? null]);
+  }
+
+  protected cambiado() {
+    return this.huella() !== this.instantanea;
+  }
+
+  protected vistaPrevia(p: { slug: string }) {
+    return abrirVistaPrevia(this.http, this.avisos, `/predicas/${p.slug}`);
+  }
+
+  protected vistaPreviaGuardada() {
+    return abrirVistaPrevia(this.http, this.avisos, `/predicas/${this.slugGuardado}`);
   }
 
   protected volver() {

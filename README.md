@@ -52,6 +52,12 @@ Si la API no responde, la web sigue mostrando la última versión que recibió.
 - `PUBLIC_DEMO=true`: versión de muestra con el contenido de la maqueta, sin API.
 - Fotos de diseño (hero, galería): van en `apps/web/src/assets/fotos` y se optimizan con
   `node apps/web/scripts/optimizar-fotos.mjs`, que genera `public/fotos`.
+- Vista previa de borradores: desde el panel (ministerios, eventos y prédicas) se abre el sitio
+  real con borradores y publicado, aunque `EN_CONSTRUCCION=true`. La API firma un permiso de
+  1 hora con `VISTA_PREVIA_SECRETO`; la web lo guarda en la cookie `ccvida_vista_previa`, muestra
+  una barra amarilla para salir y responde con `noindex` y `no-store`. Sin `VISTA_PREVIA_SECRETO`
+  en la API la vista previa queda desactivada (los endpoints responden 503). Editar algo ya
+  publicado lo cambia en el sitio al guardar: no hay versiones.
 
 ## Panel de administración
 
@@ -72,6 +78,27 @@ npm run build -w @ccvida/admin -- --define "API_URL='https://api.ccvida.com.ar'"
 
 En la API, `CORS_ORIGINS` tiene que incluir la URL del panel y las variables `COOKIE_*`
 dependen de si panel y API comparten dominio (ver `apps/api/.env.example`).
+
+## MCP de contenido
+
+Un servidor MCP local (`apps/mcp`) deja que Claude cargue contenido del sitio: ministerios, eventos,
+prédicas, series, fotos y textos. Todo lo que crea queda en **borrador**; publicar se hace desde el panel.
+Los textos del sitio son la excepción: salen en la web al confirmar, y Claude tiene que pedir confirmación.
+
+1. Crear el token (se muestra una sola vez; crear otro anula el anterior): `npm run crear-token-mcp -w @ccvida/api -- [--dias 90]`
+   en local, o `npm run crear-token-mcp:prod -- --dias 90` en la terminal del contenedor de la API (ver "API en Coolify")
+2. Guardarlo en `C:\Users\frand\.secrets\ccvida-mcp.env`:
+   ```
+   CCVIDA_MCP_TOKEN=<token>
+   CCVIDA_API_URL=<url de la API, por defecto http://localhost:3000>
+   ```
+3. Compilar: `npm run build -w @ccvida/mcp`
+4. Registrarlo en Claude Code (una vez, en tu usuario):
+   `claude mcp add --scope user ccvida-contenido -- node <ruta absoluta>/apps/mcp/dist/index.js`,
+   por ejemplo en Windows:
+   `claude mcp add --scope user ccvida-contenido -- node C:/repos_franyer/centro_cristiano_vida_capital/apps/mcp/dist/index.js`
+
+Detalle de las herramientas en [`apps/mcp/README.md`](apps/mcp/README.md).
 
 ## Despliegue
 
@@ -96,8 +123,14 @@ La demo publicada en Cloudflare Workers sigue funcionando con `PUBLIC_DEMO=true`
 - Puerto: `3000`. Healthcheck: `GET /health` (no consulta la base).
 - Monitor de caídas: `GET /health/ready` (responde 503 si la base no responde).
 - Al arrancar, el contenedor corre `prisma migrate deploy`; si la base no está disponible, la API no levanta.
-- Variables: las de `apps/api/.env.example`.
+- Variables: las de `apps/api/.env.example`, incluida `VISTA_PREVIA_SECRETO` (generar con `openssl rand -base64 32`; ver "Sitio público y contenido").
+- `VISTA_PREVIA_SECRETO` tiene que estar cargada en el servicio de la API en Coolify: sin ella, la vista previa de borradores responde 503.
 - No publicar cambios el domingo de 9 a 13 h.
+- Token del MCP de contenido contra producción: la base no tiene puerto público, así que se crea desde la
+  terminal del contenedor de la API en Coolify (que ya arranca en `/repo/apps/api`) con
+  `npm run crear-token-mcp:prod -- --dias 90` o `node dist/cli/crear-token-mcp.js --dias 90`. Ahí no va
+  `-w @ccvida/api`: la imagen no tiene el package.json raíz. Usa el `dist` compilado y las variables del
+  contenedor; muestra el token una sola vez.
 
 Para construir la imagen en local:
 

@@ -11,7 +11,7 @@ import { contenido, estadoProTemplo } from '../lib/contenido';
 import { usd } from '../lib/formato';
 
 export const prerender = false;
-const { textos, campana } = await contenido();
+const { textos, campana } = await contenido(Astro.locals);
 const pt = await estadoProTemplo(campana.metaUsd);
 ---
 
