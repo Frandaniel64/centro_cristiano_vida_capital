@@ -86,6 +86,7 @@ prédicas, series, fotos y textos. Todo lo que crea queda en **borrador**; publi
 Los textos del sitio son la excepción: salen en la web al confirmar, y Claude tiene que pedir confirmación.
 
 1. Crear el token (se muestra una sola vez; crear otro anula el anterior): `npm run crear-token-mcp -w @ccvida/api -- [--dias 90]`
+   en local, o `npm run crear-token-mcp:prod -w @ccvida/api` en el contenedor de la API (ver "API en Coolify")
 2. Guardarlo en `C:\Users\frand\.secrets\ccvida-mcp.env`:
    ```
    CCVIDA_MCP_TOKEN=<token>
@@ -93,7 +94,9 @@ Los textos del sitio son la excepción: salen en la web al confirmar, y Claude t
    ```
 3. Compilar: `npm run build -w @ccvida/mcp`
 4. Registrarlo en Claude Code (una vez, en tu usuario):
-   `claude mcp add --scope user ccvida-contenido -- node <ruta absoluta>/apps/mcp/dist/index.js`
+   `claude mcp add --scope user ccvida-contenido -- node <ruta absoluta>/apps/mcp/dist/index.js`,
+   por ejemplo en Windows:
+   `claude mcp add --scope user ccvida-contenido -- node C:/repos_franyer/centro_cristiano_vida_capital/apps/mcp/dist/index.js`
 
 Detalle de las herramientas en [`apps/mcp/README.md`](apps/mcp/README.md).
 
@@ -123,6 +126,9 @@ La demo publicada en Cloudflare Workers sigue funcionando con `PUBLIC_DEMO=true`
 - Variables: las de `apps/api/.env.example`, incluida `VISTA_PREVIA_SECRETO` (generar con `openssl rand -base64 32`; ver "Sitio público y contenido").
 - `VISTA_PREVIA_SECRETO` tiene que estar cargada en el servicio de la API en Coolify: sin ella, la vista previa de borradores responde 503.
 - No publicar cambios el domingo de 9 a 13 h.
+- Token del MCP de contenido contra producción: la base no tiene puerto público, así que se crea desde la
+  terminal del contenedor de la API en Coolify con `npm run crear-token-mcp:prod -w @ccvida/api` (opcional
+  `-- --dias 90`). Usa el `dist` compilado y las variables del contenedor; muestra el token una sola vez.
 
 Para construir la imagen en local:
 

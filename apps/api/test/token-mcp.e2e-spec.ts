@@ -3,7 +3,7 @@ import 'dotenv/config';
 import { Test } from '@nestjs/testing';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import request from 'supertest';
-import { crearTokenMcp } from '../prisma/crear-token-mcp.js';
+import { crearTokenMcp } from '../src/auth/token-mcp.js';
 import { AppModule } from '../src/app.module.js';
 import { configurarApp } from '../src/app.setup.js';
 import { hashClave, hashToken } from '../src/auth/cripto.js';
