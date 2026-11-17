@@ -1,7 +1,8 @@
-// La reunión es el domingo a las 10 h de Buenos Aires (UTC-3, sin horario de
-// verano) y la transmisión se considera en curso de 10 a 13 h.
-const HORA_INICIO_UTC = 13;
-const DURACION_MS = 3 * 60 * 60 * 1000;
+// El culto es el domingo a las 11 h de Buenos Aires (UTC-3, sin horario de
+// verano; de 10 a 11 h es el compartir, que no se transmite) y la transmisión
+// se considera en curso de 11 a 13 h. Mantener igual que en la API (en-vivo.controller.ts).
+const HORA_INICIO_UTC = 14;
+const DURACION_MS = 2 * 60 * 60 * 1000;
 const DIA_MS = 24 * 60 * 60 * 1000;
 
 /** Inicio de la transmisión actual o de la próxima. */

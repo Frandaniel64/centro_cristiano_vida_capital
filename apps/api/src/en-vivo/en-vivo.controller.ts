@@ -1,10 +1,12 @@
 import { Controller, Get, Header } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 
-// v1: por horario. La reunión es el domingo a las 10 h de Buenos Aires (UTC-3)
-// y la transmisión se considera en curso de 10 a 13 h. En v1.1 se consulta YouTube.
-const HORA_INICIO_UTC = 13;
-const DURACION_MS = 3 * 60 * 60 * 1000;
+// v1: por horario. El culto es el domingo a las 11 h de Buenos Aires (UTC-3; de 10
+// a 11 h es el compartir, que no se transmite) y la transmisión se considera en
+// curso de 11 a 13 h, con margen porque el culto suele pasarse de las 12:30.
+// En v1.1 se consulta YouTube.
+const HORA_INICIO_UTC = 14;
+const DURACION_MS = 2 * 60 * 60 * 1000;
 const DIA_MS = 24 * 60 * 60 * 1000;
 
 export function proximaTransmision(ahora: number): number {
