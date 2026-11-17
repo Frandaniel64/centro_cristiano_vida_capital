@@ -1,7 +1,7 @@
-import type { ContactoTipo, CrearVoucher, FormaPago, MostrarComo } from '@ccvida/shared';
+import type { CrearVoucher, FormaPago, MostrarComo } from '@ccvida/shared';
 import { Transform } from 'class-transformer';
-import { Equals, IsIn, IsInt, IsOptional, IsString, Length, MaxLength, Min, Validate, ValidateIf } from 'class-validator';
-import { ContactoValido } from '../comun/contacto.js';
+import { Equals, IsIn, IsInt, IsOptional, IsString, Length, MaxLength, Min, ValidateIf } from 'class-validator';
+import { CampoEmail, CampoWhatsapp } from '../comun/contacto.js';
 
 const recortar = ({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value);
 
@@ -25,12 +25,11 @@ export class CrearVoucherDto implements CrearVoucher {
   @Length(1, 60, { message: 'Escribí cómo querés aparecer (hasta 60 letras).' })
   apodo?: string;
 
-  @IsIn(['whatsapp', 'email'], { message: 'Elegí WhatsApp o email.' })
-  contactoTipo!: ContactoTipo;
+  @CampoEmail()
+  email!: string;
 
-  @Transform(recortar)
-  @Validate(ContactoValido)
-  contacto!: string;
+  @CampoWhatsapp()
+  whatsapp?: string;
 
   @IsIn(['efectivo', 'transferencia', 'mercadopago'], { message: 'Elegí cómo lo vas a pagar.' })
   formaPago!: FormaPago;

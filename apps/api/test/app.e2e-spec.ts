@@ -6,6 +6,8 @@ import type { NestExpressApplication } from '@nestjs/platform-express';
 import request from 'supertest';
 import { AppModule } from '../src/app.module.js';
 import { configurarApp } from '../src/app.setup.js';
+import { EmailService } from '../src/comun/email.service.js';
+import { config } from '../src/config.js';
 import { PrismaService } from '../src/prisma/prisma.service.js';
 import { ProTemploService } from '../src/pro-templo/pro-templo.service.js';
 
@@ -13,8 +15,7 @@ const voucherValido = {
   montoUsd: 150,
   nombre: 'Ana Prueba E2E',
   mostrarComo: 'anonimo',
-  contactoTipo: 'email',
-  contacto: 'ana@example.com',
+  email: 'ana@example.com',
   formaPago: 'efectivo',
   aceptaPrivacidad: true,
 };
@@ -28,14 +29,28 @@ describe('API pública (e2e)', () => {
   let ip = 0;
   const desde = () => `10.0.0.${++ip}`;
 
+  // Los emails se espían: ninguno sale de verdad.
+  let enviar: ReturnType<typeof vi.spyOn<EmailService, 'enviar'>>;
+  const emailsOriginales = { tesoreria: config.emailTesoreria, recepcion: config.emailRecepcion };
+  const asuntos = () => enviar.mock.calls.map((c) => c[1]);
+
   beforeAll(async () => {
     const modulo = await Test.createTestingModule({ imports: [AppModule] }).compile();
     app = configurarApp(modulo.createNestApplication<NestExpressApplication>());
     await app.init();
     prisma = app.get(PrismaService);
+    enviar = vi.spyOn(app.get(EmailService), 'enviar').mockResolvedValue(undefined);
+  });
+
+  beforeEach(() => {
+    enviar.mockClear();
+    config.emailTesoreria = 'teso@example.com, teso2@example.com';
+    config.emailRecepcion = 'recepcion@example.com';
   });
 
   afterAll(async () => {
+    config.emailTesoreria = emailsOriginales.tesoreria;
+    config.emailRecepcion = emailsOriginales.recepcion;
     await prisma.voucher.deleteMany({ where: { id: { in: vouchers } } });
     await prisma.visita.deleteMany({ where: { id: { in: visitas } } });
     app.get(ProTemploService).invalidarEstado();
@@ -88,11 +103,71 @@ describe('API pública (e2e)', () => {
   });
 
   it('los errores de validación vienen por campo y en castellano', async () => {
-    const res = await crearVoucher({ ...voucherValido, montoUsd: 0, contacto: 'ana@', aceptaPrivacidad: false });
+    const res = await crearVoucher({ ...voucherValido, montoUsd: 0, email: 'ana@', aceptaPrivacidad: false });
     expect(res.status).toBe(400);
     expect(res.body.mensaje).toBe('Revisá los datos marcados.');
-    expect(Object.keys(res.body.campos).sort()).toEqual(['aceptaPrivacidad', 'contacto', 'montoUsd']);
-    expect(res.body.campos.contacto).toContain('email');
+    expect(Object.keys(res.body.campos).sort()).toEqual(['aceptaPrivacidad', 'email', 'montoUsd']);
+    expect(res.body.campos.email).toContain('email');
+  });
+
+  it('el voucher sin email responde 400 en el campo email', async () => {
+    const { email: _sin, ...sinEmail } = voucherValido;
+    const res = await crearVoucher(sinEmail);
+    expect(res.status).toBe(400);
+    expect(res.body.campos.email).toBe('Escribí tu email para que podamos escribirte.');
+  });
+
+  it('el contrato viejo (contactoTipo/contacto) sin email responde 400, no 500', async () => {
+    const { email: _sin, ...sinEmail } = voucherValido;
+    const res = await crearVoucher({ ...sinEmail, contactoTipo: 'whatsapp', contacto: '11 5555 1234' });
+    expect(res.status).toBe(400);
+    expect(res.body.campos.email).toBeDefined();
+  });
+
+  it('un WhatsApp incompleto responde 400', async () => {
+    const res = await crearVoucher({ ...voucherValido, whatsapp: '123' });
+    expect(res.status).toBe(400);
+    expect(res.body.campos.whatsapp).toContain('código de área');
+  });
+
+  it('guarda el email como contacto y el WhatsApp opcional aparte', async () => {
+    const res = await crearVoucher({ ...voucherValido, whatsapp: '11 5555 1234' });
+    expect(res.status).toBe(201);
+    const v = await prisma.voucher.findUniqueOrThrow({ where: { numero: res.body.numero } });
+    expect(v).toMatchObject({ contactoTipo: 'email', contacto: 'ana@example.com', whatsapp: '11 5555 1234' });
+    const sinWhatsapp = await crearVoucher(voucherValido);
+    expect((await prisma.voucher.findUniqueOrThrow({ where: { numero: sinWhatsapp.body.numero } })).whatsapp).toBeNull();
+  });
+
+  it('el voucher le escribe a la persona (responder a tesorería) y avisa a tesorería', async () => {
+    const res = await crearVoucher({ ...voucherValido, formaPago: 'efectivo' });
+    const n = String(res.body.numero).padStart(4, '0');
+    await vi.waitFor(() => expect(enviar).toHaveBeenCalledTimes(2));
+    const persona = enviar.mock.calls.find((c) => c[1] === `Tu voucher Pro Templo Nº ${n}`)!;
+    expect(persona[0]).toBe('ana@example.com');
+    expect(persona[3]).toEqual({ responderA: 'teso@example.com, teso2@example.com' });
+    expect(persona[2]).toContain('mesa Pro Templo');
+    const aviso = enviar.mock.calls.find((c) => c[1] === `Voucher nuevo Nº ${n}`)!;
+    expect(aviso[0]).toBe('teso@example.com, teso2@example.com');
+    expect(aviso[2]).toContain('/vouchers');
+  });
+
+  it('sin TESORERIA_EMAIL el voucher igual se crea, sin aviso y sin responder a', async () => {
+    config.emailTesoreria = '';
+    const res = await crearVoucher(voucherValido);
+    expect(res.status).toBe(201);
+    await vi.waitFor(() => expect(enviar).toHaveBeenCalledTimes(1));
+    expect(asuntos()).toEqual([`Tu voucher Pro Templo Nº ${String(res.body.numero).padStart(4, '0')}`]);
+    expect(enviar.mock.calls[0][3]?.responderA).toBeFalsy();
+  });
+
+  it('las instrucciones de pago no mencionan WhatsApp', async () => {
+    const res = await crearVoucher({ ...voucherValido, formaPago: 'transferencia' });
+    expect(res.status).toBe(201);
+    expect(res.body.instrucciones).toContain('Nº ');
+    expect(res.body.instrucciones).not.toMatch(/whatsapp/i);
+    const publico = await request(app.getHttpServer()).get(`/api/vouchers/${res.body.numero}`);
+    expect(publico.body.instrucciones).toBe(res.body.instrucciones);
   });
 
   it('rechaza montos sobre el máximo de la campaña', async () => {
@@ -113,15 +188,44 @@ describe('API pública (e2e)', () => {
     expect(codigos).toEqual([201, 201, 201, 201, 201, 429]);
   });
 
-  it('guarda la solicitud de primera visita', async () => {
-    const res = await request(app.getHttpServer())
-      .post('/api/visitas')
-      .set('X-Forwarded-For', desde())
-      .send({ nombre: 'Juan Visita E2E', contactoTipo: 'whatsapp', contacto: '11 5555 1234', intereses: ['Jóvenes'], aceptaPrivacidad: true });
+  const crearVisita = (cuerpo: object) => request(app.getHttpServer()).post('/api/visitas').set('X-Forwarded-For', desde()).send(cuerpo);
+  const visitaValida = { nombre: 'Juan Visita E2E', email: 'juan@example.com', intereses: ['Jóvenes'], aceptaPrivacidad: true };
+
+  it('guarda la solicitud de primera visita con email y WhatsApp opcional', async () => {
+    const res = await crearVisita({ ...visitaValida, whatsapp: '11 5555 1234' });
     expect(res.status).toBe(201);
     const visita = await prisma.visita.findFirstOrThrow({ where: { nombre: 'Juan Visita E2E' }, orderBy: { creado: 'desc' } });
     visitas.push(visita.id);
-    expect(visita).toMatchObject({ estado: 'nueva', intereses: ['Jóvenes'] });
+    expect(visita).toMatchObject({ estado: 'nueva', intereses: ['Jóvenes'], contactoTipo: 'email', contacto: 'juan@example.com', whatsapp: '11 5555 1234' });
+  });
+
+  it('la visita le da la bienvenida a la persona y avisa a recepción', async () => {
+    const res = await crearVisita(visitaValida);
+    expect(res.status).toBe(201);
+    visitas.push((await prisma.visita.findFirstOrThrow({ where: { nombre: 'Juan Visita E2E' }, orderBy: { creado: 'desc' } })).id);
+    await vi.waitFor(() => expect(enviar).toHaveBeenCalledTimes(2));
+    const bienvenida = enviar.mock.calls.find((c) => c[1] === '¡Te esperamos, Juan!')!;
+    expect(bienvenida[0]).toBe('juan@example.com');
+    expect(bienvenida[2]).toContain('google.com/maps');
+    const aviso = enviar.mock.calls.find((c) => c[1] === 'Alguien avisó que viene el domingo')!;
+    expect(aviso[0]).toBe('recepcion@example.com');
+    expect(aviso[2]).toContain('/visitas');
+  });
+
+  it('la visita sin email responde 400 en el campo email, también con el contrato viejo', async () => {
+    const { email: _sin, ...sinEmail } = visitaValida;
+    const res = await crearVisita(sinEmail);
+    expect(res.status).toBe(400);
+    expect(res.body.campos.email).toBe('Escribí tu email para que podamos escribirte.');
+    const viejo = await crearVisita({ ...sinEmail, contactoTipo: 'whatsapp', contacto: '11 5555 1234' });
+    expect(viejo.status).toBe(400);
+    expect(viejo.body.campos.email).toBeDefined();
+  });
+
+  it('la visita con WhatsApp incompleto responde 400', async () => {
+    const res = await crearVisita({ ...visitaValida, whatsapp: '123' });
+    expect(res.status).toBe(400);
+    expect(res.body.campos.whatsapp).toBeDefined();
   });
 
   it('informa el próximo vivo', async () => {

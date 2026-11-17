@@ -8,6 +8,11 @@ export const TEXTOS_INICIALES: TextosSitio = {
   reunion: 'Domingos 10 h',
   direccion: 'Camarones 2201',
   barrio: 'CABA',
+  mapaUrl: '',
+  versiculoBienvenida: {
+    texto: 'Vengan a mí todos ustedes que están cansados y agobiados, y yo les daré descanso.',
+    cita: 'Mateo 11:28',
+  },
   colectivos: '24, 53 y 109',
   comoLlegar: [
     { titulo: 'Colectivos', texto: '24, 53 y 109' },

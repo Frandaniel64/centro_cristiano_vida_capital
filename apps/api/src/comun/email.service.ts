@@ -12,19 +12,6 @@ const lista = (texto: string) =>
     .map((d) => d.trim())
     .filter(Boolean);
 
-/**
- * Temporal hasta la Task 2: visitas y pro-templo todavía usan esta plantilla
- * vieja. Las nuevas viven en ./emails/plantillas.ts.
- */
-export function plantilla(titulo: string, parrafos: string[]) {
-  const cuerpo = parrafos.map((p) => `<p style="margin:0 0 16px;font-size:16px;line-height:1.5">${p}</p>`).join('');
-  return `<!doctype html><html lang="es"><body style="margin:0;padding:24px;background:#f5f5f0;font-family:Arial,sans-serif;color:#000">
-<div style="max-width:560px;margin:0 auto;background:#fff;border-radius:16px;padding:32px">
-<h1 style="margin:0 0 20px;font-size:24px">${escapar(titulo)}</h1>${cuerpo}
-<p style="margin:24px 0 0;font-size:13px;color:#555">Centro Cristiano Vida Capital · Camarones 2201, CABA</p>
-</div></body></html>`;
-}
-
 @Injectable()
 export class EmailService {
   private readonly log = new Logger(EmailService.name);

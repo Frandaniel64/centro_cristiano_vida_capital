@@ -4,6 +4,9 @@ import { Type } from 'class-transformer';
 import { ArrayMaxSize, IsArray, IsBoolean, IsIn, IsInt, IsNumber, IsOptional, IsPositive, IsString, Length, Max, MaxLength, Min, NotEquals } from 'class-validator';
 import type { SesionActual } from '../auth/auth.service.js';
 import { Roles, Sesion, SesionGuard } from '../auth/sesion.guard.js';
+import { EmailService } from '../comun/email.service.js';
+import { ladrilloConfirmado } from '../comun/emails/plantillas.js';
+import { config } from '../config.js';
 import type { Prisma, Voucher } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { ProTemploService } from '../pro-templo/pro-templo.service.js';
@@ -58,6 +61,7 @@ export class ProTemploAdminController {
   constructor(
     private readonly prisma: PrismaService,
     private readonly proTemplo: ProTemploService,
+    private readonly email: EmailService,
   ) {}
 
   private async campana() {
@@ -77,6 +81,7 @@ export class ProTemploAdminController {
       apodoAprobado: v.apodoAprobado,
       contactoTipo: v.contactoTipo,
       contacto: v.contacto,
+      whatsapp: v.whatsapp,
       formaPago: v.formaPago,
       mensaje: v.mensaje,
       estado: estadoVisible(v, diasVencimiento),
@@ -164,6 +169,12 @@ export class ProTemploAdminController {
         actualizadoPorId: s.usuario.id,
       },
     });
+    // En segundo plano: la confirmación ya quedó guardada. Los vouchers viejos
+    // pueden tener WhatsApp como contacto; a esos no se les escribe.
+    if (v.contactoTipo === 'email') {
+      const aviso = ladrilloConfirmado({ nombre: v.nombre, numero: v.numero, sitioUrl: config.sitioUrl });
+      void this.email.enviar(v.contacto, aviso.asunto, aviso.html);
+    }
     return this.devolver(numero);
   }
 

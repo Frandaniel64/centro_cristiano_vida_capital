@@ -42,6 +42,7 @@ const muestras = {
     email: 'lucia@ejemplo.com',
     whatsapp: '1155551234',
     panelUrl,
+    sitioUrl,
   }),
   'aviso-recepcion': avisoRecepcion({
     nombre: 'Lucía Pérez',
@@ -49,6 +50,7 @@ const muestras = {
     whatsapp: null,
     intereses: ['Vida Kids', 'Jóvenes'],
     panelUrl,
+    sitioUrl,
   }),
   'ladrillo-confirmado': ladrilloConfirmado({ nombre: 'Lucía Pérez', numero: 348, sitioUrl }),
 };

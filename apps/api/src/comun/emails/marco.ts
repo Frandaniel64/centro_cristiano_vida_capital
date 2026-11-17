@@ -19,7 +19,7 @@ export function marco(contenido: string, d: { sitioUrl: string; pie: string }) {
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"></head>
 <body style="margin:0;padding:0;background:#f5f5f0">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f5f5f0"><tr><td align="center" style="padding:20px 12px">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;background:${COLOR.fondo};border-radius:20px;overflow:hidden;font-family:${FUENTE};color:${COLOR.texto}">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${COLOR.fondo}" style="max-width:560px;background:${COLOR.fondo};border-radius:20px;overflow:hidden;font-family:${FUENTE};color:${COLOR.texto}">
 <tr><td align="center" style="padding:32px 28px 8px">
 <img src="${d.sitioUrl}/logo-email.png" width="64" height="64" alt="Centro Cristiano Vida Capital" style="display:block;margin:0 auto 14px;border:0">
 <div style="font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:${COLOR.gris}">Centro Cristiano Vida Capital</div>
@@ -46,16 +46,16 @@ export const parrafo = (html: string) =>
 
 /** Recuadro oscuro para datos que hay que destacar. Ya viene escapado. */
 export const bloque = (html: string) =>
-  `<tr><td style="padding:4px 28px 16px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="background:${COLOR.bloque};border-radius:12px;padding:18px 20px;font-size:15px;line-height:1.6;color:${COLOR.texto}">${html}</td></tr></table></td></tr>`;
+  `<tr><td style="padding:4px 28px 16px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="${COLOR.bloque}" style="background:${COLOR.bloque};border-radius:12px;padding:18px 20px;font-size:15px;line-height:1.6;color:${COLOR.texto}">${html}</td></tr></table></td></tr>`;
 
 /** Versículo centrado con comillas grandes verdes y sin borde lateral. */
 export const versiculo = (v: { texto: string; cita: string }) =>
-  `<tr><td style="padding:4px 28px 20px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center" style="background:${COLOR.bloque};border-radius:12px;padding:20px">
+  `<tr><td style="padding:4px 28px 20px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center" bgcolor="${COLOR.bloque}" style="background:${COLOR.bloque};border-radius:12px;padding:20px">
 <div style="font-size:44px;line-height:44px;font-weight:900;color:${COLOR.verde}">&ldquo;</div>
 <div style="font-size:18px;line-height:1.45;font-style:italic;color:${COLOR.texto}">${escapar(v.texto)}</div>
 <div style="margin-top:10px;font-size:15px;font-weight:700;color:${COLOR.verde}">${escapar(v.cita)}</div>
 </td></tr></table></td></tr>`;
 
-/** Botón redondeado verde con texto negro. */
+/** Botón redondeado verde con texto negro. La celda lleva `bgcolor` para los clientes que ignoran el CSS. */
 export const boton = (texto: string, url: string) =>
-  `<tr><td align="center" style="padding:4px 28px 24px"><a href="${escapar(url)}" style="display:inline-block;background:${COLOR.verde};color:#000000;font-weight:700;font-size:15px;text-decoration:none;padding:12px 24px;border-radius:999px">${escapar(texto)}</a></td></tr>`;
+  `<tr><td align="center" style="padding:4px 28px 24px"><table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center"><tr><td align="center" bgcolor="${COLOR.verde}" style="background:${COLOR.verde};border-radius:999px"><a href="${escapar(url)}" style="display:inline-block;background:${COLOR.verde};color:#000000;font-weight:700;font-size:15px;text-decoration:none;padding:12px 24px;border-radius:999px">${escapar(texto)}</a></td></tr></table></td></tr>`;

@@ -27,8 +27,9 @@ export interface CrearVoucher {
   nombre: string;
   mostrarComo: MostrarComo;
   apodo?: string;
-  contactoTipo: ContactoTipo;
-  contacto: string;
+  email: string;
+  // Opcional; si viene, con código de área (mínimo 10 dígitos).
+  whatsapp?: string;
   formaPago: FormaPago;
   mensaje?: string;
   aceptaPrivacidad: true;
@@ -60,8 +61,9 @@ export interface VoucherPublico {
 // POST /api/visitas
 export interface CrearVisita {
   nombre: string;
-  contactoTipo: ContactoTipo;
-  contacto: string;
+  email: string;
+  // Opcional; si viene, con código de área (mínimo 10 dígitos).
+  whatsapp?: string;
   intereses: string[];
   aceptaPrivacidad: true;
   turnstileToken?: string;
@@ -113,6 +115,7 @@ export interface VoucherAdmin {
   apodoAprobado: boolean;
   contactoTipo: ContactoTipo;
   contacto: string;
+  whatsapp: string | null;
   formaPago: FormaPago;
   mensaje: string | null;
   // Estado guardado, salvo los pendientes fuera de plazo, que vienen como "vencido".
@@ -159,6 +162,7 @@ export interface VisitaAdmin {
   nombre: string;
   contactoTipo: ContactoTipo;
   contacto: string;
+  whatsapp: string | null;
   intereses: string[];
   estado: EstadoVisita;
   notas: string | null;
@@ -267,6 +271,10 @@ export interface TextosSitio {
   reunion: string; // "Domingos 10 h"
   direccion: string;
   barrio: string;
+  // Link de "Cómo llegar". Vacío: una búsqueda de Google Maps con la dirección.
+  mapaUrl: string;
+  // Versículo del email de bienvenida a quien avisa que viene.
+  versiculoBienvenida: { texto: string; cita: string };
   colectivos: string;
   comoLlegar: { titulo: string; texto: string }[];
   agendaDomingo: { hora: string; titulo: string; texto: string }[];
