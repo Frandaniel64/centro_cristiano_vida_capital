@@ -18,10 +18,12 @@ export const config = {
     urlPublica: (process.env.R2_PUBLIC_URL ?? '').replace(/\/$/, ''),
   },
   resendApiKey: process.env.RESEND_API_KEY ?? '',
-  emailDe: process.env.EMAIL_FROM ?? 'CCVida Capital <hola@ccvida.com.ar>',
+  emailDe: process.env.EMAIL_FROM ?? 'CCVida Capital <hola@ccvidacapital.org>',
   // Quién recibe los avisos internos. Vacío: no se avisa.
   emailRecepcion: process.env.RECEPCION_EMAIL ?? '',
   emailTesoreria: process.env.TESORERIA_EMAIL ?? '',
+  // Dirección del panel, para los botones de los avisos internos.
+  panelUrl: (process.env.PANEL_URL ?? 'http://localhost:4200').replace(/\/$/, ''),
   turnstileSecreto: process.env.TURNSTILE_SECRET_KEY ?? '',
   // Clave para firmar la vista previa de borradores. Vacía: vista previa desactivada.
   vistaPreviaSecreto: process.env.VISTA_PREVIA_SECRETO ?? '',

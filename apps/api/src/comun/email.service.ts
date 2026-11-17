@@ -5,7 +5,17 @@ import { config } from '../config.js';
 export const escapar = (texto: string) =>
   texto.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
-/** Arma el HTML de un email simple con la marca. Los párrafos ya vienen escapados. */
+/** Parte "a@x.com, b@x.com" en direcciones sueltas, sin vacíos. */
+const lista = (texto: string) =>
+  texto
+    .split(',')
+    .map((d) => d.trim())
+    .filter(Boolean);
+
+/**
+ * Temporal hasta la Task 2: visitas y pro-templo todavía usan esta plantilla
+ * vieja. Las nuevas viven en ./emails/plantillas.ts.
+ */
 export function plantilla(titulo: string, parrafos: string[]) {
   const cuerpo = parrafos.map((p) => `<p style="margin:0 0 16px;font-size:16px;line-height:1.5">${p}</p>`).join('');
   return `<!doctype html><html lang="es"><body style="margin:0;padding:24px;background:#f5f5f0;font-family:Arial,sans-serif;color:#000">
@@ -20,18 +30,29 @@ export class EmailService {
   private readonly log = new Logger(EmailService.name);
   private readonly resend = config.resendApiKey ? new Resend(config.resendApiKey) : null;
 
-  /** Envía sin frenar la respuesta: si falla, queda en el log y el formulario igual se guarda. */
-  async enviar(para: string, asunto: string, html: string) {
-    if (!para) return;
+  /**
+   * Envía sin frenar la respuesta: si falla, queda en el log y el formulario igual se guarda.
+   * `para` y `responderA` aceptan varias direcciones separadas por coma.
+   */
+  async enviar(para: string, asunto: string, html: string, opciones: { responderA?: string } = {}) {
+    const a = lista(para);
+    if (a.length === 0) return;
+    const responderA = lista(opciones.responderA ?? '');
     if (!this.resend) {
-      this.log.log(`[sin Resend] Email a ${para}: ${asunto}`);
+      this.log.log(`[sin Resend] Email a ${a.join(', ')}: ${asunto}`);
       return;
     }
     try {
-      const { error } = await this.resend.emails.send({ from: config.emailDe, to: para, subject: asunto, html });
-      if (error) this.log.error(`Resend rechazó el email a ${para}: ${error.message}`);
+      const { error } = await this.resend.emails.send({
+        from: config.emailDe,
+        to: a,
+        subject: asunto,
+        html,
+        ...(responderA.length ? { replyTo: responderA } : {}),
+      });
+      if (error) this.log.error(`Resend rechazó el email a ${a.join(', ')}: ${error.message}`);
     } catch (e) {
-      this.log.error(`No se pudo enviar el email a ${para}`, e as Error);
+      this.log.error(`No se pudo enviar el email a ${a.join(', ')}`, e as Error);
     }
   }
 }
