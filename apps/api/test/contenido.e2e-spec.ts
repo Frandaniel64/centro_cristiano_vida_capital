@@ -59,7 +59,7 @@ describe('Contenido (e2e)', () => {
 
   const foto = () => sharp({ create: { width: 1200, height: 800, channels: 3, background: '#8cc63f' } }).jpeg().toBuffer();
 
-  async function subirFoto(agente: ReturnType<typeof request.agent>, alt = 'Chicos jugando en Kids Vida') {
+  async function subirFoto(agente: ReturnType<typeof request.agent>, alt = 'Chicos jugando en Vida Kids') {
     const res = await agente.post('/api/admin/medios').attach('archivo', await foto(), 'foto.jpg').field('textoAlternativo', alt);
     if (res.status === 201) borrar.medios.push(res.body.id);
     return res;
@@ -113,7 +113,7 @@ describe('Contenido (e2e)', () => {
     borrar.ministerios.push(m.body.id);
     expect(m.body.slug).toBe(`jovenes-${SUFIJO}`);
     expect(m.body.actividades).toEqual(['Música', 'Charla']);
-    expect(m.body.foto.textoAlternativo).toBe('Chicos jugando en Kids Vida');
+    expect(m.body.foto.textoAlternativo).toBe('Chicos jugando en Vida Kids');
 
     // Otro con el mismo nombre recibe -2.
     const otro = await editor.post('/api/admin/ministerios').send({ ...datos, fotoId: null });
