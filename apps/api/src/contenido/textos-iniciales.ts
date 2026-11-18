@@ -24,7 +24,7 @@ export const TEXTOS_INICIALES: TextosSitio = {
   faqVisita: [
     { pregunta: '¿Cómo me tengo que vestir?', respuesta: 'Como estés cómodo. Vas a ver gente de jean y zapatillas, y también algunos más arreglados.' },
     { pregunta: '¿Puedo ir solo?', respuesta: 'Claro. Avisanos con el formulario y alguien te espera en la puerta para que no entres solo.' },
-    { pregunta: '¿Qué hago con mis hijos?', respuesta: 'Pueden ir a Kids Vida durante la reunión. Los registrás en la entrada y los retirás al final.' },
+    { pregunta: '¿Qué hago con mis hijos?', respuesta: 'Pueden ir a Vida Kids durante la reunión. Los registrás en la entrada y los retirás al final.' },
     { pregunta: '¿Me van a pedir plata?', respuesta: 'No. Hay un momento de ofrenda para quienes quieran dar, pero nadie espera que lo hagas en tu primera visita.' },
   ],
   faqProTemplo: [
@@ -39,7 +39,7 @@ export const TEXTOS_INICIALES: TextosSitio = {
   pastores: {
     nombres: 'Martín y Carolina Ruiz',
     texto:
-      'Pastorean CCVida desde 2016. Martín predica casi todos los domingos; Carolina coordina Kids Vida y los encuentros de matrimonios. Tienen tres hijos y una mesa donde siempre entra uno más.',
+      'Pastorean CCVida desde 2016. Martín predica casi todos los domingos; Carolina coordina Vida Kids y los encuentros de matrimonios. Tienen tres hijos y una mesa donde siempre entra uno más.',
     cita: '“Queremos que cada persona que entra sienta que llegó a casa.”',
   },
   creemos: [

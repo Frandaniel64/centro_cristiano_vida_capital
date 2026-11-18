@@ -6,7 +6,7 @@ import { fotoDiseno } from '../lib/fotos';
 export const fotos = {
   alabanza: fotoDiseno('alabanza', 'Personas levantando las manos durante la alabanza'),
   amigas: fotoDiseno('amigas', 'Amigas riendo juntas'),
-  kidsVida: fotoDiseno('kids-vida', 'Nenas pintando en Kids Vida'),
+  kidsVida: fotoDiseno('kids-vida', 'Nenas pintando en Vida Kids'),
   abuelaNieta: fotoDiseno('abuela-nieta', 'Una abuela abrazando a su nieta'),
   salonVacio: fotoDiseno('salon-vacio', 'Salón vacío con piso de madera y ventanales'),
   grupoCiudad: fotoDiseno('grupo-ciudad', 'Un grupo de personas abrazadas de espaldas mirando la ciudad'),
@@ -24,14 +24,14 @@ export const fotos = {
 };
 
 export const primeraVez = [
-  { titulo: 'Kids Vida', texto: 'Mientras vos estás en la reunión, los chicos aprenden y juegan.' },
+  { titulo: 'Vida Kids', texto: 'Mientras vos estás en la reunión, los chicos aprenden y juegan.' },
   { titulo: 'Vení como estés', texto: 'No hay código de vestimenta. Alguien te va a recibir en la puerta con un café.' },
 ];
 
 export const proTemploDestinos = [
   { monto: 'USD 4.000', titulo: 'Depósito y garantía', texto: 'Para firmar el contrato del local.', bg: '#0c74b8', fg: '#ffffff' },
   { monto: 'USD 3.500', titulo: 'Primeros tres meses', texto: 'El alquiler cubierto mientras nos acomodamos.', bg: '#8cc63f', fg: '#000000' },
-  { monto: 'USD 2.500', titulo: 'Acondicionamiento', texto: 'Sillas, sonido, luces y la sala de Kids Vida.', bg: '#f5d547', fg: '#000000' },
+  { monto: 'USD 2.500', titulo: 'Acondicionamiento', texto: 'Sillas, sonido, luces y la sala de Vida Kids.', bg: '#f5d547', fg: '#000000' },
 ];
 
 export const proTemploPasos = [

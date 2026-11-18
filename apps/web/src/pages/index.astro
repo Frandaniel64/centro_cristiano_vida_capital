@@ -19,6 +19,8 @@ const pt = await estadoProTemplo(campana.metaUsd);
 const ultimaPredica = predicas.find((p) => p.destacada) ?? predicas[0];
 const destacados = proximosEventos(eventos.filter((e) => e.destacado)).slice(0, 3);
 const flecha = 'M5 12h14M13 6l6 6-6 6';
+// "¿Primera vez?" muestra la agenda del domingo que se edita en el panel.
+const agenda = textos.agendaDomingo;
 // El lema se muestra con la última palabra en verde: "La iglesia sos vos."
 const palabras = textos.lema.trim().split(' ');
 const lemaFinal = palabras.pop() ?? '';
@@ -88,8 +90,22 @@ const jsonLd = {
     <h2 class="d h2">¿Primera vez? <span class="text-azul-link">Te esperamos.</span></h2>
     <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,300px),1fr))] border-t border-l border-linea">
       <div class="flex flex-col gap-2.5 border-r border-b border-linea p-8">
-        <p class="d text-[56px] leading-[.95] tracking-[-.04em] text-amarillo">10:00</p>
-        <p class="muted m-0">Cantamos juntos, escuchamos una prédica y nos quedamos a charlar. Terminamos cerca de las 11:45.</p>
+        {
+          agenda.length > 0 ? (
+            <>
+              <p class="d text-[56px] leading-[.95] tracking-[-.04em] text-amarillo">{agenda[0].hora}</p>
+              <ul class="muted m-0 flex list-none flex-col gap-1 p-0">
+                {agenda.map((a) => (
+                  <li>
+                    {a.hora} · {a.titulo}
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            <p class="d h3">{textos.reunion}</p>
+          )
+        }
       </div>
       {
         primeraVez.map((p) => (

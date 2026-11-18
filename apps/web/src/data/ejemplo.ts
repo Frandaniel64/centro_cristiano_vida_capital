@@ -27,7 +27,7 @@ export const CONTENIDO_EJEMPLO: ContenidoPublico = {
     faqVisita: [
       { pregunta: '¿Cómo me tengo que vestir?', respuesta: 'Como estés cómodo. Vas a ver gente de jean y zapatillas, y también algunos más arreglados.' },
       { pregunta: '¿Puedo ir solo?', respuesta: 'Claro. Avisanos con el formulario y alguien te espera en la puerta para que no entres solo.' },
-      { pregunta: '¿Qué hago con mis hijos?', respuesta: 'Pueden ir a Kids Vida durante la reunión. Los registrás en la entrada y los retirás al final.' },
+      { pregunta: '¿Qué hago con mis hijos?', respuesta: 'Pueden ir a Vida Kids durante la reunión. Los registrás en la entrada y los retirás al final.' },
       { pregunta: '¿Me van a pedir plata?', respuesta: 'No. Hay un momento de ofrenda para quienes quieran dar, pero nadie espera que lo hagas en tu primera visita.' },
     ],
     faqProTemplo: [
@@ -42,7 +42,7 @@ export const CONTENIDO_EJEMPLO: ContenidoPublico = {
     pastores: {
       nombres: 'Martín y Carolina Ruiz',
       texto:
-        'Pastorean CCVida desde 2016. Martín predica casi todos los domingos; Carolina coordina Kids Vida y los encuentros de matrimonios. Tienen tres hijos y una mesa donde siempre entra uno más.',
+        'Pastorean CCVida desde 2016. Martín predica casi todos los domingos; Carolina coordina Vida Kids y los encuentros de matrimonios. Tienen tres hijos y una mesa donde siempre entra uno más.',
       cita: '“Queremos que cada persona que entra sienta que llegó a casa.”',
     },
     creemos: [
@@ -71,7 +71,7 @@ export const CONTENIDO_EJEMPLO: ContenidoPublico = {
   ministerios: [
     {
       slug: 'kids-vida',
-      nombre: 'Kids Vida',
+      nombre: 'Vida Kids',
       edades: 'De 3 a 11 años',
       horario: 'Domingos 10 h, durante la reunión',
       resumen: 'Los más chicos conocen a Jesús jugando.',
@@ -126,7 +126,7 @@ export const CONTENIDO_EJEMPLO: ContenidoPublico = {
       lugar: 'Camarones 2201, CABA',
       resumen: 'Una charla para parejas y un almuerzo compartido después de la reunión.',
       descripcion:
-        'Después de la reunión del domingo nos quedamos a almorzar juntos y a charlar sobre cómo cuidar el matrimonio en lo cotidiano.\n\nPueden venir parejas de novios y matrimonios, sean o no de la iglesia. Los chicos quedan en Kids Vida.',
+        'Después de la reunión del domingo nos quedamos a almorzar juntos y a charlar sobre cómo cuidar el matrimonio en lo cotidiano.\n\nPueden venir parejas de novios y matrimonios, sean o no de la iglesia. Los chicos quedan en Vida Kids.',
       ministerio: 'matrimonios',
       destacado: true,
       linkInscripcion: null,
