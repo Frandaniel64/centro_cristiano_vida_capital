@@ -58,6 +58,9 @@ Si la API no responde, la web sigue mostrando la última versión que recibió.
   una barra amarilla para salir y responde con `noindex` y `no-store`. Sin `VISTA_PREVIA_SECRETO`
   en la API la vista previa queda desactivada (los endpoints responden 503). Editar algo ya
   publicado lo cambia en el sitio al guardar: no hay versiones.
+- Link para compartir: en Inicio del panel, un administrador crea un link de vista previa que dura
+  7 días (por ejemplo, para que los pastores revisen la web). No se puede anular uno solo: para
+  cortar todos los links hay que cambiar `VISTA_PREVIA_SECRETO` y reiniciar la API.
 
 ## Panel de administración
 
