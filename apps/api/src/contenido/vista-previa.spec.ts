@@ -1,4 +1,4 @@
-import { DURACION_PERMISO_MS, firmarPermiso, rutaInterna, verificarPermiso } from './vista-previa.js';
+import { DURACION_COMPARTIR_MS, DURACION_PERMISO_MS, firmarPermiso, rutaInterna, verificarPermiso } from './vista-previa.js';
 
 describe('permiso de vista previa', () => {
   it('un permiso vigente devuelve el usuario', () => {
@@ -7,6 +7,13 @@ describe('permiso de vista previa', () => {
 
   it('un permiso vencido no sirve', () => {
     expect(verificarPermiso(firmarPermiso('u1', 's', 0), 's', DURACION_PERMISO_MS + 1)).toBeNull();
+  });
+
+  it('el permiso para compartir dura 7 días', () => {
+    expect(DURACION_COMPARTIR_MS).toBe(7 * 24 * 60 * 60 * 1000);
+    const permiso = firmarPermiso('u1', 's', 0, DURACION_COMPARTIR_MS);
+    expect(verificarPermiso(permiso, 's', DURACION_COMPARTIR_MS)).toEqual({ usuarioId: 'u1' });
+    expect(verificarPermiso(permiso, 's', DURACION_COMPARTIR_MS + 1)).toBeNull();
   });
 
   it('firmado con otra clave no sirve', () => {
