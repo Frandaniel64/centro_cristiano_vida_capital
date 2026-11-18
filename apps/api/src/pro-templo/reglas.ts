@@ -33,19 +33,28 @@ export function nombrePublico(v: { nombre: string; mostrarComo: MostrarComo; apo
 /**
  * Cómo pagar, en una sola fuente para la web y el email. `datos` son los datos
  * bancarios tal como los cargó la iglesia: van aparte para mostrarlos en un recuadro.
+ * `canal` cambia solo la referencia al email: en la web es "el email que te
+ * mandamos"; dentro del email mismo, "este email".
  */
 export type InstruccionesPago = { texto: string; datos?: string };
+export type CanalInstrucciones = 'web' | 'email';
 
-export function instruccionesDePago(forma: FormaPago, numero: number, datosTransferencia: string): InstruccionesPago {
+export function instruccionesDePago(
+  forma: FormaPago,
+  numero: number,
+  datosTransferencia: string,
+  canal: CanalInstrucciones = 'web',
+): InstruccionesPago {
   const n = numeroVoucher(numero);
+  const elEmail = canal === 'email' ? 'este email' : 'el email que te mandamos';
   if (forma === 'efectivo') {
     return { texto: `Acercate a la mesa Pro Templo el domingo después de la reunión y decí tu número: Nº ${n}.` };
   }
   if (forma === 'transferencia') {
     const datos = datosTransferencia.trim();
     return datos
-      ? { texto: `Transferí a esta cuenta y respondé el email que te mandamos con la foto del comprobante (Nº ${n}):`, datos }
-      : { texto: `Respondé el email que te mandamos y tesorería te pasa los datos para transferir (Nº ${n}).` };
+      ? { texto: `Transferí a esta cuenta y respondé ${elEmail} con la foto del comprobante (Nº ${n}):`, datos }
+      : { texto: `Respondé ${elEmail} y tesorería te pasa los datos para transferir (Nº ${n}).` };
   }
   return { texto: `Te mandamos el link de pago por email. Tu número es Nº ${n}.` };
 }

@@ -150,14 +150,18 @@ export class ProTemploAdminController {
   @Post('vouchers/:numero/confirmar')
   @HttpCode(200)
   async confirmar(@Param('numero', ParseIntPipe) numero: number, @Body() d: ConfirmarDto, @Sesion() s: SesionActual) {
-    const v = await this.voucher(numero);
-    if (v.estado === 'confirmado') throw new BadRequestException({ mensaje: 'Este voucher ya está confirmado.' });
-    if (v.estado === 'anulado') throw new BadRequestException({ mensaje: 'Un voucher anulado no se puede confirmar. Reactivalo primero.' });
+    const yaConfirmado = () => new BadRequestException({ mensaje: 'Este voucher ya está confirmado.' });
+    const anulado = () => new BadRequestException({ mensaje: 'Un voucher anulado no se puede confirmar. Reactivalo primero.' });
+    const antes = await this.voucher(numero);
+    if (antes.estado === 'confirmado') throw yaConfirmado();
+    if (antes.estado === 'anulado') throw anulado();
     if (d.monedaRecibida === 'ARS' && !d.tipoCambio) {
       throw new BadRequestException({ mensaje: 'Revisá los datos marcados.', campos: { tipoCambio: 'Si se pagó en pesos, cargá el tipo de cambio.' } });
     }
-    await this.prisma.voucher.update({
-      where: { numero },
+    // Pasa a confirmado solo si todavía no lo está: dos confirmaciones a la vez
+    // no pueden ganar las dos (ni mandar dos emails).
+    const { count } = await this.prisma.voucher.updateMany({
+      where: { numero, estado: { notIn: ['confirmado', 'anulado'] } },
       data: {
         estado: 'confirmado',
         montoRecibido: d.montoRecibido,
@@ -169,6 +173,9 @@ export class ProTemploAdminController {
         actualizadoPorId: s.usuario.id,
       },
     });
+    const v = await this.voucher(numero);
+    // Otro pedido lo cambió entre la lectura y la actualización.
+    if (count === 0) throw v.estado === 'anulado' ? anulado() : yaConfirmado();
     // En segundo plano: la confirmación ya quedó guardada. Los vouchers viejos
     // pueden tener WhatsApp como contacto; a esos no se les escribe.
     if (v.contactoTipo === 'email') {

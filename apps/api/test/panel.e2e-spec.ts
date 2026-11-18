@@ -213,6 +213,38 @@ describe('Panel (e2e)', () => {
     expect(ladrillos()).toHaveLength(1);
   });
 
+  it('dos confirmaciones a la vez: una sola gana y sale un solo email', async () => {
+    const { agente } = await ingresar('tesoreria');
+    const creado = await request(app.getHttpServer())
+      .post('/api/vouchers')
+      .set('X-Forwarded-For', desde())
+      .send({ montoUsd: 25, nombre: 'Carrera E2E', mostrarComo: 'anonimo', email: 'carrera@example.com', formaPago: 'efectivo', aceptaPrivacidad: true });
+    vouchers.push((await prisma.voucher.findUniqueOrThrow({ where: { numero: creado.body.numero } })).id);
+    enviar.mockClear();
+
+    const confirmar = () => agente.post(`/api/admin/vouchers/${creado.body.numero}/confirmar`).send({ montoRecibido: 25, monedaRecibida: 'USD' });
+    const respuestas = await Promise.all([confirmar(), confirmar()]);
+    expect(respuestas.map((r) => r.status).sort()).toEqual([200, 400]);
+    expect(respuestas.find((r) => r.status === 400)!.body.mensaje).toBe('Este voucher ya está confirmado.');
+    await new Promise((r) => setTimeout(r, 50));
+    expect(enviar.mock.calls.filter((c) => c[1] === '¡Tu ladrillo ya está en la pared!')).toHaveLength(1);
+  });
+
+  it('un voucher anulado no se confirma ni manda email', async () => {
+    const { agente } = await ingresar('tesoreria');
+    const creado = await request(app.getHttpServer())
+      .post('/api/vouchers')
+      .set('X-Forwarded-For', desde())
+      .send({ montoUsd: 5, nombre: 'Anulado E2E', mostrarComo: 'anonimo', email: 'anulado@example.com', formaPago: 'efectivo', aceptaPrivacidad: true });
+    vouchers.push((await prisma.voucher.findUniqueOrThrow({ where: { numero: creado.body.numero } })).id);
+    await agente.post(`/api/admin/vouchers/${creado.body.numero}/anular`).send({ motivo: 'Prueba' });
+    enviar.mockClear();
+    const res = await agente.post(`/api/admin/vouchers/${creado.body.numero}/confirmar`).send({ montoRecibido: 5, monedaRecibida: 'USD' });
+    expect(res.status).toBe(400);
+    expect(res.body.mensaje).toBe('Un voucher anulado no se puede confirmar. Reactivalo primero.');
+    expect(enviar).not.toHaveBeenCalled();
+  });
+
   it('el WhatsApp opcional aparece en el panel de vouchers y de visitas', async () => {
     const tesoreria = await ingresar('tesoreria');
     const recepcion = await ingresar('recepcion');

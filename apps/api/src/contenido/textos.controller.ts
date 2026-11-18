@@ -51,7 +51,7 @@ class TextosDto implements TextosSitio {
   @IsString() @MaxLength(60) reunion!: string;
   @IsString() @MaxLength(120) direccion!: string;
   @IsString() @MaxLength(60) barrio!: string;
-  @IsString() @MaxLength(500) mapaUrl!: string;
+  @IsString() @MaxLength(500, { message: 'El link del mapa puede tener hasta 500 letras.' }) mapaUrl!: string;
   @ValidateNested() @Type(() => VersiculoDto) versiculoBienvenida!: VersiculoDto;
   @IsString() @MaxLength(120) colectivos!: string;
   @IsArray() @ArrayMaxSize(8) @ValidateNested({ each: true }) @Type(() => ItemDto) comoLlegar!: ItemDto[];

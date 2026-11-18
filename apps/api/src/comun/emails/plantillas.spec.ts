@@ -77,7 +77,7 @@ describe('plantillas de email', () => {
 
   it('transferencia sin datos no deja bloque vacío y avisa que tesorería pasa los datos', () => {
     const { html } = voucher({ formaPago: 'transferencia', datosTransferencia: '' });
-    expect(html).toContain('Respondé el email que te mandamos y tesorería te pasa los datos para transferir (Nº 0348).');
+    expect(html).toContain('Respondé este email y tesorería te pasa los datos para transferir (Nº 0348).');
     expect(html).not.toContain('<pre');
   });
 
@@ -85,14 +85,15 @@ describe('plantillas de email', () => {
     const { html } = voucher({ formaPago: 'transferencia', datosTransferencia: 'CBU 123\nAlias <CCVIDA>' });
     expect(html).toContain('CBU 123<br>Alias &lt;CCVIDA&gt;');
     expect(html).not.toContain('pre-line');
-    expect(html).toContain('respondé el email que te mandamos con la foto del comprobante');
+    expect(html).toContain('respondé este email con la foto del comprobante');
+    expect(html).not.toContain('te mandamos');
     expect(html).toContain('Tu ladrillo aparece en la pared cuando tesorería confirma el pago.');
   });
 
   it('las instrucciones del email salen de la misma fuente que las de la web', () => {
     for (const formaPago of ['efectivo', 'transferencia', 'mercadopago'] as const) {
       for (const datosTransferencia of ['', 'CBU 123\nAlias X']) {
-        const { texto, datos } = instruccionesDePago(formaPago, 348, datosTransferencia);
+        const { texto, datos } = instruccionesDePago(formaPago, 348, datosTransferencia, 'email');
         const { html } = voucher({ formaPago, datosTransferencia });
         expect(html).toContain(escapar(texto));
         if (datos) expect(html).toContain(datos.split('\n').map(escapar).join('<br>'));

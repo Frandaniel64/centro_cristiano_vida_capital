@@ -70,6 +70,17 @@ describe('instruccionesDePago', () => {
     });
   });
 
+  it('en el email se habla de "este email", no del que te mandamos', () => {
+    expect(instruccionesDePago('transferencia', 1, 'CBU 123', 'email')).toEqual({
+      texto: 'Transferí a esta cuenta y respondé este email con la foto del comprobante (Nº 0001):',
+      datos: 'CBU 123',
+    });
+    expect(instruccionesDePago('transferencia', 1, '', 'email')).toEqual({
+      texto: 'Respondé este email y tesorería te pasa los datos para transferir (Nº 0001).',
+    });
+    expect(instruccionesDePago('efectivo', 1, '', 'email')).toEqual(instruccionesDePago('efectivo', 1, ''));
+  });
+
   it('Mercado Pago avisa que el link llega por email', () => {
     expect(instruccionesDePago('mercadopago', 7, '')).toEqual({ texto: 'Te mandamos el link de pago por email. Tu número es Nº 0007.' });
   });
@@ -77,7 +88,9 @@ describe('instruccionesDePago', () => {
   it('ninguna instrucción menciona WhatsApp', () => {
     for (const forma of ['efectivo', 'transferencia', 'mercadopago'] as const) {
       for (const datos of ['', 'CBU 123']) {
-        expect(instruccionesEnTexto(instruccionesDePago(forma, 1, datos))).not.toMatch(/whatsapp/i);
+        for (const canal of ['web', 'email'] as const) {
+          expect(instruccionesEnTexto(instruccionesDePago(forma, 1, datos, canal))).not.toMatch(/whatsapp/i);
+        }
       }
     }
   });

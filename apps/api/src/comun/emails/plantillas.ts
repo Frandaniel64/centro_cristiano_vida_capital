@@ -41,9 +41,9 @@ export function bienvenidaVisita(d: {
   return { asunto: `¡Te esperamos, ${nombre}!`, html: marco(contenido, { sitioUrl: d.sitioUrl, pie: PIE_PERSONA }) };
 }
 
-/** Lo que hay que hacer para pagar: el mismo texto que muestra la web, con los datos bancarios en un recuadro. */
+/** Lo que hay que hacer para pagar: la misma fuente que la web (versión email), con los datos bancarios en un recuadro. */
 function pasosDePago(forma: FormaPago, numero: number, datosTransferencia: string) {
-  const { texto, datos } = instruccionesDePago(forma, numero, datosTransferencia);
+  const { texto, datos } = instruccionesDePago(forma, numero, datosTransferencia, 'email');
   return parrafo(e(texto)) + (datos ? bloque(datos.split(/\r?\n/).map(e).join('<br>')) : '');
 }
 

@@ -212,6 +212,16 @@ describe('API pública (e2e)', () => {
     expect(aviso[2]).toContain('/visitas');
   });
 
+  it('sin RECEPCION_EMAIL la visita solo manda la bienvenida', async () => {
+    config.emailRecepcion = '';
+    const res = await crearVisita(visitaValida);
+    expect(res.status).toBe(201);
+    visitas.push((await prisma.visita.findFirstOrThrow({ where: { nombre: 'Juan Visita E2E' }, orderBy: { creado: 'desc' } })).id);
+    await vi.waitFor(() => expect(enviar).toHaveBeenCalledTimes(1));
+    await new Promise((r) => setTimeout(r, 50));
+    expect(asuntos()).toEqual(['¡Te esperamos, Juan!']);
+  });
+
   it('la visita sin email responde 400 en el campo email, también con el contrato viejo', async () => {
     const { email: _sin, ...sinEmail } = visitaValida;
     const res = await crearVisita(sinEmail);
