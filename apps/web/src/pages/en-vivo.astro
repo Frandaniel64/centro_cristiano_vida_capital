@@ -17,7 +17,8 @@ const canalId = youtube.match(/\/channel\/(UC[\w-]{22})/)?.[1] ?? '';
 const linkVivo = youtube ? `${youtube}/live` : '';
 const usuario = (url: string) => url.replace(/^https:\/\/(www\.)?[^/]+\//, '').replace(/\/$/, '') || url;
 const redes = [
-  { red: 'YouTube', nombre: youtube ? usuario(youtube) : 'CCVida Capital', url: youtube },
+  // Un link /channel/UC… no dice nada a quien lo lee: ahí va el nombre de la iglesia.
+  { red: 'YouTube', nombre: youtube && !canalId ? usuario(youtube) : 'CCVida Capital', url: youtube },
   { red: 'Facebook', nombre: textos.facebook ? usuario(textos.facebook) : 'CCVida Capital', url: textos.facebook },
   { red: 'Instagram', nombre: textos.instagram ? `@${usuario(textos.instagram).replace(/^@/, '')}` : 'CCVida Capital', url: textos.instagram },
 ];
