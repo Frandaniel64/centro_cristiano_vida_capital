@@ -243,6 +243,30 @@ describe('Contenido (e2e)', () => {
       expect(res.body.url.endsWith('&ir=%2Fministerios%2Fx')).toBe(true);
     });
 
+    it('editor no puede pedir un link para compartir', async () => {
+      const editor = await ingresar('editor');
+      expect((await editor.post('/api/admin/vista-previa').send({ ruta: '/', compartir: true })).status).toBe(403);
+    });
+
+    it('administrador pide un link para compartir que dura 7 días', async () => {
+      const admin = await ingresar('administrador');
+      const antes = Date.now();
+      const res = await admin.post('/api/admin/vista-previa').send({ ruta: '/', compartir: true });
+      expect(res.status).toBe(200);
+      const semana = 7 * 24 * 60 * 60 * 1000;
+      const vence = new Date(res.body.vence).getTime();
+      expect(vence).toBeGreaterThanOrEqual(antes + semana);
+      expect(vence).toBeLessThanOrEqual(Date.now() + semana);
+      const prev = await request(app.getHttpServer()).get('/api/contenido/vista-previa').set('Authorization', `Bearer ${permisoDe(res.body.url)}`);
+      expect(prev.status).toBe(200);
+    });
+
+    it('sin compartir, el link vence en una hora', async () => {
+      const editor = await ingresar('editor');
+      const res = await editor.post('/api/admin/vista-previa').send({ ruta: '/' });
+      expect(new Date(res.body.vence).getTime()).toBeLessThanOrEqual(Date.now() + 60 * 60 * 1000);
+    });
+
     it('rechaza una ruta externa', async () => {
       const editor = await ingresar('editor');
       const res = await editor.post('/api/admin/vista-previa').send({ ruta: '//evil.com' });

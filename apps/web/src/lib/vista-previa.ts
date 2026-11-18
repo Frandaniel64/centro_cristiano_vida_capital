@@ -15,3 +15,21 @@ export function rutaInterna(ruta: unknown): ruta is string {
     !/[\u0000-\u001f\u007f]/.test(ruta)
   );
 }
+
+const UNA_HORA_S = 60 * 60;
+const SIETE_DIAS_S = 7 * 24 * UNA_HORA_S;
+
+/**
+ * Segundos que le quedan al permiso según su vencimiento, para que la cookie dure
+ * lo mismo (una hora, o siete días el link para compartir). No valida la firma:
+ * eso lo hace la API en cada pedido. Si no se puede leer, una hora.
+ */
+export function vigenciaCookie(permiso: string, ahora = Date.now()): number {
+  try {
+    const datos = JSON.parse(Buffer.from(permiso.split('.')[0] ?? '', 'base64url').toString('utf8'));
+    if (typeof datos?.exp !== 'number') return UNA_HORA_S;
+    return Math.min(Math.max(Math.floor((datos.exp - ahora) / 1000), 0), SIETE_DIAS_S);
+  } catch {
+    return UNA_HORA_S;
+  }
+}

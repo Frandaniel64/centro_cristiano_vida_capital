@@ -1,15 +1,17 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 
 // Permiso firmado para ver borradores en el sitio público: "<payload>.<firma>",
-// ambos en base64url. Dura una hora y no se guarda en ningún lado.
+// ambos en base64url. Dura una hora (siete días el link para compartir) y no se
+// guarda en ningún lado: para anular todos los links hay que cambiar VISTA_PREVIA_SECRETO.
 export const DURACION_PERMISO_MS = 3_600_000;
+export const DURACION_COMPARTIR_MS = 7 * 24 * DURACION_PERMISO_MS;
 
 const LARGO_MAXIMO_RUTA = 200;
 
 const firmar = (payload: string, secreto: string) => createHmac('sha256', secreto).update(payload).digest('base64url');
 
-export function firmarPermiso(usuarioId: string, secreto: string, ahora = Date.now()) {
-  const payload = Buffer.from(JSON.stringify({ u: usuarioId, exp: ahora + DURACION_PERMISO_MS })).toString('base64url');
+export function firmarPermiso(usuarioId: string, secreto: string, ahora = Date.now(), duracionMs = DURACION_PERMISO_MS) {
+  const payload = Buffer.from(JSON.stringify({ u: usuarioId, exp: ahora + duracionMs })).toString('base64url');
   return `${payload}.${firmar(payload, secreto)}`;
 }
 
