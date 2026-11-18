@@ -9,9 +9,10 @@ const acento = (href: string) =>
 
 <header class="border-b border-linea bg-fondo">
   <div class="wrap flex items-center justify-between gap-4 py-3.5">
-    <a href="/" aria-label="CCVida Capital, ir al inicio" class="flex items-center gap-3 text-texto no-underline">
-      <img src="/logo.svg" alt="" width="40" height="40" class="size-10 rounded-full" />
-      <span class="d text-[19px] tracking-[-.01em]">CCVida Capital</span>
+    <a href="/" aria-label="Centro Cristiano Vida Capital, ir al inicio" class="flex items-center gap-3 text-texto no-underline">
+      <img src="/logo.svg" alt="" width="40" height="40" class="size-10 shrink-0 rounded-full" />
+      <!-- En dos líneas para que el nombre completo no le quite lugar al menú. -->
+      <span class="d flex flex-col text-[17px] leading-[1.05] tracking-[-.01em]"><span>Centro Cristiano</span><span>Vida Capital</span></span>
     </a>
 
     <nav aria-label="Principal" class="nav-links items-center gap-0.5">

@@ -51,7 +51,7 @@ export const miniatura = (m: Pick<MedioAdmin, 'url' | 'tamanos'>) => {
         @if (campos()['archivo']) { <p class="error">{{ campos()['archivo'] }}</p> }
         <mat-form-field>
           <mat-label>Texto alternativo</mat-label>
-          <input matInput name="alt" maxlength="300" [(ngModel)]="textoAlternativo" placeholder="Ej.: Chicos de Kids Vida pintando en una mesa" />
+          <input matInput name="alt" maxlength="300" [(ngModel)]="textoAlternativo" placeholder="Ej.: Chicos de Vida Kids pintando en una mesa" />
           <mat-hint>Describí lo que se ve, para quien usa un lector de pantalla. Es obligatorio.</mat-hint>
         </mat-form-field>
         @if (campos()['textoAlternativo']) { <p class="error">{{ campos()['textoAlternativo'] }}</p> }
