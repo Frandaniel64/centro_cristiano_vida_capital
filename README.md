@@ -100,6 +100,28 @@ Los textos del sitio son la excepción: salen en la web al confirmar, y Claude t
 
 Detalle de las herramientas en [`apps/mcp/README.md`](apps/mcp/README.md).
 
+## Emails
+
+Los emails salen con [Resend](https://resend.com). Si no hay `RESEND_API_KEY`, solo se escriben en el log de la API. Salen en segundo plano: un fallo de Resend nunca hace fallar un formulario ni una confirmación.
+
+Antes de producción hay que verificar el dominio `ccvidacapital.org` en Resend y cargar en el DNS los registros SPF, DKIM y DMARC que indica el panel de Resend. Sin eso, los emails no llegan o caen en spam.
+
+Variables de la API (ver `apps/api/.env.example`):
+
+| Variable | Qué es |
+|---|---|
+| `RESEND_API_KEY` | Clave de Resend. Vacía = no envía, solo loguea |
+| `EMAIL_FROM` | Remitente. Por defecto `CCVida Capital <hola@ccvidacapital.org>` |
+| `RECEPCION_EMAIL` | Recibe el aviso de cada visita nueva. Varias direcciones separadas por coma |
+| `TESORERIA_EMAIL` | Recibe el aviso de cada voucher nuevo. Varias direcciones separadas por coma. Las respuestas al email del voucher van a estas direcciones |
+| `PANEL_URL` | URL del panel, para los enlaces de los emails. Por defecto `http://localhost:4200` |
+
+Para ver cómo quedan los 5 emails sin enviar nada:
+
+```bash
+npm run emails:muestra -w @ccvida/api   # escribe los HTML en apps/api/emails-muestra/ (no se commitea)
+```
+
 ## Despliegue
 
 Cuatro servicios separados en Coolify, todos con build pack **Dockerfile** y contexto `/` (raíz del repo):
