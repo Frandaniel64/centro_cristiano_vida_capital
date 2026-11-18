@@ -5,7 +5,8 @@ import { bloque, boton, marco, parrafo, titulo, versiculo } from './marco.js';
 
 type Email = { asunto: string; html: string };
 
-const PIE_PERSONA = 'Centro Cristiano Vida Capital &middot; Camarones 2201, CABA';
+const DIRECCION_POR_DEFECTO = 'Camarones 2201';
+const piePersona = (direccion?: string) => `Centro Cristiano Vida Capital &middot; ${escapar(direccion?.trim() || DIRECCION_POR_DEFECTO)}, CABA`;
 const PIE_INTERNO = 'Aviso automático de la web de Centro Cristiano Vida Capital.';
 
 const primerNombre = (nombre: string) => nombre.trim().split(/\s+/)[0] ?? '';
@@ -37,8 +38,8 @@ export function bienvenidaVisita(d: {
     titulo(`¡Te esperamos, ${e(nombre)}!`, `${e(d.reunion)} &middot; ${e(lugar)}`) +
     versiculo(d.versiculo) +
     parrafo('Vas a encontrar a alguien en la puerta para recibirte. Si venís con chicos, hay espacio para ellos en Vida Kids.') +
-    boton('Cómo llegar', urlMapa(d.direccion, d.mapaUrl));
-  return { asunto: `¡Te esperamos, ${nombre}!`, html: marco(contenido, { sitioUrl: d.sitioUrl, pie: PIE_PERSONA }) };
+    boton('📍 Cómo llegar', urlMapa(d.direccion, d.mapaUrl));
+  return { asunto: `¡Te esperamos, ${nombre}!`, html: marco(contenido, { sitioUrl: d.sitioUrl, pie: piePersona(d.direccion) }) };
 }
 
 /** Lo que hay que hacer para pagar: la misma fuente que la web (versión email), con los datos bancarios en un recuadro. */
@@ -54,6 +55,7 @@ export function voucherRegistrado(d: {
   formaPago: FormaPago;
   datosTransferencia: string;
   sitioUrl: string;
+  direccion?: string;
 }): Email {
   const n = numeroVoucher(d.numero);
   const contenido =
@@ -65,7 +67,7 @@ export function voucherRegistrado(d: {
     pasosDePago(d.formaPago, d.numero, d.datosTransferencia) +
     parrafo('Tu ladrillo aparece en la pared cuando tesorería confirma el pago.') +
     boton('Ver el estado de mi voucher', `${d.sitioUrl}/pro-templo/voucher/${n}`);
-  return { asunto: `Tu voucher Pro Templo Nº ${n}`, html: marco(contenido, { sitioUrl: d.sitioUrl, pie: PIE_PERSONA }) };
+  return { asunto: `Tu voucher Pro Templo Nº ${n}`, html: marco(contenido, { sitioUrl: d.sitioUrl, pie: piePersona(d.direccion) }) };
 }
 
 const contactoPersona = (email: string, whatsapp: string | null) =>
@@ -107,11 +109,11 @@ export function avisoRecepcion(d: {
   return { asunto: 'Alguien avisó que viene el domingo', html: marco(contenido, { sitioUrl: d.sitioUrl, pie: PIE_INTERNO }) };
 }
 
-export function ladrilloConfirmado(d: { nombre: string; numero: number; sitioUrl: string }): Email {
+export function ladrilloConfirmado(d: { nombre: string; numero: number; sitioUrl: string; direccion?: string }): Email {
   const n = numeroVoucher(d.numero);
   const contenido =
     titulo(`¡Gracias, ${e(primerNombre(d.nombre))}!`, `Tesorería confirmó tu voucher Nº ${n}.`) +
     parrafo('Tu ladrillo ya está en la pared. Gracias por ser parte de lo que Dios está construyendo en nuestra casa.') +
     boton('Ver la pared', `${d.sitioUrl}/pro-templo`);
-  return { asunto: '¡Tu ladrillo ya está en la pared!', html: marco(contenido, { sitioUrl: d.sitioUrl, pie: PIE_PERSONA }) };
+  return { asunto: '¡Tu ladrillo ya está en la pared!', html: marco(contenido, { sitioUrl: d.sitioUrl, pie: piePersona(d.direccion) }) };
 }

@@ -6,7 +6,7 @@ export function errorEmail(valor: unknown): string {
   const v = typeof valor === 'string' ? valor.trim() : '';
   if (!v) return 'Escribí tu email para que podamos escribirte.';
   if (v.length > 120) return 'El email puede tener hasta 120 letras.';
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) {
+  if (!/^[^\s@,;]+@[^\s@,;]+\.[^\s@,;]+$/.test(v)) {
     return 'Revisá el email: le falta la @ o el dominio, por ejemplo nombre@gmail.com.';
   }
   return '';

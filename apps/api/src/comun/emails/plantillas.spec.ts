@@ -58,6 +58,12 @@ describe('plantillas de email', () => {
     expect(ladrillo().html).toContain(`${sitioUrl}/pro-templo`);
   });
 
+  it('el pie de los emails a la persona usa la dirección de los textos', () => {
+    expect(voucher().html).toContain('Camarones 2201, CABA');
+    expect(ladrilloConfirmado({ nombre: 'A', numero: 1, sitioUrl, direccion: 'Av. Rivadavia 9999' }).html).toContain('Av. Rivadavia 9999, CABA');
+    expect(visita().html).toContain('📍 Cómo llegar');
+  });
+
   it('escapan lo que escribió la persona en las 5', () => {
     for (const { html } of [visita(malo), voucher({ nombre: malo }), tesoreria(malo), recepcion(malo), ladrillo(malo)]) {
       expect(html).toContain('&lt;script&gt;');

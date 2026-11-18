@@ -4,6 +4,7 @@ import 'dotenv/config';
 import { Test } from '@nestjs/testing';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import request from 'supertest';
+import type { MockInstance } from 'vitest';
 import { AppModule } from '../src/app.module.js';
 import { configurarApp } from '../src/app.setup.js';
 import { EmailService } from '../src/comun/email.service.js';
@@ -30,7 +31,7 @@ describe('API pública (e2e)', () => {
   const desde = () => `10.0.0.${++ip}`;
 
   // Los emails se espían: ninguno sale de verdad.
-  let enviar: ReturnType<typeof vi.spyOn<EmailService, 'enviar'>>;
+  let enviar: MockInstance<EmailService['enviar']>;
   const emailsOriginales = { tesoreria: config.emailTesoreria, recepcion: config.emailRecepcion };
   const asuntos = () => enviar.mock.calls.map((c) => c[1]);
 

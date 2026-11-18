@@ -3,6 +3,7 @@ import 'dotenv/config';
 import { Test } from '@nestjs/testing';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import request from 'supertest';
+import type { MockInstance } from 'vitest';
 import { AppModule } from '../src/app.module.js';
 import { configurarApp } from '../src/app.setup.js';
 import { EmailService } from '../src/comun/email.service.js';
@@ -32,7 +33,7 @@ describe('Panel (e2e)', () => {
     enviar = vi.spyOn(app.get(EmailService), 'enviar').mockResolvedValue(undefined);
   });
 
-  let enviar: ReturnType<typeof vi.spyOn<EmailService, 'enviar'>>;
+  let enviar: MockInstance<EmailService['enviar']>;
 
   afterAll(async () => {
     await prisma.ajusteCampana.deleteMany({ where: { cargadoPorId: { in: usuarios } } });

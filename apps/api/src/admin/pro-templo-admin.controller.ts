@@ -1,9 +1,10 @@
-import { BadRequestException, Body, Controller, Get, HttpCode, NotFoundException, Param, ParseIntPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { BadRequestException, Logger, Body, Controller, Get, HttpCode, NotFoundException, Param, ParseIntPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import type { AjusteAdmin, CampanaAdmin, EstadoVoucher, FormaPago, Pagina, VoucherAdmin } from '@ccvida/shared';
 import { Type } from 'class-transformer';
 import { ArrayMaxSize, IsArray, IsBoolean, IsIn, IsInt, IsNumber, IsOptional, IsPositive, IsString, Length, Max, MaxLength, Min, NotEquals } from 'class-validator';
 import type { SesionActual } from '../auth/auth.service.js';
 import { Roles, Sesion, SesionGuard } from '../auth/sesion.guard.js';
+import { ContenidoService } from '../contenido/contenido.service.js';
 import { EmailService } from '../comun/email.service.js';
 import { ladrilloConfirmado } from '../comun/emails/plantillas.js';
 import { config } from '../config.js';
@@ -58,10 +59,13 @@ class CampanaDto implements Partial<CampanaAdmin> {
 @UseGuards(SesionGuard)
 @Roles('administrador', 'tesoreria')
 export class ProTemploAdminController {
+  private readonly log = new Logger(ProTemploAdminController.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly proTemplo: ProTemploService,
     private readonly email: EmailService,
+    private readonly contenido: ContenidoService,
   ) {}
 
   private async campana() {
@@ -179,10 +183,19 @@ export class ProTemploAdminController {
     // En segundo plano: la confirmación ya quedó guardada. Los vouchers viejos
     // pueden tener WhatsApp como contacto; a esos no se les escribe.
     if (v.contactoTipo === 'email') {
-      const aviso = ladrilloConfirmado({ nombre: v.nombre, numero: v.numero, sitioUrl: config.sitioUrl });
-      void this.email.enviar(v.contacto, aviso.asunto, aviso.html);
+      void this.avisarConfirmacion(v);
     }
     return this.devolver(numero);
+  }
+
+  private async avisarConfirmacion(v: Voucher) {
+    try {
+      const { direccion } = await this.contenido.textos();
+      const aviso = ladrilloConfirmado({ nombre: v.nombre, numero: v.numero, sitioUrl: config.sitioUrl, direccion });
+      void this.email.enviar(v.contacto, aviso.asunto, aviso.html);
+    } catch (e) {
+      this.log.error(`No se pudo armar el email de confirmación del voucher Nº ${v.numero}`, e as Error);
+    }
   }
 
   @Post('vouchers/:numero/anular')

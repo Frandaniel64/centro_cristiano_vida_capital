@@ -1,6 +1,7 @@
 import { Injectable, Logger, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
 import type { EstadoProTemplo, VoucherCreado } from '@ccvida/shared';
 import { EmailService } from '../comun/email.service.js';
+import { ContenidoService } from '../contenido/contenido.service.js';
 import { avisoTesoreria, voucherRegistrado } from '../comun/emails/plantillas.js';
 import { ErrorDeFormulario } from '../comun/validacion.js';
 import { config } from '../config.js';
@@ -20,6 +21,7 @@ export class ProTemploService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly email: EmailService,
+    private readonly contenido: ContenidoService,
   ) {}
 
   private async campana() {
@@ -87,7 +89,7 @@ export class ProTemploService {
 
     const configuracion = await this.prisma.configuracion.findUnique({ where: { id: 1 } });
     const datosTransferencia = configuracion?.datosTransferencia ?? '';
-    this.avisar(voucher.numero, datos, datosTransferencia);
+    void this.avisar(voucher.numero, datos, datosTransferencia);
 
     return {
       numero: voucher.numero,
@@ -100,8 +102,9 @@ export class ProTemploService {
 
   // Los emails salen en segundo plano: el voucher ya quedó guardado. Las
   // direcciones de tesorería se leen en cada envío.
-  private avisar(numero: number, datos: CrearVoucherDto, datosTransferencia: string) {
+  private async avisar(numero: number, datos: CrearVoucherDto, datosTransferencia: string) {
     try {
+      const { direccion } = await this.contenido.textos();
       const tesoreria = config.emailTesoreria.trim();
       const persona = voucherRegistrado({
         nombre: datos.nombre,
@@ -110,6 +113,7 @@ export class ProTemploService {
         formaPago: datos.formaPago,
         datosTransferencia,
         sitioUrl: config.sitioUrl,
+        direccion,
       });
       // Si la persona responde (comprobante, dudas), le llega a tesorería.
       void this.email.enviar(datos.email, persona.asunto, persona.html, tesoreria ? { responderA: tesoreria } : {});

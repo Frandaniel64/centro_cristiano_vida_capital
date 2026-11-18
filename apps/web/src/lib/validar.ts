@@ -2,7 +2,7 @@
 export function errorEmail(valor: string): string {
   const v = valor.trim();
   if (!v) return 'Escribí tu email.';
-  if (v.length > 120 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) {
+  if (v.length > 120 || !/^[^\s@,;]+@[^\s@,;]+\.[^\s@,;]+$/.test(v)) {
     return 'Revisá el email: le falta la @ o el dominio, por ejemplo nombre@gmail.com.';
   }
   return '';

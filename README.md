@@ -114,7 +114,15 @@ Variables de la API (ver `apps/api/.env.example`):
 | `EMAIL_FROM` | Remitente. Por defecto `CCVida Capital <hola@ccvidacapital.org>` |
 | `RECEPCION_EMAIL` | Recibe el aviso de cada visita nueva. Varias direcciones separadas por coma |
 | `TESORERIA_EMAIL` | Recibe el aviso de cada voucher nuevo. Varias direcciones separadas por coma. Las respuestas al email del voucher van a estas direcciones |
-| `PANEL_URL` | URL del panel, para los enlaces de los emails. Por defecto `http://localhost:4200` |
+| `PANEL_URL` | URL del panel, para los enlaces de los emails. Por defecto `http://localhost:4200`. En producción: `https://panel.ccvidacapital.org` |
+| `SITE_URL` | URL pública de la web, con `https`. De ahí salen el logo de los emails (`SITE_URL/logo-email.png`) y todos sus enlaces: si no es pública, el logo no se ve |
+| `TURNSTILE_SECRET_KEY` | En producción, obligatoria en la práctica (y `PUBLIC_TURNSTILE_SITE_KEY` en la web): los formularios públicos mandan un email a la dirección que escriba la persona, y sin captcha cualquiera puede usarlos para enviar correo a terceros |
+
+Después de desplegar:
+
+1. Si la base de producción tiene la frase vieja en "FAQ Pro Templo" ("Te pasamos los datos por WhatsApp."), corregila en el panel, en Textos: "Te mandamos los datos por email.".
+2. Mandá un email real de cada clase: una visita, un voucher (a un email propio) y la confirmación de ese voucher desde el panel.
+3. Orden del despliegue: API, después web, después panel. No lo hagas el domingo de 9 a 13 h.
 
 Para ver cómo quedan los 5 emails sin enviar nada:
 
@@ -130,7 +138,7 @@ Cuatro servicios separados en Coolify, todos con build pack **Dockerfile** y con
 |---|---|---|---|
 | Base de datos | PostgreSQL 17 de Coolify, sin puerto público, backup diario | 5432 | — |
 | API | `apps/api/Dockerfile` | 3000 | — (todo en runtime, ver abajo) |
-| Web pública | `apps/web/Dockerfile` | 4321 | `PUBLIC_API_URL`, `SITE_URL`, `PUBLIC_DEMO=false`, opcional `PUBLIC_TURNSTILE_SITE_KEY` |
+| Web pública | `apps/web/Dockerfile` | 4321 | `PUBLIC_API_URL`, `SITE_URL`, `PUBLIC_DEMO=false`, `PUBLIC_TURNSTILE_SITE_KEY` (recomendada en producción) |
 | Panel | `apps/admin/Dockerfile` (nginx) | 80 | `API_URL` |
 
 La web y el panel fijan la URL de la API al compilar: si cambia el dominio de la API, hay que
