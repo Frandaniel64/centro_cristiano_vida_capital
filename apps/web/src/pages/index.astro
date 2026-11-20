@@ -179,8 +179,8 @@ const jsonLd = {
           ministerios.map((m) => (
             <a href={`/ministerios/${m.slug}`} class="fila flex min-h-[420px] flex-col overflow-hidden rounded-3xl no-underline" style={`background: ${m.color ?? '#b1d9e1'}; color: ${colorTexto(m.color)}`}>
               {m.foto && (
-                <span class="block h-[200px] w-full">
-                  <Foto foto={m.foto} decorativa sizes="(max-width: 860px) 100vw, 25vw" />
+                <span class="block h-[240px] w-full">
+                  <Foto foto={m.foto} decorativa sizes="(max-width: 860px) 100vw, 25vw" class="object-[50%_30%]" />
                 </span>
               )}
               <span class="flex grow flex-col justify-between gap-4 p-6">
