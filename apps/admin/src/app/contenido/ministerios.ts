@@ -19,7 +19,7 @@ interface Formulario extends Omit<Guardar<MinisterioAdmin>, 'actividades'> {
   actividades: string;
 }
 
-const VACIO: Formulario = { nombre: '', slug: '', estado: 'borrador', edades: '', horario: '', resumen: '', descripcion: '', actividades: '', color: '#0c74b8', orden: 0, fotoId: null };
+const VACIO: Formulario = { nombre: '', slug: '', estado: 'borrador', edades: '', horario: '', resumen: '', descripcion: '', actividades: '', color: '#0a6cac', orden: 0, fotoId: null };
 
 @Component({
   selector: 'app-ministerios',
@@ -189,7 +189,7 @@ export class Ministerios {
       resumen: m.resumen ?? '',
       descripcion: m.descripcion ?? '',
       actividades: aLineas(m.actividades),
-      color: m.color ?? '#0c74b8',
+      color: m.color ?? '#0a6cac',
       orden: m.orden,
       fotoId: m.foto?.id ?? null,
     };

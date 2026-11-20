@@ -106,7 +106,7 @@ export class ProTemploService {
         plantilla(`¡Gracias, ${datos.nombre.split(' ')[0]}!`, [
           `Registramos tu voucher <strong>Nº ${n}</strong> de <strong>USD ${datos.montoUsd.toLocaleString('es-AR')}</strong>. Está pendiente de pago y suma a la pared cuando tesorería lo confirme.`,
           escapar(instrucciones).replace(/\n/g, '<br>'),
-          `Podés ver el estado de tu voucher acá: <a href="${link}">${link}</a>`,
+          `Puedes ver el estado de tu voucher aquí: <a href="${link}">${link}</a>`,
         ]),
       );
     }

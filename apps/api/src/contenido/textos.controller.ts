@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Put, UseGuards } from '@nestjs/common';
 import type { TextosAdmin, TextosSitio } from '@ccvida/shared';
 import { Type } from 'class-transformer';
-import { ArrayMaxSize, IsArray, IsOptional, IsString, Matches, MaxLength, ValidateNested } from 'class-validator';
+import { ArrayMaxSize, IsArray, IsOptional, IsString, MaxLength, ValidateNested } from 'class-validator';
 import type { SesionActual } from '../auth/auth.service.js';
 import { Roles, Sesion, SesionGuard } from '../auth/sesion.guard.js';
 import { ErrorDeFormulario } from '../comun/validacion.js';
@@ -29,8 +29,12 @@ class PastoresDto {
   @IsString() @MaxLength(300) cita!: string;
 }
 
-class PilarDto extends ItemDto {
-  @Matches(/^#[0-9a-fA-F]{6}$/, { message: 'Elegí un color.' }) color!: string;
+class PilarModeloDto {
+  @IsString() @MaxLength(40) titulo!: string;
+  @IsString() @MaxLength(80) frase!: string;
+  @IsString() @MaxLength(800) texto!: string;
+  @IsString() @MaxLength(80) introItems!: string;
+  @IsArray() @ArrayMaxSize(6) @ValidateNested({ each: true }) @Type(() => ItemDto) items!: ItemDto[];
 }
 
 class FotosNosotrosDto {
@@ -54,14 +58,16 @@ class TextosDto implements TextosSitio {
   @IsString() @MaxLength(4000) historia!: string;
   @IsString() @MaxLength(200) datosIglesia!: string;
   @ValidateNested() @Type(() => PastoresDto) pastores!: PastoresDto;
-  @IsArray() @ArrayMaxSize(8) @ValidateNested({ each: true }) @Type(() => ItemDto) creemos!: ItemDto[];
   @IsString() @MaxLength(40) whatsapp!: string;
   @IsString() @MaxLength(300) instagram!: string;
   @IsString() @MaxLength(300) youtube!: string;
   @IsString() @MaxLength(300) facebook!: string;
   @IsString() @MaxLength(1000) datosTransferencia!: string;
   @IsString() @MaxLength(600) nosotrosIntro!: string;
-  @IsArray() @ArrayMaxSize(6) @ValidateNested({ each: true }) @Type(() => PilarDto) pilares!: PilarDto[];
+  @IsString() @MaxLength(2000) mision!: string;
+  @IsString() @MaxLength(2000) vision!: string;
+  @IsString() @MaxLength(120) modeloBajada!: string;
+  @IsArray() @ArrayMaxSize(4) @ValidateNested({ each: true }) @Type(() => PilarModeloDto) modelo!: PilarModeloDto[];
   @ValidateNested() @Type(() => FotosNosotrosDto) fotosNosotros!: FotosNosotrosDto;
 }
 

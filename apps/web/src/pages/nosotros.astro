@@ -2,7 +2,7 @@
 import Foto from '../components/Foto.astro';
 import Base from '../layouts/Base.astro';
 import { fotos } from '../data/estaticos';
-import { colorTexto, contenido, parrafos } from '../lib/contenido';
+import { contenido, parrafos } from '../lib/contenido';
 
 export const prerender = false;
 const { textos, nosotros } = await contenido(Astro.locals);
@@ -11,11 +11,19 @@ const portada = nosotros.portada ?? fotos.grupoCiudad;
 const fotoHistoria = nosotros.historia ?? fotos.amigosMesa;
 const fotoPastores = nosotros.pastores ?? fotos.pastor;
 const galeria = nosotros.galeria.length ? nosotros.galeria : fotos.galeria;
+const [mision = '', ...misionApoyo] = parrafos(textos.mision);
+const [vision = '', ...visionApoyo] = parrafos(textos.vision);
+// Colores de la paleta oficial para cada parte del modelo (fondo, texto).
+const COLORES_MODELO = [
+  { fondo: 'bg-azul-vida', acento: 'text-celeste-vida' },
+  { fondo: 'bg-verde-hoja text-azul-noche', acento: 'text-azul-noche/70' },
+  { fondo: 'bg-azul-noche', acento: 'text-verde-hoja' },
+];
 ---
 
 <Base titulo="Nosotros" descripcion="Somos una iglesia cristiana evangélica en Buenos Aires: una familia que se recibe, se acompaña y comparte la mesa." imagen={portada}>
   <section class="wrap flex flex-col gap-10 pt-14">
-    <h1 class="d h1">Somos <span class="text-verde-hoja">familia</span></h1>
+    <h1 class="d h1">Somos <span class="text-verde-oscuro">familia</span></h1>
     <div class="flex flex-wrap justify-between gap-6 border-t border-linea pt-6">
       <p class="lead muted flex-[0_1_560px]">{textos.nosotrosIntro}</p>
       <p class="d flex-[0_1_320px] text-[22px] leading-[1.2]">{textos.datosIglesia}</p>
@@ -29,6 +37,9 @@ const galeria = nosotros.galeria.length ? nosotros.galeria : fotos.galeria;
     <div class="flex min-w-0 flex-[1_1_480px] flex-col gap-5">
       <h2 class="d h2">Nuestra historia</h2>
       {parrafos(textos.historia).map((p) => <p class="lead muted">{p}</p>)}
+      <p class="lead muted">
+        Somos parte de la familia de <a href="https://ccvidaargentina.org/site/">Centro Cristiano Vida Argentina</a>, nuestra iglesia madre en San Isidro, y de la <a href="https://www.uad.org.ar/v02/">Unión de Asambleas de Dios</a>.
+      </p>
     </div>
     <div class="h-[440px] min-w-0 flex-[1_1_420px] overflow-hidden rounded-3xl">
       <Foto foto={fotoHistoria} sizes="(max-width: 860px) 100vw, 50vw" />
@@ -36,24 +47,53 @@ const galeria = nosotros.galeria.length ? nosotros.galeria : fotos.galeria;
   </section>
 
   <section class="linea">
-    <div class="wrap flex flex-col gap-10 py-30">
-      <h2 class="d h2">Lo que nos mueve</h2>
-      <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,260px),1fr))] gap-3">
-        {
-          textos.pilares.map((p) => (
-            <div class="flex min-h-[300px] flex-col justify-end gap-2.5 rounded-3xl border border-linea p-7" style={`background: ${p.color}; color: ${colorTexto(p.color)}`}>
-              <h3 class="d h3 text-[34px]">{p.titulo}</h3>
-              <p class="m-0">{p.texto}</p>
-            </div>
-          ))
-        }
+    <div class="wrap flex flex-wrap gap-12 py-30">
+      <h2 class="d h2 flex-[1_1_360px]">Nuestra misión</h2>
+      <div class="flex min-w-0 flex-[2_1_560px] flex-col gap-5">
+        <p class="d m-0 text-[clamp(28px,3vw,40px)] leading-[1.15] tracking-[-.02em]">{mision}</p>
+        {misionApoyo.map((p) => <p class="lead muted">{p}</p>)}
       </div>
     </div>
   </section>
 
-  <section class="claro bg-amarillo text-black">
+  <section aria-labelledby="modelo" class="linea">
+    <div class="wrap flex flex-col gap-10 py-30">
+      <div class="flex flex-col gap-3">
+        <h2 id="modelo" class="d h2">Nuestro modelo: las {textos.modelo.length}E</h2>
+        {textos.modeloBajada && <p class="lead muted">{textos.modeloBajada}</p>}
+      </div>
+      <ol class="m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(min(100%,320px),1fr))] gap-3 p-0">
+        {
+          textos.modelo.map((m, i) => {
+            const c = COLORES_MODELO[i % COLORES_MODELO.length]!;
+            return (
+              <li class={`flex flex-col gap-4 rounded-3xl p-[clamp(24px,3vw,36px)] ${c.fondo}`}>
+                <p class={`d m-0 text-6xl leading-none ${c.acento}`}>{i + 1}</p>
+                <div>
+                  <h3 class="d h3 text-[34px] uppercase">{m.titulo}</h3>
+                  <p class="m-0 mt-1 text-xl font-bold">{m.frase}</p>
+                </div>
+                <p class="m-0">{m.texto}</p>
+                {m.introItems && <p class="m-0 font-bold">{m.introItems}</p>}
+                <ul class="m-0 flex list-none flex-col gap-3 p-0">
+                  {m.items.map((it) => (
+                    <li class="border-t border-current/25 pt-3">
+                      <strong class="block text-lg">{it.titulo}</strong>
+                      <span>{it.texto}</span>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            );
+          })
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="claro bg-celeste-vida text-azul-noche">
     <div class="wrap flex flex-wrap-reverse items-center gap-14 py-30">
-      <div class="h-[480px] min-w-0 flex-[1_1_380px] overflow-hidden rounded-[999px_999px_24px_24px] bg-black">
+      <div class="h-[480px] min-w-0 flex-[1_1_380px] overflow-hidden rounded-[999px_999px_24px_24px] bg-azul-noche">
         <Foto foto={fotoPastores} sizes="(max-width: 860px) 100vw, 45vw" />
       </div>
       <div class="flex min-w-0 flex-[1_1_480px] flex-col gap-5">
@@ -66,20 +106,21 @@ const galeria = nosotros.galeria.length ? nosotros.galeria : fotos.galeria;
   </section>
 
   <section class="wrap flex flex-wrap gap-12 py-30">
-    <h2 class="d h2 flex-[1_1_360px]">Lo que creemos</h2>
-    <div class="grid flex-[2_1_560px] grid-cols-[repeat(auto-fit,minmax(min(100%,260px),1fr))] gap-x-10 gap-y-7">
-      {
-        textos.creemos.map((c) => (
-          <div class="border-t-2 border-texto pt-4">
-            <h3 class="d mb-1.5 text-2xl leading-[1.2]">{c.titulo}</h3>
-            <p class="muted m-0">{c.texto}</p>
-          </div>
-        ))
-      }
+    <h2 class="d h2 flex-[1_1_360px]">Nuestra visión</h2>
+    <div class="flex min-w-0 flex-[2_1_560px] flex-col gap-5">
+      <p class="d m-0 text-[clamp(28px,3vw,40px)] leading-[1.15] tracking-[-.02em]">{vision}</p>
+      {visionApoyo.map((p) => <p class="lead muted">{p}</p>)}
     </div>
   </section>
 
-  <section aria-label="Galería" class="wrap grid auto-rows-[260px] grid-cols-[repeat(auto-fit,minmax(min(100%,240px),1fr))] gap-3 pb-30">
+  <section class="bg-azul-noche">
+    <div class="wrap flex flex-col gap-4 py-24 text-center">
+      <p class="d m-0 text-[clamp(28px,4vw,52px)] leading-[1.1] tracking-[-.02em]">{textos.modelo.map((m) => `${m.frase}.`).join(' ')}</p>
+      <p class="d m-0 text-[clamp(36px,6vw,80px)] leading-none tracking-[-.03em] text-verde-hoja">{textos.lema}</p>
+    </div>
+  </section>
+
+  <section aria-label="Galería" class="wrap grid auto-rows-[260px] grid-cols-[repeat(auto-fit,minmax(min(100%,240px),1fr))] gap-3 py-30">
     {
       galeria.map((f) => (
         <div class="overflow-hidden rounded-3xl">

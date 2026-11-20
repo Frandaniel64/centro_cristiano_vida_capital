@@ -6,7 +6,7 @@ const actuales = {
   lema: 'Una familia',
   youtube: 'https://youtube.com/old',
   pastores: { nombres: 'Juan y Ana', texto: 'Texto', cita: 'vieja' },
-  creemos: [{ titulo: 'A', texto: 'a' }],
+  comoLlegar: [{ titulo: 'A', texto: 'a' }],
   fotosNosotros: { portada: 'f1', historia: null, pastores: null, galeria: ['f1'] },
   fotos: { f1: { id: 'f1', url: 'u' } },
 };
@@ -53,7 +53,7 @@ describe('textos', () => {
       lema: 'Una familia',
       youtube: 'https://youtube.com/old',
       pastores: { nombres: 'Juan y Ana', texto: 'Texto', cita: 'x' },
-      creemos: [{ titulo: 'A', texto: 'a' }],
+      comoLlegar: [{ titulo: 'A', texto: 'a' }],
       fotosNosotros: { portada: 'f1', historia: null, pastores: null, galeria: ['f1'] },
     });
     expect(r).toEqual({ guardado: true, cambios: [{ campo: 'pastores.cita', antes: 'vieja', despues: 'x' }] });
@@ -67,9 +67,9 @@ describe('textos', () => {
 
   it('un array que cambia es una sola entrada', async () => {
     const { cliente } = armar();
-    const r = await editarTextos(cliente, { creemos: [{ titulo: 'B', texto: 'b' }] });
+    const r = await editarTextos(cliente, { comoLlegar: [{ titulo: 'B', texto: 'b' }] });
     expect(r.cambios).toEqual([
-      { campo: 'creemos', antes: [{ titulo: 'A', texto: 'a' }], despues: [{ titulo: 'B', texto: 'b' }] },
+      { campo: 'comoLlegar', antes: [{ titulo: 'A', texto: 'a' }], despues: [{ titulo: 'B', texto: 'b' }] },
     ]);
   });
 

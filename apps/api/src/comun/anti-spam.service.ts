@@ -3,7 +3,7 @@ import type { ErrorApi } from '@ccvida/shared';
 import { config } from '../config.js';
 
 const RECHAZO: ErrorApi = {
-  mensaje: 'No pudimos verificar el envío. Recargá la página y probá de nuevo.',
+  mensaje: 'No pudimos verificar el envío. Recarga la página y prueba de nuevo.',
 };
 
 @Injectable()

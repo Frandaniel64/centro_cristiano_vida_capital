@@ -26,24 +26,25 @@
   font-display: swap;
 }
 
-/* Tokens de la Propuesta 2 (spec, sección Diseño) y Manual de Identidad Visual. El sitio es solo oscuro. */
+/* Paleta oficial del Manual de Identidad Visual: azul #0A6CAC, verde #A0D062,
+   azul noche #0D1F2D y celeste #B1D9E1. Sitio claro; sin negro ni amarillo. */
 @theme {
-  --color-fondo: #000000;
-  --color-panel: #0a0a0a;
-  --color-linea: #262626;
-  --color-borde-control: #3a3a3a;
-  --color-ladrillo-vacio: #1c1c1c;
-  --color-texto: #f5f5f0;
-  --color-texto-suave: #a3a3a3;
+  --color-fondo: #faf7f0;
+  --color-panel: #ffffff;
+  --color-linea: #e4ddcf;
+  --color-borde-control: #b9b09e;
+  --color-ladrillo-vacio: #e9e3d6;
+  --color-texto: #0d1f2d;
+  --color-texto-suave: #4f5d6a;
   --color-azul-noche: #0d1f2d;
-  --color-azul-vida: #0c74b8;
-  --color-azul-link: #4fa3e0;
+  --color-azul-vida: #0a6cac;
+  --color-azul-link: #0a6cac;
   --color-celeste-vida: #b1d9e1;
   --color-verde-hoja: #a0d062;
-  --color-amarillo: #f5d547;
+  /* Verde de la marca oscurecido, solo para texto sobre fondo claro (contraste). */
+  --color-verde-oscuro: #3f7417;
   --color-rojo-vivo: #d92d20;
-  --color-error: #ff8a80;
-  --color-input-amarillo: #fff8d6;
+  --color-error: #b42318;
 
   --font-titulo: "MADE TOMMY", "Bricolage Grotesque Variable", system-ui, sans-serif;
   --font-texto: "Figtree Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -52,7 +53,7 @@
 @layer base {
   html {
     background: var(--color-fondo);
-    color-scheme: dark;
+    color-scheme: light;
   }
   body {
     margin: 0;
@@ -70,15 +71,27 @@
     color: var(--color-texto);
   }
   ::selection {
-    background: var(--color-amarillo);
-    color: #000;
+    background: var(--color-celeste-vida);
+    color: var(--color-azul-noche);
   }
   :focus-visible {
-    outline: 3px solid var(--color-amarillo);
+    outline: 3px solid var(--color-azul-vida);
     outline-offset: 3px;
   }
   .claro :focus-visible {
-    outline-color: #000;
+    outline-color: var(--color-azul-noche);
+  }
+  /* Sobre fondos oscuros o de color fuerte, el texto pasa a blanco. */
+  .oscuro,
+  .bg-azul-noche,
+  .bg-azul-vida {
+    --color-texto: #ffffff;
+    --color-texto-suave: #d3dee8;
+    --color-linea: rgba(255, 255, 255, 0.2);
+    --color-borde-control: rgba(255, 255, 255, 0.45);
+    --color-azul-link: #b1d9e1;
+    --color-verde-oscuro: var(--color-verde-hoja);
+    color: var(--color-texto);
   }
   summary {
     cursor: pointer;
@@ -164,19 +177,20 @@
   }
   .b-verde {
     background: var(--color-verde-hoja);
-    color: #000;
+    color: var(--color-azul-noche);
   }
-  .b-amarillo {
-    background: var(--color-amarillo);
-    color: #000;
+  .b-azul {
+    background: var(--color-azul-vida);
+    color: #fff;
   }
   .b-blanco {
-    background: var(--color-texto);
-    color: #000;
+    background: #fff;
+    color: var(--color-azul-noche);
+    box-shadow: 0 0 0 1.5px var(--color-linea);
   }
   .b-negro {
-    background: #000;
-    color: var(--color-texto);
+    background: var(--color-azul-noche);
+    color: #fff;
   }
   .b-borde {
     background: transparent;
@@ -232,7 +246,7 @@
     transition: background 0.5s ease-out;
   }
   .ladrillo.nuevo {
-    outline: 2px solid #fff;
+    outline: 2px solid var(--color-azul-noche);
   }
 
   details[open] .mas {
@@ -254,12 +268,12 @@
     cursor: pointer;
   }
   .opcion:has(input:focus-visible) {
-    outline: 3px solid var(--color-amarillo);
+    outline: 3px solid var(--color-azul-vida);
     outline-offset: 3px;
     border-radius: 999px;
   }
   .claro .opcion:has(input:focus-visible) {
-    outline-color: #000;
+    outline-color: var(--color-azul-noche);
   }
 
   .campo {
@@ -269,7 +283,7 @@
     border: 1.5px solid var(--color-borde-control);
     font: inherit;
     color: var(--color-texto);
-    background: #000;
+    background: #fff;
     box-sizing: border-box;
     width: 100%;
   }
@@ -277,9 +291,9 @@
     border-color: var(--color-error);
   }
   .claro .campo {
-    border: 2px solid #000;
-    color: #000;
-    background: var(--color-input-amarillo);
+    border: 2px solid var(--color-azul-noche);
+    color: var(--color-azul-noche);
+    background: #fff;
     border-radius: 16px;
   }
   .claro .campo[aria-invalid="true"] {

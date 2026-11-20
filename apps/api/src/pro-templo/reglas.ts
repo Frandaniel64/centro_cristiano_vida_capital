@@ -33,12 +33,12 @@ export function nombrePublico(v: { nombre: string; mostrarComo: MostrarComo; apo
 export function instruccionesDePago(forma: FormaPago, numero: number, datosTransferencia: string) {
   const n = numeroVoucher(numero);
   if (forma === 'efectivo') {
-    return `Acercate a la mesa Pro Templo el domingo después de la reunión y decí tu número: Nº ${n}.`;
+    return `Acércate a la mesa Pro Templo el domingo después de la reunión y di tu número: Nº ${n}.`;
   }
   if (forma === 'transferencia') {
     return datosTransferencia
-      ? `Transferí a esta cuenta y mandanos el comprobante por WhatsApp con tu número (Nº ${n}):\n${datosTransferencia}`
-      : `Te mandamos los datos para transferir por WhatsApp. Cuando pagues, mandanos el comprobante con tu número (Nº ${n}).`;
+      ? `Transfiere a esta cuenta y mándanos el comprobante por WhatsApp con tu número (Nº ${n}):\n${datosTransferencia}`
+      : `Te mandamos los datos para transferir por WhatsApp. Cuando pagues, mándanos el comprobante con tu número (Nº ${n}).`;
   }
   return `Te mandamos el link de pago de Mercado Pago. Tu número es Nº ${n}.`;
 }

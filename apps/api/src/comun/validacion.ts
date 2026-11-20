@@ -8,7 +8,7 @@ export class ErrorDeFormulario extends BadRequestException {
   }
 }
 
-/** Un campo por error; los anidados con su ruta (`pastores.cita`, `creemos.0.texto`). */
+/** Un campo por error; los anidados con su ruta (`pastores.cita`, `comoLlegar.0.texto`). */
 export function aplanar(errores: ValidationError[], prefijo = '', campos: Record<string, string> = {}): Record<string, string> {
   for (const e of errores) {
     const ruta = prefijo ? `${prefijo}.${e.property}` : e.property;

@@ -38,7 +38,7 @@ const ogUrl = new URL(imagenCompartir(imagen ?? fotos.alabanza)!, Astro.site);
     <link rel="canonical" href={canonica} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="sitemap" href="/sitemap.xml" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#faf7f0" />
     {(demo || noindex || vistaPrevia) && <meta name="robots" content="noindex, nofollow" />}
 
     <meta property="og:type" content="website" />
@@ -57,7 +57,7 @@ const ogUrl = new URL(imagenCompartir(imagen ?? fotos.alabanza)!, Astro.site);
   <body>
     {
       vistaPrevia && (
-        <p class="sticky top-0 z-50 m-0 bg-[#f5d547] px-4 py-2 text-center text-sm font-bold text-black">
+        <p class="sticky top-0 z-50 m-0 bg-celeste-vida px-4 py-2 text-center text-sm font-bold text-azul-noche">
           Vista previa: estás viendo borradores.{' '}
           <a href="/vista-previa?salir" class="underline">
             Salir
@@ -67,7 +67,7 @@ const ogUrl = new URL(imagenCompartir(imagen ?? fotos.alabanza)!, Astro.site);
     }
     {
       demo && (
-        <p class="m-0 bg-amarillo px-4 py-2 text-center text-sm font-bold text-black">
+        <p class="m-0 bg-celeste-vida px-4 py-2 text-center text-sm font-bold text-azul-noche">
           Versión de muestra: los textos, fotos y montos son de ejemplo y los formularios no guardan datos.
         </p>
       )
@@ -76,8 +76,8 @@ const ogUrl = new URL(imagenCompartir(imagen ?? fotos.alabanza)!, Astro.site);
     <main>
       <slot />
     </main>
-    <a href="/visitanos" class="cta-movil btn b-verde mx-4 mb-4 min-h-14 w-[calc(100%-32px)] shadow-[0_8px_24px_rgba(0,0,0,.5)]">
-      Planeá tu visita
+    <a href="/visitanos" class="cta-movil btn b-verde mx-4 mb-4 min-h-14 w-[calc(100%-32px)] shadow-[0_8px_24px_rgba(13,31,45,.25)]">
+      Planea tu visita
     </a>
     <Footer textos={textos} />
   </body>

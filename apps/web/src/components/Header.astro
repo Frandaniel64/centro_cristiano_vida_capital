@@ -4,7 +4,7 @@ import { nav, navCompleta } from '../data/estaticos';
 const actual = Astro.url.pathname.replace(/\/$/, '') || '/';
 const esActual = (href: string) => (href === '/' ? actual === '/' : actual.startsWith(href));
 const acento = (href: string) =>
-  esActual(href) ? 'text-verde-hoja' : href === '/pro-templo' ? 'text-amarillo' : 'text-texto';
+  esActual(href) ? 'text-verde-oscuro' : href === '/pro-templo' ? 'text-azul-vida' : 'text-texto';
 ---
 
 <header class="border-b border-linea bg-fondo">
@@ -26,14 +26,14 @@ const acento = (href: string) =>
             aria-current={esActual(n.href) ? 'page' : undefined}
             class:list={[
               'inline-flex min-h-11 items-center rounded-full px-3.5 text-sm font-semibold no-underline',
-              esActual(n.href) ? 'bg-texto text-black' : 'text-texto',
+              esActual(n.href) ? 'bg-texto text-white' : 'text-texto',
             ]}
           >
             {n.label}
           </a>
         ))
       }
-      <a href="/visitanos" class="btn b-verde ml-2 min-h-11 px-5 text-sm">Planeá tu visita</a>
+      <a href="/visitanos" class="btn b-verde ml-2 min-h-11 px-5 text-sm">Planea tu visita</a>
     </nav>
 
     <button
@@ -44,7 +44,7 @@ const acento = (href: string) =>
       aria-label="Abrir menú"
       data-menu-btn
     >
-      <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f5f5f0" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"></path></svg>
+      <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"></path></svg>
     </button>
   </div>
 

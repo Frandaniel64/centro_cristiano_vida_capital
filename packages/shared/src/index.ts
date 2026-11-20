@@ -260,6 +260,15 @@ export interface PreguntaFrecuente {
   respuesta: string;
 }
 
+/** Una de las "3E" del modelo (Encuentro, Entrega, Extensión). */
+export interface PilarModelo {
+  titulo: string; // "Encuentro"
+  frase: string; // "Conectar con Dios"
+  texto: string;
+  introItems: string; // "Lo hacemos a través de:"
+  items: { titulo: string; texto: string }[];
+}
+
 /** Textos editables del sitio ("Textos del sitio" en el panel). */
 export interface TextosSitio {
   lema: string;
@@ -275,11 +284,15 @@ export interface TextosSitio {
   historia: string;
   datosIglesia: string; // "Más de 150 personas · Desde 2016 · Floresta, CABA"
   pastores: { nombres: string; texto: string; cita: string };
-  creemos: { titulo: string; texto: string }[];
   // Página Nosotros (sección "Nosotros" del panel).
   nosotrosIntro: string;
-  // "Lo que nos mueve": bloques de color.
-  pilares: { titulo: string; texto: string; color: string }[];
+  // Misión: el primer párrafo es la frase; los demás, el texto que la acompaña.
+  mision: string;
+  // Visión, en párrafos.
+  vision: string;
+  // Modelo de las 3E: la frase que lo presenta y sus tres partes.
+  modeloBajada: string;
+  modelo: PilarModelo[];
   // Fotos de Nosotros, por id de la biblioteca de fotos.
   fotosNosotros: { portada: string | null; historia: string | null; pastores: string | null; galeria: string[] };
   whatsapp: string;

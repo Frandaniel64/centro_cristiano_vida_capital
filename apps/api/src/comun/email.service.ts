@@ -8,10 +8,10 @@ export const escapar = (texto: string) =>
 /** Arma el HTML de un email simple con la marca. Los párrafos ya vienen escapados. */
 export function plantilla(titulo: string, parrafos: string[]) {
   const cuerpo = parrafos.map((p) => `<p style="margin:0 0 16px;font-size:16px;line-height:1.5">${p}</p>`).join('');
-  return `<!doctype html><html lang="es"><body style="margin:0;padding:24px;background:#f5f5f0;font-family:Arial,sans-serif;color:#000">
+  return `<!doctype html><html lang="es"><body style="margin:0;padding:24px;background:#faf7f0;font-family:Arial,sans-serif;color:#0d1f2d">
 <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:16px;padding:32px">
 <h1 style="margin:0 0 20px;font-size:24px">${escapar(titulo)}</h1>${cuerpo}
-<p style="margin:24px 0 0;font-size:13px;color:#555">Centro Cristiano Vida Capital · Camarones 2201, CABA</p>
+<p style="margin:24px 0 0;font-size:13px;color:#4f5d6a">Centro Cristiano Vida Capital · Camarones 2201, CABA</p>
 </div></body></html>`;
 }
 

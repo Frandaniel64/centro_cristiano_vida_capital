@@ -17,15 +17,15 @@ const descripcion = nombres.length
   <section class="wrap flex flex-col gap-8 pt-14 pb-18">
     <h1 class="d h1">Crecemos <span class="text-azul-link">juntos</span></h1>
     <p class="lead muted max-w-[560px] border-t border-linea pt-6">
-      Hay un lugar para cada etapa de la vida. Encontrá el tuyo y sumate cuando quieras: no hace falta anotarse para venir la primera vez.
+      Hay un lugar para cada etapa de la vida. Encuentra el tuyo y súmate cuando quieras: no hace falta anotarse para venir la primera vez.
     </p>
   </section>
   {ministerios.map((m, i) => <MinisterioArticulo ministerio={m} invertido={i % 2 === 1} />)}
   {
     ministerios.length === 0 && (
       <section class="wrap flex flex-col items-start gap-5 pb-30">
-        <p class="lead muted m-0">Pronto vas a encontrar acá todos nuestros ministerios. Mientras tanto, te esperamos el domingo.</p>
-        <a href="/visitanos" class="btn b-verde">Planeá tu visita</a>
+        <p class="lead muted m-0">Pronto vas a encontrar aquí todos nuestros ministerios. Mientras tanto, te esperamos el domingo.</p>
+        <a href="/visitanos" class="btn b-verde">Planea tu visita</a>
       </section>
     )
   }

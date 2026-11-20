@@ -183,7 +183,7 @@ describe('Contenido (e2e)', () => {
     const editor = await ingresar('editor');
     const f = await subirFoto(editor, 'Pastores saludando en la puerta');
     const textos = (await editor.get('/api/admin/textos')).body;
-    expect(textos.pilares).toHaveLength(4);
+    expect(textos.modelo).toHaveLength(3);
     const { fotos: _sinFotos, ...soloTextos } = textos;
 
     const guardado = await editor.put('/api/admin/textos').send({ ...soloTextos, fotosNosotros: { portada: f.body.id, historia: null, pastores: f.body.id, galeria: [f.body.id] } });
@@ -204,8 +204,18 @@ describe('Contenido (e2e)', () => {
 
   it('los textos del sitio arrancan con los de la maqueta y se guardan', async () => {
     const editor = await ingresar('editor');
+    // Sin nada guardado arrancan los textos iniciales (la base se restaura en afterAll).
+    await prisma.configuracion.update({ where: { id: 1 }, data: { textos: {} } });
     const textos = (await editor.get('/api/admin/textos')).body;
-    expect(textos.lema).toBe('La iglesia sos vos.');
+    expect(textos.lema).toBe('Hay lugar para ti.');
+    expect(textos.modelo.map((m: { titulo: string }) => m.titulo)).toEqual(['Encuentro', 'Entrega', 'Extensión']);
+    // Lo guardado gana, y los campos que ya no existen se descartan.
+    await prisma.configuracion.update({ where: { id: 1 }, data: { textos: { lema: 'Guardado', pilares: [], creemos: [] } } });
+    const mezclados = (await editor.get('/api/admin/textos')).body;
+    expect(mezclados.lema).toBe('Guardado');
+    expect(mezclados.pilares).toBeUndefined();
+    expect(mezclados.creemos).toBeUndefined();
+    expect(mezclados.modelo).toHaveLength(3);
     const guardado = await editor.put('/api/admin/textos').send({ ...textos, lema: 'Vení como estés.', youtube: 'youtube.com/x' });
     expect(guardado.status).toBe(400);
     expect(guardado.body.campos.youtube).toBeDefined();

@@ -14,11 +14,11 @@ const formasPago: Record<FormaPago, { titulo: string; texto: string }> = {
   mercadopago: { titulo: 'Mercado Pago en pesos', texto: 'Al tipo de cambio que fija la iglesia.' },
 };
 const radioPill =
-  'opcion inline-flex min-h-11 items-center rounded-full border-2 border-black px-4 text-[15px] font-bold has-[:checked]:bg-black has-[:checked]:text-amarillo';
+  'opcion inline-flex min-h-11 items-center rounded-full border-2 border-azul-noche px-4 text-[15px] font-bold has-[:checked]:bg-azul-noche has-[:checked]:text-white';
 const errorClase = 'm-0 text-sm font-bold text-[#7a1a10]';
 ---
 
-<div class="claro flex flex-[2_1_380px] min-w-0 flex-col gap-[18px] rounded-[28px] bg-amarillo p-[clamp(24px,3.5vw,40px)] text-black">
+<div class="claro flex flex-[2_1_380px] min-w-0 flex-col gap-[18px] rounded-[28px] bg-celeste-vida p-[clamp(24px,3.5vw,40px)] text-azul-noche">
   <form id="form-voucher" novalidate class="flex flex-col gap-[18px]" data-maximo={campana.montoMaximoUsd}>
     <div>
       <h2 class="d text-[38px] leading-none tracking-[-.02em]">Tu voucher, tu ladrillo</h2>
@@ -30,7 +30,7 @@ const errorClase = 'm-0 text-sm font-bold text-[#7a1a10]';
       <div class="grid grid-cols-3 gap-2">
         {
           campana.montosSugeridos.map((m) => (
-            <label class="opcion flex min-h-14 cursor-pointer items-center justify-center rounded-2xl border-2 border-black text-lg font-extrabold has-[:checked]:bg-black has-[:checked]:text-amarillo">
+            <label class="opcion flex min-h-14 cursor-pointer items-center justify-center rounded-2xl border-2 border-azul-noche text-lg font-extrabold has-[:checked]:bg-azul-noche has-[:checked]:text-white">
               <input type="radio" name="monto" value={m} checked={m === MONTO_INICIAL} />
               USD {m}
             </label>
@@ -45,12 +45,12 @@ const errorClase = 'm-0 text-sm font-bold text-[#7a1a10]';
       <p id="error-otro-monto" data-error="otroMonto" class={errorClase} hidden></p>
     </div>
 
-    <div aria-hidden="true" class="relative flex items-center justify-between gap-4 overflow-hidden rounded-[18px] bg-black px-6 py-5 text-texto">
-      <span class="absolute top-1/2 -left-3 -mt-3 size-6 rounded-full bg-amarillo"></span>
-      <span class="absolute top-1/2 -right-3 -mt-3 size-6 rounded-full bg-amarillo"></span>
+    <div aria-hidden="true" class="relative flex items-center justify-between gap-4 overflow-hidden rounded-[18px] bg-azul-noche px-6 py-5 text-texto">
+      <span class="absolute top-1/2 -left-3 -mt-3 size-6 rounded-full bg-celeste-vida"></span>
+      <span class="absolute top-1/2 -right-3 -mt-3 size-6 rounded-full bg-celeste-vida"></span>
       <span>
-        <span class="block text-xs font-bold tracking-[.08em] text-verde-hoja">VOUCHER PRO TEMPLO</span>
-        <span class="d block text-[42px] leading-none text-amarillo">USD <span data-v="monto">{MONTO_INICIAL}</span></span>
+        <span class="block text-xs font-bold tracking-[.08em] text-verde-oscuro">VOUCHER PRO TEMPLO</span>
+        <span class="d block text-[42px] leading-none text-azul-vida">USD <span data-v="monto">{MONTO_INICIAL}</span></span>
       </span>
       <span class="muted border-l-[1.5px] border-dashed border-borde-control pl-4 text-right text-[13px]">
         Nº ····<br /><span data-v="ladrillos">parte de un ladrillo</span>
@@ -65,7 +65,7 @@ const errorClase = 'm-0 text-sm font-bold text-[#7a1a10]';
     </div>
 
     <fieldset class="m-0 flex flex-col gap-2.5 border-0 p-0">
-      <legend class="mb-2.5 p-0 text-[15px] font-bold">¿Cómo querés aparecer en la web?</legend>
+      <legend class="mb-2.5 p-0 text-[15px] font-bold">¿Cómo quieres aparecer en la web?</legend>
       <div class="flex flex-wrap gap-2">
         <label class={radioPill}><input type="radio" name="mostrarComo" value="anonimo" checked />Anónimo</label>
         <label class={radioPill}><input type="radio" name="mostrarComo" value="nombre" />Mi nombre</label>
@@ -81,9 +81,9 @@ const errorClase = 'm-0 text-sm font-bold text-[#7a1a10]';
 
     <fieldset class="m-0 flex flex-col gap-2.5 border-0 p-0">
       <legend class="mb-2.5 p-0 text-[15px] font-bold">¿Cómo te avisamos? *</legend>
-      <div class="inline-flex gap-1 self-start rounded-full border-2 border-black p-1">
-        <label class="opcion inline-flex min-h-11 items-center rounded-full px-5 text-[15px] font-bold has-[:checked]:bg-black has-[:checked]:text-amarillo"><input type="radio" name="contactoTipo" value="whatsapp" checked />WhatsApp</label>
-        <label class="opcion inline-flex min-h-11 items-center rounded-full px-5 text-[15px] font-bold has-[:checked]:bg-black has-[:checked]:text-amarillo"><input type="radio" name="contactoTipo" value="email" />Email</label>
+      <div class="inline-flex gap-1 self-start rounded-full border-2 border-azul-noche p-1">
+        <label class="opcion inline-flex min-h-11 items-center rounded-full px-5 text-[15px] font-bold has-[:checked]:bg-azul-noche has-[:checked]:text-white"><input type="radio" name="contactoTipo" value="whatsapp" checked />WhatsApp</label>
+        <label class="opcion inline-flex min-h-11 items-center rounded-full px-5 text-[15px] font-bold has-[:checked]:bg-azul-noche has-[:checked]:text-white"><input type="radio" name="contactoTipo" value="email" />Email</label>
       </div>
       <label for="voucher-contacto" class="text-[15px] font-bold" data-etiqueta-contacto>Tu WhatsApp *</label>
       <input id="voucher-contacto" name="contacto" type="tel" inputmode="tel" autocomplete="tel" placeholder="11 5555 1234" class="campo" aria-describedby="error-voucher-contacto" />
@@ -94,7 +94,7 @@ const errorClase = 'm-0 text-sm font-bold text-[#7a1a10]';
       <legend class="mb-2.5 p-0 text-[15px] font-bold">¿Cómo lo vas a pagar? *</legend>
       {
         campana.formasPago.map((f, i) => (
-          <label class="opcion flex cursor-pointer flex-col rounded-2xl border-2 border-black px-[18px] py-3 has-[:checked]:bg-black has-[:checked]:text-amarillo">
+          <label class="opcion flex cursor-pointer flex-col rounded-2xl border-2 border-azul-noche px-[18px] py-3 has-[:checked]:bg-azul-noche has-[:checked]:text-white">
             <input type="radio" name="formaPago" value={f} checked={i === 0} />
             <span class="font-bold">{formasPago[f].titulo}</span>
             <span class="text-sm">{formasPago[f].texto}</span>
@@ -114,29 +114,29 @@ const errorClase = 'm-0 text-sm font-bold text-[#7a1a10]';
     <div class="flex flex-col gap-1.5">
       <label class="flex cursor-pointer items-start gap-2.5 text-[15px]">
         <input type="checkbox" name="aceptaPrivacidad" class="mt-1 size-[18px] shrink-0 accent-black" aria-describedby="error-voucher-privacidad" />
-        <span>Acepto la <a href="/privacidad" class="font-bold text-black">política de privacidad</a>. *</span>
+        <span>Acepto la <a href="/privacidad" class="font-bold text-azul-noche">política de privacidad</a>. *</span>
       </label>
       <p id="error-voucher-privacidad" data-error="aceptaPrivacidad" class={errorClase} hidden></p>
     </div>
 
     <p data-error="general" role="alert" class={errorClase} hidden></p>
 
-    <button type="submit" class="btn b-negro min-h-15 text-lg text-amarillo">
+    <button type="submit" class="btn b-negro min-h-15 text-lg">
       <span>Quiero mi voucher de USD <span data-v="monto">{MONTO_INICIAL}</span></span>
     </button>
     <p class="m-0 text-[13px]">Tu voucher suma a la pared cuando tesorería confirma el pago.</p>
   </form>
 
   <div data-voucher-ok hidden role="status" tabindex="-1" class="flex flex-col gap-3.5 outline-none">
-    <span class="inline-flex size-14 items-center justify-center rounded-full bg-black">
-      <svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#f5d547" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"></path></svg>
+    <span class="inline-flex size-14 items-center justify-center rounded-full bg-azul-noche">
+      <svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#a0d062" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"></path></svg>
     </span>
     <p class="d text-[32px] leading-[1.05]">¡Gracias! Tu voucher Nº <span data-ok="numero"></span> de USD <span data-ok="monto"></span> quedó registrado.</p>
     <p class="m-0">Está <strong>pendiente de pago</strong>. Suma a la pared cuando tesorería lo confirme.</p>
-    <p class="m-0 rounded-2xl bg-black px-5 py-4 whitespace-pre-line text-texto" data-ok="instrucciones"></p>
-    <p class="m-0 text-sm">Guardá tu número: lo vas a necesitar para pagar.</p>
-    <a data-ok="link" href="/pro-templo" class="self-start font-extrabold text-black">Ver el estado de mi voucher</a>
-    <button type="button" data-otro-voucher class="min-h-11 cursor-pointer self-start border-0 bg-transparent p-0 font-extrabold text-black underline">Dar otro voucher</button>
+    <p class="m-0 rounded-2xl bg-azul-noche px-5 py-4 whitespace-pre-line text-texto" data-ok="instrucciones"></p>
+    <p class="m-0 text-sm">Guarda tu número: lo vas a necesitar para pagar.</p>
+    <a data-ok="link" href="/pro-templo" class="self-start font-extrabold text-azul-noche">Ver el estado de mi voucher</a>
+    <button type="button" data-otro-voucher class="min-h-11 cursor-pointer self-start border-0 bg-transparent p-0 font-extrabold text-azul-noche underline">Dar otro voucher</button>
   </div>
 </div>
 
@@ -187,11 +187,11 @@ const errorClase = 'm-0 text-sm font-bold text-[#7a1a10]';
     const validar = () => {
       limpiarErrores(form);
       const m = monto();
-      if (!Number.isInteger(m) || m < 1) mostrarError(form, 'otroMonto', 'Elegí un monto o escribí uno en dólares, sin centavos.');
+      if (!Number.isInteger(m) || m < 1) mostrarError(form, 'otroMonto', 'Elige un monto o escribe uno en dólares, sin centavos.');
       else if (m > maximo) mostrarError(form, 'otroMonto', `El monto máximo por voucher es USD ${usd(maximo)}.`);
-      if (!valorDe(form, 'nombre').trim()) mostrarError(form, 'nombre', 'Escribí tu nombre y apellido.');
+      if (!valorDe(form, 'nombre').trim()) mostrarError(form, 'nombre', 'Escribe tu nombre y apellido.');
       if (valorDe(form, 'mostrarComo') === 'apodo' && !valorDe(form, 'apodo').trim()) {
-        mostrarError(form, 'apodo', 'Escribí cómo querés aparecer.');
+        mostrarError(form, 'apodo', 'Escribe cómo quieres aparecer.');
       }
       const tipo = valorDe(form, 'contactoTipo') as 'whatsapp' | 'email';
       mostrarError(form, 'contacto', errorContacto(tipo, valorDe(form, 'contacto')));

@@ -3,6 +3,7 @@ import CuentaRegresiva from '../components/CuentaRegresiva.astro';
 import Foto from '../components/Foto.astro';
 import TarjetaPredica from '../components/TarjetaPredica.astro';
 import Base from '../layouts/Base.astro';
+import IconoRed from '../components/IconoRed.astro';
 import { fotos } from '../data/estaticos';
 import { contenido } from '../lib/contenido';
 
@@ -18,15 +19,15 @@ const linkVivo = youtube ? `${youtube}/live` : '';
 const usuario = (url: string) => url.replace(/^https:\/\/(www\.)?[^/]+\//, '').replace(/\/$/, '') || url;
 const redes = [
   // Un link /channel/UC… no dice nada a quien lo lee: ahí va el nombre de la iglesia.
-  { red: 'YouTube', nombre: youtube && !canalId ? usuario(youtube) : 'CCVida Capital', url: youtube },
-  { red: 'Facebook', nombre: textos.facebook ? usuario(textos.facebook) : 'CCVida Capital', url: textos.facebook },
-  { red: 'Instagram', nombre: textos.instagram ? `@${usuario(textos.instagram).replace(/^@/, '')}` : 'CCVida Capital', url: textos.instagram },
+  { red: 'YouTube' as const, nombre: youtube && !canalId ? usuario(youtube) : 'CCVida Capital', url: youtube },
+  { red: 'Facebook' as const, nombre: textos.facebook ? usuario(textos.facebook) : 'CCVida Capital', url: textos.facebook },
+  { red: 'Instagram' as const, nombre: textos.instagram ? `@${usuario(textos.instagram).replace(/^@/, '')}` : 'CCVida Capital', url: textos.instagram },
 ];
 const pill =
-  'inline-flex min-h-11 cursor-pointer items-center rounded-full border-[1.5px] border-borde-control bg-transparent px-[18px] text-sm font-bold text-texto aria-pressed:border-texto aria-pressed:bg-texto aria-pressed:text-black';
+  'inline-flex min-h-11 cursor-pointer items-center rounded-full border-[1.5px] border-borde-control bg-transparent px-[18px] text-sm font-bold text-texto aria-pressed:border-texto aria-pressed:bg-texto aria-pressed:text-azul-noche';
 ---
 
-<Base titulo="En vivo y prédicas" descripcion="Mirá la reunión en vivo cada domingo a las 11 h y el archivo de prédicas por serie." imagen={fotos.transmision}>
+<Base titulo="En vivo y prédicas" descripcion="Mira la reunión en vivo cada domingo a las 11 h y el archivo de prédicas por serie." imagen={fotos.transmision}>
   <section class="wrap flex flex-col gap-8 pt-14 pb-24">
     <div class="flex flex-wrap items-end justify-between gap-6">
       <div class="flex flex-[1_1_560px] flex-col gap-4">
@@ -38,44 +39,45 @@ const pill =
 
     <div class="relative aspect-video overflow-hidden rounded-3xl border border-linea bg-panel" data-reproductor>
       <Foto foto={fotos.transmision} sizes="(max-width: 1408px) 100vw, 1360px" class="absolute inset-0" prioridad />
-      <div class="absolute inset-0 bg-black/50"></div>
+      <div class="absolute inset-0 bg-azul-noche/50"></div>
       <span data-solo-en-vivo hidden class="chip absolute top-5 left-5 rounded-lg bg-rojo-vivo text-white">EN VIVO</span>
       {
         canalId ? (
           <button type="button" class="btn b-blanco absolute top-1/2 left-1/2 size-26 -translate-1/2 p-0" aria-label="Reproducir la transmisión" data-reproducir={canalId}>
-            <svg aria-hidden="true" width="36" height="36" viewBox="0 0 24 24" fill="#000000"><path d="M8 5l11 7-11 7z" /></svg>
+            <svg aria-hidden="true" width="36" height="36" viewBox="0 0 24 24" fill="#0d1f2d"><path d="M8 5l11 7-11 7z" /></svg>
           </button>
         ) : (
           linkVivo && (
             <a href={linkVivo} class="btn b-blanco absolute top-1/2 left-1/2 size-26 -translate-1/2 p-0" aria-label="Ver la transmisión en YouTube">
-              <svg aria-hidden="true" width="36" height="36" viewBox="0 0 24 24" fill="#000000"><path d="M8 5l11 7-11 7z" /></svg>
+              <svg aria-hidden="true" width="36" height="36" viewBox="0 0 24 24" fill="#0d1f2d"><path d="M8 5l11 7-11 7z" /></svg>
             </a>
           )
         )
       }
-      <p class="absolute bottom-5 left-6 m-0 font-semibold">
+      <p class="oscuro absolute bottom-5 left-6 m-0 font-semibold">
         <span data-solo-en-vivo hidden>Transmisión en vivo desde {textos.direccion}</span>
         <span data-solo-sin-vivo>La transmisión arranca el domingo a las 11 h</span>
       </p>
     </div>
 
-    <div class="flex flex-wrap border-y border-linea">
+    <ul aria-label="Síguenos en redes" class="m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(min(100%,260px),1fr))] gap-3 p-0">
       {
-        redes.map((r) =>
-          r.url ? (
-            <a href={r.url} class="dato">
-              <span class="muted block text-[13px]">{r.red}</span>
-              <span class="text-lg font-bold">{r.nombre}</span>
+        redes.filter((r) => r.url).map((r) => (
+          <li>
+            <a href={r.url} class="fila flex min-h-20 items-center gap-4 rounded-2xl border-[1.5px] border-borde-control bg-panel px-5 py-3 text-texto no-underline transition-colors hover:border-azul-vida">
+              <span class="inline-flex size-11 items-center justify-center rounded-full bg-azul-vida text-white"><IconoRed red={r.red} /></span>
+              <span class="flex min-w-0 flex-1 flex-col">
+                <span class="muted text-[13px]">{r.red}</span>
+                <span class="truncate text-lg font-bold">{r.nombre}</span>
+              </span>
+              <span class="flecha inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-azul-noche text-white">
+                <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8" /></svg>
+              </span>
             </a>
-          ) : (
-            <div class="dato">
-              <span class="muted block text-[13px]">{r.red}</span>
-              <span class="text-lg font-bold">{r.nombre}</span>
-            </div>
-          ),
-        )
+          </li>
+        ))
       }
-    </div>
+    </ul>
   </section>
 
   <section class="linea">
@@ -95,7 +97,7 @@ const pill =
       <div class="grid grid-cols-[repeat(auto-fill,minmax(min(100%,360px),1fr))] gap-x-5 gap-y-8" data-lista-predicas>
         {predicas.map((p) => <TarjetaPredica predica={p} />)}
       </div>
-      {predicas.length === 0 && <p class="lead muted m-0">Pronto vas a encontrar acá las prédicas de cada domingo.</p>}
+      {predicas.length === 0 && <p class="lead muted m-0">Pronto vas a encontrar aquí las prédicas de cada domingo.</p>}
     </div>
   </section>
 </Base>
