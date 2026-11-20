@@ -242,7 +242,7 @@
     transition: transform 0.2s ease-out;
   }
 
-  /* Opción tipo botón (montos, series, WhatsApp/Email) sobre un input radio real. */
+  /* Opción tipo botón (montos, series) sobre un input radio real. */
   .opcion {
     position: relative;
   }

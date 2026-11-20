@@ -1,11 +1,13 @@
 import { Injectable, Logger, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
 import type { EstadoProTemplo, VoucherCreado } from '@ccvida/shared';
-import { EmailService, escapar, plantilla } from '../comun/email.service.js';
+import { EmailService } from '../comun/email.service.js';
+import { ContenidoService } from '../contenido/contenido.service.js';
+import { avisoTesoreria, voucherRegistrado } from '../comun/emails/plantillas.js';
 import { ErrorDeFormulario } from '../comun/validacion.js';
 import { config } from '../config.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import type { CrearVoucherDto } from './crear-voucher.dto.js';
-import { calcularEstado, estadoVisible, instruccionesDePago, nombrePublico, numeroVoucher } from './reglas.js';
+import { calcularEstado, estadoVisible, instruccionesDePago, instruccionesEnTexto, nombrePublico, numeroVoucher } from './reglas.js';
 
 const SLUG_CAMPANA = 'pro-templo';
 const CACHE_MS = 10_000;
@@ -19,6 +21,7 @@ export class ProTemploService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly email: EmailService,
+    private readonly contenido: ContenidoService,
   ) {}
 
   private async campana() {
@@ -75,51 +78,62 @@ export class ProTemploService {
         nombre: datos.nombre,
         mostrarComo: datos.mostrarComo,
         apodo: datos.mostrarComo === 'apodo' ? datos.apodo : null,
-        contactoTipo: datos.contactoTipo,
-        contacto: datos.contacto,
+        // El email es el contacto principal; el WhatsApp, opcional, va aparte.
+        contactoTipo: 'email',
+        contacto: datos.email,
+        whatsapp: datos.whatsapp || null,
         formaPago: datos.formaPago,
         mensaje: datos.mensaje || null,
       },
     });
 
     const configuracion = await this.prisma.configuracion.findUnique({ where: { id: 1 } });
-    const instrucciones = instruccionesDePago(voucher.formaPago, voucher.numero, configuracion?.datosTransferencia ?? '');
-    this.avisar(voucher.numero, datos, instrucciones);
+    const datosTransferencia = configuracion?.datosTransferencia ?? '';
+    void this.avisar(voucher.numero, datos, datosTransferencia);
 
     return {
       numero: voucher.numero,
       montoUsd: voucher.montoUsd,
       formaPago: voucher.formaPago,
       estado: voucher.estado,
-      instrucciones,
+      instrucciones: instruccionesEnTexto(instruccionesDePago(voucher.formaPago, voucher.numero, datosTransferencia)),
     };
   }
 
-  // Los emails salen en segundo plano: el voucher ya quedó guardado.
-  private avisar(numero: number, datos: CrearVoucherDto, instrucciones: string) {
-    const n = numeroVoucher(numero);
-    const link = `${config.sitioUrl}/pro-templo/voucher/${n}`;
-    if (datos.contactoTipo === 'email') {
-      void this.email.enviar(
-        datos.contacto,
-        `Tu voucher Pro Templo Nº ${n}`,
-        plantilla(`¡Gracias, ${datos.nombre.split(' ')[0]}!`, [
-          `Registramos tu voucher <strong>Nº ${n}</strong> de <strong>USD ${datos.montoUsd.toLocaleString('es-AR')}</strong>. Está pendiente de pago y suma a la pared cuando tesorería lo confirme.`,
-          escapar(instrucciones).replace(/\n/g, '<br>'),
-          `Podés ver el estado de tu voucher acá: <a href="${link}">${link}</a>`,
-        ]),
-      );
+  // Los emails salen en segundo plano: el voucher ya quedó guardado. Las
+  // direcciones de tesorería se leen en cada envío.
+  private async avisar(numero: number, datos: CrearVoucherDto, datosTransferencia: string) {
+    try {
+      const { direccion } = await this.contenido.textos();
+      const tesoreria = config.emailTesoreria.trim();
+      const persona = voucherRegistrado({
+        nombre: datos.nombre,
+        numero,
+        montoUsd: datos.montoUsd,
+        formaPago: datos.formaPago,
+        datosTransferencia,
+        sitioUrl: config.sitioUrl,
+        direccion,
+      });
+      // Si la persona responde (comprobante, dudas), le llega a tesorería.
+      void this.email.enviar(datos.email, persona.asunto, persona.html, tesoreria ? { responderA: tesoreria } : {});
+      if (tesoreria) {
+        const aviso = avisoTesoreria({
+          nombre: datos.nombre,
+          numero,
+          montoUsd: datos.montoUsd,
+          formaPago: datos.formaPago,
+          email: datos.email,
+          whatsapp: datos.whatsapp || null,
+          panelUrl: config.panelUrl,
+          sitioUrl: config.sitioUrl,
+        });
+        void this.email.enviar(tesoreria, aviso.asunto, aviso.html);
+      }
+      this.log.log(`Voucher Nº ${numeroVoucher(numero)} creado por USD ${datos.montoUsd}`);
+    } catch (e) {
+      this.log.error(`No se pudieron armar los emails del voucher Nº ${numeroVoucher(numero)}`, e as Error);
     }
-    void this.email.enviar(
-      config.emailTesoreria,
-      `Voucher nuevo Nº ${n} · USD ${datos.montoUsd}`,
-      plantilla(`Voucher nuevo Nº ${n}`, [
-        `${escapar(datos.nombre)} pidió un voucher de USD ${datos.montoUsd} para pagar por ${datos.formaPago}.`,
-        `Contacto (${datos.contactoTipo}): ${escapar(datos.contacto)}`,
-        datos.mensaje ? `Mensaje: ${escapar(datos.mensaje)}` : 'Sin mensaje.',
-      ]),
-    );
-    this.log.log(`Voucher Nº ${n} creado por USD ${datos.montoUsd}`);
   }
 
   /** Estado público de un voucher: sin nombre ni contacto. */
@@ -138,7 +152,8 @@ export class ProTemploService {
       estado,
       formaPago: v.formaPago,
       creado: v.creado.toISOString(),
-      instrucciones: estado === 'pendiente' ? instruccionesDePago(v.formaPago, v.numero, configuracion?.datosTransferencia ?? '') : null,
+      instrucciones:
+        estado === 'pendiente' ? instruccionesEnTexto(instruccionesDePago(v.formaPago, v.numero, configuracion?.datosTransferencia ?? '')) : null,
     };
   }
 }

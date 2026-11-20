@@ -114,6 +114,26 @@ import { Avisos } from '../avisos';
           </mat-form-field>
         </section>
 
+        <section class="tarjeta pila" aria-labelledby="t-bienvenida">
+          <h2 id="t-bienvenida">Email de bienvenida</h2>
+          <mat-form-field>
+            <mat-label>Versículo</mat-label>
+            <textarea matInput name="versiculoTexto" rows="3" maxlength="300" [(ngModel)]="t.versiculoBienvenida.texto"></textarea>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Cita del versículo</mat-label>
+            <input matInput name="versiculoCita" maxlength="60" [(ngModel)]="t.versiculoBienvenida.cita" placeholder="Mateo 11:28" />
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Link de Google Maps (opcional)</mat-label>
+            <input matInput name="mapaUrl" type="url" maxlength="500" [(ngModel)]="t.mapaUrl" placeholder="https://maps.app.goo.gl/…" />
+            <mat-hint>Pegá el link de la ficha de la iglesia en Google Maps. Si lo dejás vacío, el botón busca la dirección.</mat-hint>
+          </mat-form-field>
+          @for (c of ['versiculoBienvenida.texto', 'versiculoBienvenida.cita', 'versiculoBienvenida', 'mapaUrl']; track c) {
+            @if (campos()[c]) { <p class="error">{{ campos()[c] }}</p> }
+          }
+        </section>
+
         <div class="barra fila derecha">
           <button matButton="filled" type="submit" [disabled]="guardando()">Guardar textos</button>
         </div>

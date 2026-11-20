@@ -1,4 +1,4 @@
-import { calcularEstado, estadoVisible, instruccionesDePago, NOMBRE_ANONIMO, nombrePublico } from './reglas.js';
+import { calcularEstado, estadoVisible, instruccionesDePago, instruccionesEnTexto, NOMBRE_ANONIMO, nombrePublico } from './reglas.js';
 
 describe('calcularEstado', () => {
   const campana = { metaUsd: 10_000, mostrarMontos: true };
@@ -52,15 +52,56 @@ describe('nombrePublico', () => {
 
 describe('instruccionesDePago', () => {
   it('efectivo indica la mesa Pro Templo con el número', () => {
-    expect(instruccionesDePago('efectivo', 348, '')).toContain('Nº 0348');
+    expect(instruccionesDePago('efectivo', 348, '')).toEqual({
+      texto: 'Acercate a la mesa Pro Templo el domingo después de la reunión y decí tu número: Nº 0348.',
+    });
   });
 
-  it('transferencia usa los datos bancarios de la configuración', () => {
-    expect(instruccionesDePago('transferencia', 1, 'CBU 123')).toContain('CBU 123');
+  it('transferencia con datos pide responder el email con el comprobante y aparta los datos', () => {
+    expect(instruccionesDePago('transferencia', 1, '  CBU 123\nAlias X  ')).toEqual({
+      texto: 'Transferí a esta cuenta y respondé el email que te mandamos con la foto del comprobante (Nº 0001):',
+      datos: 'CBU 123\nAlias X',
+    });
   });
 
-  it('sin datos bancarios cargados avisa que se mandan por WhatsApp', () => {
-    expect(instruccionesDePago('transferencia', 1, '')).toContain('WhatsApp');
+  it('transferencia sin datos cargados: tesorería los pasa por email', () => {
+    expect(instruccionesDePago('transferencia', 1, '  ')).toEqual({
+      texto: 'Respondé el email que te mandamos y tesorería te pasa los datos para transferir (Nº 0001).',
+    });
+  });
+
+  it('en el email se habla de "este email", no del que te mandamos', () => {
+    expect(instruccionesDePago('transferencia', 1, 'CBU 123', 'email')).toEqual({
+      texto: 'Transferí a esta cuenta y respondé este email con la foto del comprobante (Nº 0001):',
+      datos: 'CBU 123',
+    });
+    expect(instruccionesDePago('transferencia', 1, '', 'email')).toEqual({
+      texto: 'Respondé este email y tesorería te pasa los datos para transferir (Nº 0001).',
+    });
+    expect(instruccionesDePago('efectivo', 1, '', 'email')).toEqual(instruccionesDePago('efectivo', 1, ''));
+  });
+
+  it('Mercado Pago avisa que el link llega por email', () => {
+    expect(instruccionesDePago('mercadopago', 7, '')).toEqual({ texto: 'Te mandamos el link de pago por email. Tu número es Nº 0007.' });
+  });
+
+  it('ninguna instrucción menciona WhatsApp', () => {
+    for (const forma of ['efectivo', 'transferencia', 'mercadopago'] as const) {
+      for (const datos of ['', 'CBU 123']) {
+        for (const canal of ['web', 'email'] as const) {
+          expect(instruccionesEnTexto(instruccionesDePago(forma, 1, datos, canal))).not.toMatch(/whatsapp/i);
+        }
+      }
+    }
+  });
+
+  it('en texto plano los datos van en las líneas siguientes', () => {
+    expect(instruccionesEnTexto(instruccionesDePago('transferencia', 1, 'CBU 123'))).toBe(
+      'Transferí a esta cuenta y respondé el email que te mandamos con la foto del comprobante (Nº 0001):\nCBU 123',
+    );
+    expect(instruccionesEnTexto(instruccionesDePago('efectivo', 1, ''))).toBe(
+      'Acercate a la mesa Pro Templo el domingo después de la reunión y decí tu número: Nº 0001.',
+    );
   });
 });
 

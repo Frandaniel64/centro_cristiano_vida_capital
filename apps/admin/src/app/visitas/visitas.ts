@@ -77,6 +77,9 @@ const POR_PAGINA = 25;
             } @else {
               <a [href]="'mailto:' + v.contacto">{{ v.contacto }}</a>
             }
+            @if (v.whatsapp) {
+              <div><a [href]="whatsapp(v.whatsapp)" target="_blank" rel="noopener">WhatsApp {{ v.whatsapp }}</a></div>
+            }
           </td>
         </ng-container>
         <ng-container matColumnDef="intereses">

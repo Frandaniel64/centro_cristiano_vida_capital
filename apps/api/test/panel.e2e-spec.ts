@@ -3,8 +3,10 @@ import 'dotenv/config';
 import { Test } from '@nestjs/testing';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import request from 'supertest';
+import type { MockInstance } from 'vitest';
 import { AppModule } from '../src/app.module.js';
 import { configurarApp } from '../src/app.setup.js';
+import { EmailService } from '../src/comun/email.service.js';
 import { codigoTotp, generarSecretoTotp, hashClave } from '../src/auth/cripto.js';
 import type { Rol } from '../src/generated/prisma/client.js';
 import { PrismaService } from '../src/prisma/prisma.service.js';
@@ -18,6 +20,7 @@ describe('Panel (e2e)', () => {
   let prisma: PrismaService;
   const usuarios: string[] = [];
   const vouchers: string[] = [];
+  const visitas: string[] = [];
   let ip = 0;
   const desde = () => `10.1.0.${++ip}`;
 
@@ -26,11 +29,16 @@ describe('Panel (e2e)', () => {
     app = configurarApp(modulo.createNestApplication<NestExpressApplication>());
     await app.init();
     prisma = app.get(PrismaService);
+    // Los emails se espían: ninguno sale de verdad.
+    enviar = vi.spyOn(app.get(EmailService), 'enviar').mockResolvedValue(undefined);
   });
+
+  let enviar: MockInstance<EmailService['enviar']>;
 
   afterAll(async () => {
     await prisma.ajusteCampana.deleteMany({ where: { cargadoPorId: { in: usuarios } } });
     await prisma.voucher.deleteMany({ where: { id: { in: vouchers } } });
+    await prisma.visita.deleteMany({ where: { id: { in: visitas } } });
     await prisma.usuario.deleteMany({ where: { id: { in: usuarios } } });
     app.get(ProTemploService).invalidarEstado();
     await app.close();
@@ -135,7 +143,7 @@ describe('Panel (e2e)', () => {
     const creado = await request(app.getHttpServer())
       .post('/api/vouchers')
       .set('X-Forwarded-For', desde())
-      .send({ montoUsd: 70, nombre: 'Donante E2E', mostrarComo: 'apodo', apodo: 'Familia E2E', contactoTipo: 'whatsapp', contacto: '11 5555 1234', formaPago: 'efectivo', aceptaPrivacidad: true });
+      .send({ montoUsd: 70, nombre: 'Donante E2E', mostrarComo: 'apodo', apodo: 'Familia E2E', email: 'donante@example.com', formaPago: 'efectivo', aceptaPrivacidad: true });
     const numero = creado.body.numero as number;
     vouchers.push((await prisma.voucher.findUniqueOrThrow({ where: { numero } })).id);
 
@@ -162,7 +170,7 @@ describe('Panel (e2e)', () => {
     const creado = await request(app.getHttpServer())
       .post('/api/vouchers')
       .set('X-Forwarded-For', desde())
-      .send({ montoUsd: 15, nombre: 'Pendiente E2E', mostrarComo: 'anonimo', contactoTipo: 'whatsapp', contacto: '11 5555 1234', formaPago: 'efectivo', aceptaPrivacidad: true });
+      .send({ montoUsd: 15, nombre: 'Pendiente E2E', mostrarComo: 'anonimo', email: 'donante@example.com', formaPago: 'efectivo', aceptaPrivacidad: true });
     vouchers.push((await prisma.voucher.findUniqueOrThrow({ where: { numero: creado.body.numero } })).id);
 
     const lista = await agente.get('/api/admin/vouchers').query({ estado: 'pendiente', q: String(creado.body.numero) });
@@ -178,11 +186,87 @@ describe('Panel (e2e)', () => {
     const creado = await request(app.getHttpServer())
       .post('/api/vouchers')
       .set('X-Forwarded-For', desde())
-      .send({ montoUsd: 10, nombre: 'Pesos E2E', mostrarComo: 'anonimo', contactoTipo: 'whatsapp', contacto: '11 5555 1234', formaPago: 'efectivo', aceptaPrivacidad: true });
+      .send({ montoUsd: 10, nombre: 'Pesos E2E', mostrarComo: 'anonimo', email: 'donante@example.com', formaPago: 'efectivo', aceptaPrivacidad: true });
     vouchers.push((await prisma.voucher.findUniqueOrThrow({ where: { numero: creado.body.numero } })).id);
     const res = await agente.post(`/api/admin/vouchers/${creado.body.numero}/confirmar`).send({ montoRecibido: 12000, monedaRecibida: 'ARS' });
     expect(res.status).toBe(400);
     expect(res.body.campos.tipoCambio).toBeDefined();
+  });
+
+  it('confirmar manda un solo email de ladrillo; confirmar de nuevo no manda otro', async () => {
+    const { agente } = await ingresar('tesoreria');
+    const creado = await request(app.getHttpServer())
+      .post('/api/vouchers')
+      .set('X-Forwarded-For', desde())
+      .send({ montoUsd: 20, nombre: 'Ladrillo E2E', mostrarComo: 'anonimo', email: 'ladrillo@example.com', formaPago: 'efectivo', aceptaPrivacidad: true });
+    vouchers.push((await prisma.voucher.findUniqueOrThrow({ where: { numero: creado.body.numero } })).id);
+    enviar.mockClear();
+    const ladrillos = () => enviar.mock.calls.filter((c) => c[1] === '¡Tu ladrillo ya está en la pared!');
+
+    const ok = await agente.post(`/api/admin/vouchers/${creado.body.numero}/confirmar`).send({ montoRecibido: 20, monedaRecibida: 'USD' });
+    expect(ok.status).toBe(200);
+    await vi.waitFor(() => expect(ladrillos()).toHaveLength(1));
+    expect(ladrillos()[0][0]).toBe('ladrillo@example.com');
+    expect(ladrillos()[0][2]).toContain(String(creado.body.numero).padStart(4, '0'));
+
+    const otra = await agente.post(`/api/admin/vouchers/${creado.body.numero}/confirmar`).send({ montoRecibido: 20, monedaRecibida: 'USD' });
+    expect(otra.status).toBe(400);
+    expect(ladrillos()).toHaveLength(1);
+  });
+
+  it('dos confirmaciones a la vez: una sola gana y sale un solo email', async () => {
+    const { agente } = await ingresar('tesoreria');
+    const creado = await request(app.getHttpServer())
+      .post('/api/vouchers')
+      .set('X-Forwarded-For', desde())
+      .send({ montoUsd: 25, nombre: 'Carrera E2E', mostrarComo: 'anonimo', email: 'carrera@example.com', formaPago: 'efectivo', aceptaPrivacidad: true });
+    vouchers.push((await prisma.voucher.findUniqueOrThrow({ where: { numero: creado.body.numero } })).id);
+    enviar.mockClear();
+
+    const confirmar = () => agente.post(`/api/admin/vouchers/${creado.body.numero}/confirmar`).send({ montoRecibido: 25, monedaRecibida: 'USD' });
+    const respuestas = await Promise.all([confirmar(), confirmar()]);
+    expect(respuestas.map((r) => r.status).sort()).toEqual([200, 400]);
+    expect(respuestas.find((r) => r.status === 400)!.body.mensaje).toBe('Este voucher ya está confirmado.');
+    await new Promise((r) => setTimeout(r, 50));
+    expect(enviar.mock.calls.filter((c) => c[1] === '¡Tu ladrillo ya está en la pared!')).toHaveLength(1);
+  });
+
+  it('un voucher anulado no se confirma ni manda email', async () => {
+    const { agente } = await ingresar('tesoreria');
+    const creado = await request(app.getHttpServer())
+      .post('/api/vouchers')
+      .set('X-Forwarded-For', desde())
+      .send({ montoUsd: 5, nombre: 'Anulado E2E', mostrarComo: 'anonimo', email: 'anulado@example.com', formaPago: 'efectivo', aceptaPrivacidad: true });
+    vouchers.push((await prisma.voucher.findUniqueOrThrow({ where: { numero: creado.body.numero } })).id);
+    await agente.post(`/api/admin/vouchers/${creado.body.numero}/anular`).send({ motivo: 'Prueba' });
+    enviar.mockClear();
+    const res = await agente.post(`/api/admin/vouchers/${creado.body.numero}/confirmar`).send({ montoRecibido: 5, monedaRecibida: 'USD' });
+    expect(res.status).toBe(400);
+    expect(res.body.mensaje).toBe('Un voucher anulado no se puede confirmar. Reactivalo primero.');
+    expect(enviar).not.toHaveBeenCalled();
+  });
+
+  it('el WhatsApp opcional aparece en el panel de vouchers y de visitas', async () => {
+    const tesoreria = await ingresar('tesoreria');
+    const recepcion = await ingresar('recepcion');
+    const voucher = await request(app.getHttpServer())
+      .post('/api/vouchers')
+      .set('X-Forwarded-For', desde())
+      .send({ montoUsd: 5, nombre: 'Whatsapp E2E', mostrarComo: 'anonimo', email: 'wa@example.com', whatsapp: '11 5555 1234', formaPago: 'efectivo', aceptaPrivacidad: true });
+    vouchers.push((await prisma.voucher.findUniqueOrThrow({ where: { numero: voucher.body.numero } })).id);
+    const lista = await tesoreria.agente.get('/api/admin/vouchers').query({ q: String(voucher.body.numero) });
+    expect(lista.body.items[0]).toMatchObject({ numero: voucher.body.numero, contacto: 'wa@example.com', whatsapp: '11 5555 1234' });
+
+    const nombre = `Visita WA ${SUFIJO}`;
+    const visita = await request(app.getHttpServer())
+      .post('/api/visitas')
+      .set('X-Forwarded-For', desde())
+      .send({ nombre, email: 'wa@example.com', whatsapp: '11 5555 1234', intereses: [], aceptaPrivacidad: true });
+    expect(visita.status).toBe(201);
+    const v = await prisma.visita.findFirstOrThrow({ where: { nombre } });
+    visitas.push(v.id);
+    const vistas = await recepcion.agente.get('/api/admin/visitas').query({ q: nombre });
+    expect(vistas.body.items[0]).toMatchObject({ nombre, contacto: 'wa@example.com', whatsapp: '11 5555 1234' });
   });
 
   it('un ajuste manual suma al total y guarda quién lo cargó', async () => {

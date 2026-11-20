@@ -30,18 +30,37 @@ export function nombrePublico(v: { nombre: string; mostrarComo: MostrarComo; apo
   return NOMBRE_ANONIMO;
 }
 
-export function instruccionesDePago(forma: FormaPago, numero: number, datosTransferencia: string) {
+/**
+ * Cómo pagar, en una sola fuente para la web y el email. `datos` son los datos
+ * bancarios tal como los cargó la iglesia: van aparte para mostrarlos en un recuadro.
+ * `canal` cambia solo la referencia al email: en la web es "el email que te
+ * mandamos"; dentro del email mismo, "este email".
+ */
+export type InstruccionesPago = { texto: string; datos?: string };
+export type CanalInstrucciones = 'web' | 'email';
+
+export function instruccionesDePago(
+  forma: FormaPago,
+  numero: number,
+  datosTransferencia: string,
+  canal: CanalInstrucciones = 'web',
+): InstruccionesPago {
   const n = numeroVoucher(numero);
+  const elEmail = canal === 'email' ? 'este email' : 'el email que te mandamos';
   if (forma === 'efectivo') {
-    return `Acercate a la mesa Pro Templo el domingo después de la reunión y decí tu número: Nº ${n}.`;
+    return { texto: `Acercate a la mesa Pro Templo el domingo después de la reunión y decí tu número: Nº ${n}.` };
   }
   if (forma === 'transferencia') {
-    return datosTransferencia
-      ? `Transferí a esta cuenta y mandanos el comprobante por WhatsApp con tu número (Nº ${n}):\n${datosTransferencia}`
-      : `Te mandamos los datos para transferir por WhatsApp. Cuando pagues, mandanos el comprobante con tu número (Nº ${n}).`;
+    const datos = datosTransferencia.trim();
+    return datos
+      ? { texto: `Transferí a esta cuenta y respondé ${elEmail} con la foto del comprobante (Nº ${n}):`, datos }
+      : { texto: `Respondé ${elEmail} y tesorería te pasa los datos para transferir (Nº ${n}).` };
   }
-  return `Te mandamos el link de pago de Mercado Pago. Tu número es Nº ${n}.`;
+  return { texto: `Te mandamos el link de pago por email. Tu número es Nº ${n}.` };
 }
+
+/** Las instrucciones como texto plano, para la web: los datos en las líneas siguientes. */
+export const instruccionesEnTexto = (i: InstruccionesPago) => (i.datos ? `${i.texto}\n${i.datos}` : i.texto);
 
 /** Un pendiente que pasó el plazo se informa como vencido aunque nadie lo haya marcado todavía. */
 export function estadoVisible(
