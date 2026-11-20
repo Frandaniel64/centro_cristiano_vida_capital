@@ -1,30 +1,6 @@
-@import "@fontsource-variable/bricolage-grotesque/opsz.css";
+@import "@fontsource-variable/outfit/wght.css";
 @import "@fontsource-variable/figtree/wght.css";
 @import "tailwindcss";
-
-@font-face {
-  font-family: "MADE TOMMY";
-  src: url("/fonts/made-tommy-medium.otf") format("opentype");
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "MADE TOMMY";
-  src: url("/fonts/made-tommy-bold.otf") format("opentype");
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "MADE TOMMY";
-  src: url("/fonts/made-tommy-black.otf") format("opentype");
-  font-weight: 800 900;
-  font-style: normal;
-  font-display: swap;
-}
 
 /* Paleta oficial del Manual de Identidad Visual: azul #0A6CAC, verde #A0D062,
    azul noche #0D1F2D y celeste #B1D9E1. Sitio claro; sin negro ni amarillo. */
@@ -46,7 +22,7 @@
   --color-rojo-vivo: #d92d20;
   --color-error: #b42318;
 
-  --font-titulo: "MADE TOMMY", "Bricolage Grotesque Variable", system-ui, sans-serif;
+  --font-titulo: "Outfit Variable", system-ui, sans-serif;
   --font-texto: "Figtree Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
