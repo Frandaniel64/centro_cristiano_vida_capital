@@ -18,8 +18,9 @@ const fondo = m.color ?? '#b1d9e1';
   <div class:list={['wrap flex flex-wrap items-center gap-12 py-18', invertido && 'flex-row-reverse']}>
     {
       m.foto && (
-        <div class="h-[460px] min-w-0 flex-[1_1_460px] overflow-hidden rounded-3xl" style={`background: ${fondo}`}>
-          <Foto foto={m.foto} sizes="(max-width: 860px) 100vw, 50vw" prioridad={nivel === 'h1'} />
+        <div class="aspect-[4/3] w-full min-w-0 flex-[1_1_460px] overflow-hidden rounded-3xl sm:aspect-auto sm:h-[460px]" style={`background: ${fondo}`}>
+          {/* Las fotos grupales suelen tener las caras en la parte de arriba. */}
+          <Foto foto={m.foto} sizes="(max-width: 860px) 100vw, 50vw" prioridad={nivel === 'h1'} class="object-[50%_30%]" />
         </div>
       )
     }
