@@ -1,9 +1,13 @@
-import { BadRequestException, Body, Controller, Get, HttpCode, NotFoundException, Param, ParseIntPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { BadRequestException, Logger, Body, Controller, Get, HttpCode, NotFoundException, Param, ParseIntPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import type { AjusteAdmin, CampanaAdmin, EstadoVoucher, FormaPago, Pagina, VoucherAdmin } from '@ccvida/shared';
 import { Type } from 'class-transformer';
 import { ArrayMaxSize, IsArray, IsBoolean, IsIn, IsInt, IsNumber, IsOptional, IsPositive, IsString, Length, Max, MaxLength, Min, NotEquals } from 'class-validator';
 import type { SesionActual } from '../auth/auth.service.js';
 import { Roles, Sesion, SesionGuard } from '../auth/sesion.guard.js';
+import { ContenidoService } from '../contenido/contenido.service.js';
+import { EmailService } from '../comun/email.service.js';
+import { ladrilloConfirmado } from '../comun/emails/plantillas.js';
+import { config } from '../config.js';
 import type { Prisma, Voucher } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { ProTemploService } from '../pro-templo/pro-templo.service.js';
@@ -55,9 +59,13 @@ class CampanaDto implements Partial<CampanaAdmin> {
 @UseGuards(SesionGuard)
 @Roles('administrador', 'tesoreria')
 export class ProTemploAdminController {
+  private readonly log = new Logger(ProTemploAdminController.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly proTemplo: ProTemploService,
+    private readonly email: EmailService,
+    private readonly contenido: ContenidoService,
   ) {}
 
   private async campana() {
@@ -77,6 +85,7 @@ export class ProTemploAdminController {
       apodoAprobado: v.apodoAprobado,
       contactoTipo: v.contactoTipo,
       contacto: v.contacto,
+      whatsapp: v.whatsapp,
       formaPago: v.formaPago,
       mensaje: v.mensaje,
       estado: estadoVisible(v, diasVencimiento),
@@ -145,14 +154,18 @@ export class ProTemploAdminController {
   @Post('vouchers/:numero/confirmar')
   @HttpCode(200)
   async confirmar(@Param('numero', ParseIntPipe) numero: number, @Body() d: ConfirmarDto, @Sesion() s: SesionActual) {
-    const v = await this.voucher(numero);
-    if (v.estado === 'confirmado') throw new BadRequestException({ mensaje: 'Este voucher ya está confirmado.' });
-    if (v.estado === 'anulado') throw new BadRequestException({ mensaje: 'Un voucher anulado no se puede confirmar. Reactivalo primero.' });
+    const yaConfirmado = () => new BadRequestException({ mensaje: 'Este voucher ya está confirmado.' });
+    const anulado = () => new BadRequestException({ mensaje: 'Un voucher anulado no se puede confirmar. Reactivalo primero.' });
+    const antes = await this.voucher(numero);
+    if (antes.estado === 'confirmado') throw yaConfirmado();
+    if (antes.estado === 'anulado') throw anulado();
     if (d.monedaRecibida === 'ARS' && !d.tipoCambio) {
       throw new BadRequestException({ mensaje: 'Revisá los datos marcados.', campos: { tipoCambio: 'Si se pagó en pesos, cargá el tipo de cambio.' } });
     }
-    await this.prisma.voucher.update({
-      where: { numero },
+    // Pasa a confirmado solo si todavía no lo está: dos confirmaciones a la vez
+    // no pueden ganar las dos (ni mandar dos emails).
+    const { count } = await this.prisma.voucher.updateMany({
+      where: { numero, estado: { notIn: ['confirmado', 'anulado'] } },
       data: {
         estado: 'confirmado',
         montoRecibido: d.montoRecibido,
@@ -164,7 +177,25 @@ export class ProTemploAdminController {
         actualizadoPorId: s.usuario.id,
       },
     });
+    const v = await this.voucher(numero);
+    // Otro pedido lo cambió entre la lectura y la actualización.
+    if (count === 0) throw v.estado === 'anulado' ? anulado() : yaConfirmado();
+    // En segundo plano: la confirmación ya quedó guardada. Los vouchers viejos
+    // pueden tener WhatsApp como contacto; a esos no se les escribe.
+    if (v.contactoTipo === 'email') {
+      void this.avisarConfirmacion(v);
+    }
     return this.devolver(numero);
+  }
+
+  private async avisarConfirmacion(v: Voucher) {
+    try {
+      const { direccion } = await this.contenido.textos();
+      const aviso = ladrilloConfirmado({ nombre: v.nombre, numero: v.numero, sitioUrl: config.sitioUrl, direccion });
+      void this.email.enviar(v.contacto, aviso.asunto, aviso.html);
+    } catch (e) {
+      this.log.error(`No se pudo armar el email de confirmación del voucher Nº ${v.numero}`, e as Error);
+    }
   }
 
   @Post('vouchers/:numero/anular')

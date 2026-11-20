@@ -10,7 +10,6 @@ interface Props {
 }
 const { intereses, reunion, direccion } = Astro.props;
 
-const pill = 'opcion inline-flex min-h-11 items-center rounded-full px-5 text-[15px] font-bold has-[:checked]:bg-texto has-[:checked]:text-white';
 const errorClase = 'm-0 text-sm font-semibold text-error';
 ---
 
@@ -31,16 +30,17 @@ const errorClase = 'm-0 text-sm font-semibold text-error';
       <p id="error-visita-nombre" data-error="nombre" class={errorClase} hidden></p>
     </div>
 
-    <fieldset class="m-0 flex flex-col gap-2.5 border-0 p-0">
-      <legend class="mb-2.5 p-0 text-[15px] font-semibold">¿Cómo te escribimos? *</legend>
-      <div class="inline-flex gap-1 self-start rounded-full border border-borde-control p-1">
-        <label class={pill}><input type="radio" name="contactoTipo" value="whatsapp" checked />WhatsApp</label>
-        <label class={pill}><input type="radio" name="contactoTipo" value="email" />Email</label>
-      </div>
-      <label for="visita-contacto" class="text-[15px] font-semibold" data-etiqueta-contacto>Tu WhatsApp *</label>
-      <input id="visita-contacto" name="contacto" type="tel" inputmode="tel" autocomplete="tel" placeholder="11 5555 1234" class="campo" aria-describedby="error-visita-contacto" />
-      <p id="error-visita-contacto" data-error="contacto" class={errorClase} hidden></p>
-    </fieldset>
+    <div class="flex flex-col gap-1.5">
+      <label for="visita-email" class="text-[15px] font-semibold">Tu email *</label>
+      <input id="visita-email" name="email" type="email" inputmode="email" autocomplete="email" maxlength="120" placeholder="nombre@gmail.com" class="campo" aria-describedby="error-visita-email" />
+      <p id="error-visita-email" data-error="email" class={errorClase} hidden></p>
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <label for="visita-whatsapp" class="text-[15px] font-semibold">WhatsApp <span class="muted font-medium">(opcional)</span></label>
+      <input id="visita-whatsapp" name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" placeholder="11 5555 1234" class="campo" aria-describedby="error-visita-whatsapp" />
+      <p id="error-visita-whatsapp" data-error="whatsapp" class={errorClase} hidden></p>
+    </div>
 
     <fieldset class="m-0 border-0 p-0">
       <legend class="mb-2.5 p-0 text-[15px] font-semibold">¿Qué te interesa? <span class="muted font-medium">(opcional)</span></legend>
@@ -75,21 +75,20 @@ const errorClase = 'm-0 text-sm font-semibold text-error';
 <script>
   import type { CrearVisita } from '@ccvida/shared';
   import { ErrorDeApi, enviar } from '../lib/api';
-  import { conectarContacto, enfocarPrimerError, limpiarErrores, mostrarError, valorDe } from '../lib/formularios';
-  import { errorContacto } from '../lib/validar';
+  import { enfocarPrimerError, limpiarErrores, mostrarError, valorDe } from '../lib/formularios';
+  import { errorEmail, errorWhatsapp } from '../lib/validar';
 
   const form = document.querySelector<HTMLFormElement>('#form-visita');
   const ok = document.querySelector<HTMLElement>('[data-visita-ok]');
 
   if (form && ok) {
     const boton = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
-    conectarContacto(form);
 
     const validar = () => {
       limpiarErrores(form);
       if (!valorDe(form, 'nombre').trim()) mostrarError(form, 'nombre', 'Escribe tu nombre para que sepamos a quién recibir.');
-      const tipo = valorDe(form, 'contactoTipo') as 'whatsapp' | 'email';
-      mostrarError(form, 'contacto', errorContacto(tipo, valorDe(form, 'contacto')));
+      mostrarError(form, 'email', errorEmail(valorDe(form, 'email')));
+      mostrarError(form, 'whatsapp', errorWhatsapp(valorDe(form, 'whatsapp')));
       if (!form.querySelector<HTMLInputElement>('input[name="aceptaPrivacidad"]')!.checked) {
         mostrarError(form, 'aceptaPrivacidad', 'Para guardar tus datos necesitamos que aceptes la política de privacidad.');
       }
@@ -102,11 +101,10 @@ const errorClase = 'm-0 text-sm font-semibold text-error';
         enfocarPrimerError(form);
         return;
       }
-      const tipo = valorDe(form, 'contactoTipo') as 'whatsapp' | 'email';
       const datos: CrearVisita = {
         nombre: valorDe(form, 'nombre').trim(),
-        contactoTipo: tipo,
-        contacto: valorDe(form, 'contacto').trim(),
+        email: valorDe(form, 'email').trim(),
+        whatsapp: valorDe(form, 'whatsapp').trim() || undefined,
         intereses: [...form.querySelectorAll<HTMLInputElement>('input[name="intereses"]:checked')].map((i) => i.value),
         aceptaPrivacidad: true,
         turnstileToken: valorDe(form, 'cf-turnstile-response') || undefined,
@@ -118,7 +116,7 @@ const errorClase = 'm-0 text-sm font-semibold text-error';
         await enviar('/api/visitas', datos);
         ok.querySelector('[data-ok="nombre"]')!.textContent = datos.nombre.split(' ')[0];
         ok.querySelector('[data-ok="mensaje"]')!.textContent =
-          `Te escribimos por ${tipo === 'whatsapp' ? 'WhatsApp' : 'email'} antes del domingo. ${form.dataset.despedida}`;
+          `¡Listo! Te mandamos un email a ${datos.email} con todo para el domingo. ${form.dataset.despedida}`;
         form.hidden = true;
         ok.hidden = false;
         ok.focus();

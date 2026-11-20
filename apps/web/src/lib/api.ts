@@ -8,7 +8,7 @@ export const DEMO = import.meta.env.PUBLIC_DEMO === 'true';
 
 const INSTRUCCIONES_DEMO: Record<string, string> = {
   efectivo: 'Acércate a la mesa Pro Templo el domingo después de la reunión y di tu número.',
-  transferencia: 'Transfiere a la cuenta en dólares de la iglesia y mándanos el comprobante por WhatsApp con tu número.\n(Los datos bancarios reales se cargan desde el panel.)',
+  transferencia: 'Transfiere a la cuenta en dólares de la iglesia y responde el email que te mandamos con el comprobante y tu número.\n(Los datos bancarios reales se cargan desde el panel.)',
   mercadopago: 'Te mandamos el link de pago de Mercado Pago.',
 };
 let numeroDemo = 347;

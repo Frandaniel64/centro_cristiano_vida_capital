@@ -32,7 +32,7 @@ export const CONTENIDO_EJEMPLO: ContenidoPublico = {
     ],
     faqProTemplo: [
       { pregunta: '¿Qué es un voucher?', respuesta: 'Es tu aporte en dólares para el proyecto Pro Templo. Eliges el monto, lo pagas y recibes un voucher con tu número.' },
-      { pregunta: '¿Cómo lo pago?', respuesta: 'En efectivo en la mesa Pro Templo los domingos después de la reunión, o por transferencia. Te pasamos los datos por WhatsApp.' },
+      { pregunta: '¿Cómo lo pago?', respuesta: 'En efectivo en la mesa Pro Templo los domingos después de la reunión, o por transferencia. Te mandamos los datos por email.' },
       { pregunta: '¿Puedo dar más de un voucher?', respuesta: 'Sí, cuantos quieras y cuando quieras. Cada uno suma a la pared.' },
       { pregunta: '¿Qué pasa si superamos la meta?', respuesta: 'Lo que sobre se usa para equipar el local y sostener el alquiler de los meses siguientes.' },
     ],
@@ -50,6 +50,11 @@ export const CONTENIDO_EJEMPLO: ContenidoPublico = {
     youtube: '',
     facebook: '',
     datosTransferencia: '',
+    mapaUrl: '',
+    versiculoBienvenida: {
+      texto: 'Vengan a mí todos ustedes que están cansados y agobiados, y yo les daré descanso.',
+      cita: 'Mateo 11:28',
+    },
     nosotrosIntro:
       'Centro Cristiano Vida Capital es una iglesia cristiana evangélica en el corazón de Buenos Aires. Creemos que la iglesia no es un edificio: eres tú.',
     // Textos oficiales de la iglesia (documento "Nuestro modelo: Las 3E", noviembre 2026).
