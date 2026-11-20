@@ -48,13 +48,13 @@ export function instruccionesDePago(
   const n = numeroVoucher(numero);
   const elEmail = canal === 'email' ? 'este email' : 'el email que te mandamos';
   if (forma === 'efectivo') {
-    return { texto: `Acercate a la mesa Pro Templo el domingo después de la reunión y decí tu número: Nº ${n}.` };
+    return { texto: `Acércate a la mesa Pro Templo el domingo después de la reunión y di tu número: Nº ${n}.` };
   }
   if (forma === 'transferencia') {
     const datos = datosTransferencia.trim();
     return datos
-      ? { texto: `Transferí a esta cuenta y respondé ${elEmail} con la foto del comprobante (Nº ${n}):`, datos }
-      : { texto: `Respondé ${elEmail} y tesorería te pasa los datos para transferir (Nº ${n}).` };
+      ? { texto: `Transfiere a esta cuenta y responde ${elEmail} con la foto del comprobante (Nº ${n}):`, datos }
+      : { texto: `Responde ${elEmail} y tesorería te pasa los datos para transferir (Nº ${n}).` };
   }
   return { texto: `Te mandamos el link de pago por email. Tu número es Nº ${n}.` };
 }

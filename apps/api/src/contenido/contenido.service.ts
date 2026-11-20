@@ -34,10 +34,17 @@ export class ContenidoService {
     }
   }
 
-  /** Lo guardado, completado con los textos iniciales en lo que falte. */
+  /**
+   * Lo guardado, completado con los textos iniciales en lo que falte. Los
+   * campos que ya no existen (por ejemplo "pilares" y "creemos", que reemplazó
+   * el modelo de las 3E) se descartan.
+   */
   async textos(): Promise<TextosSitio> {
     const c = await this.prisma.configuracion.findUnique({ where: { id: 1 } });
-    return { ...TEXTOS_INICIALES, ...((c?.textos ?? {}) as Partial<TextosSitio>) };
+    const guardados = (c?.textos ?? {}) as Record<string, unknown>;
+    const salida: Record<string, unknown> = {};
+    for (const [clave, inicial] of Object.entries(TEXTOS_INICIALES)) salida[clave] = Object.hasOwn(guardados, clave) ? guardados[clave] : inicial;
+    return salida as unknown as TextosSitio;
   }
 
   /** Ids de las fotos que usa la página Nosotros. */

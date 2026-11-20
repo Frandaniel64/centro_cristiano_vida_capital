@@ -11,7 +11,7 @@ interface Props {
 }
 const { ministerio: m, invertido = false, nivel = 'h2' } = Astro.props;
 const Titulo = nivel;
-const fondo = m.color ?? '#f5f5f0';
+const fondo = m.color ?? '#b1d9e1';
 ---
 
 <article class="linea" id={m.slug}>
@@ -36,7 +36,7 @@ const fondo = m.color ?? '#f5f5f0';
           </ul>
         )
       }
-      {m.horario && <p class="m-0 font-bold text-amarillo">{m.horario}</p>}
+      {m.horario && <p class="m-0 font-bold text-azul-vida">{m.horario}</p>}
       <a href="/visitanos" class="btn b-verde self-start">Quiero sumarme</a>
     </div>
   </div>

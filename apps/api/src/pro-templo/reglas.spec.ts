@@ -53,30 +53,30 @@ describe('nombrePublico', () => {
 describe('instruccionesDePago', () => {
   it('efectivo indica la mesa Pro Templo con el número', () => {
     expect(instruccionesDePago('efectivo', 348, '')).toEqual({
-      texto: 'Acercate a la mesa Pro Templo el domingo después de la reunión y decí tu número: Nº 0348.',
+      texto: 'Acércate a la mesa Pro Templo el domingo después de la reunión y di tu número: Nº 0348.',
     });
   });
 
   it('transferencia con datos pide responder el email con el comprobante y aparta los datos', () => {
     expect(instruccionesDePago('transferencia', 1, '  CBU 123\nAlias X  ')).toEqual({
-      texto: 'Transferí a esta cuenta y respondé el email que te mandamos con la foto del comprobante (Nº 0001):',
+      texto: 'Transfiere a esta cuenta y responde el email que te mandamos con la foto del comprobante (Nº 0001):',
       datos: 'CBU 123\nAlias X',
     });
   });
 
   it('transferencia sin datos cargados: tesorería los pasa por email', () => {
     expect(instruccionesDePago('transferencia', 1, '  ')).toEqual({
-      texto: 'Respondé el email que te mandamos y tesorería te pasa los datos para transferir (Nº 0001).',
+      texto: 'Responde el email que te mandamos y tesorería te pasa los datos para transferir (Nº 0001).',
     });
   });
 
   it('en el email se habla de "este email", no del que te mandamos', () => {
     expect(instruccionesDePago('transferencia', 1, 'CBU 123', 'email')).toEqual({
-      texto: 'Transferí a esta cuenta y respondé este email con la foto del comprobante (Nº 0001):',
+      texto: 'Transfiere a esta cuenta y responde este email con la foto del comprobante (Nº 0001):',
       datos: 'CBU 123',
     });
     expect(instruccionesDePago('transferencia', 1, '', 'email')).toEqual({
-      texto: 'Respondé este email y tesorería te pasa los datos para transferir (Nº 0001).',
+      texto: 'Responde este email y tesorería te pasa los datos para transferir (Nº 0001).',
     });
     expect(instruccionesDePago('efectivo', 1, '', 'email')).toEqual(instruccionesDePago('efectivo', 1, ''));
   });
@@ -97,10 +97,10 @@ describe('instruccionesDePago', () => {
 
   it('en texto plano los datos van en las líneas siguientes', () => {
     expect(instruccionesEnTexto(instruccionesDePago('transferencia', 1, 'CBU 123'))).toBe(
-      'Transferí a esta cuenta y respondé el email que te mandamos con la foto del comprobante (Nº 0001):\nCBU 123',
+      'Transfiere a esta cuenta y responde el email que te mandamos con la foto del comprobante (Nº 0001):\nCBU 123',
     );
     expect(instruccionesEnTexto(instruccionesDePago('efectivo', 1, ''))).toBe(
-      'Acercate a la mesa Pro Templo el domingo después de la reunión y decí tu número: Nº 0001.',
+      'Acércate a la mesa Pro Templo el domingo después de la reunión y di tu número: Nº 0001.',
     );
   });
 });

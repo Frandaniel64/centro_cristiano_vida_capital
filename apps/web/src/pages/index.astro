@@ -21,7 +21,7 @@ const destacados = proximosEventos(eventos.filter((e) => e.destacado)).slice(0, 
 const flecha = 'M5 12h14M13 6l6 6-6 6';
 // "¿Primera vez?" muestra la agenda del domingo que se edita en el panel.
 const agenda = textos.agendaDomingo;
-// El lema se muestra con la última palabra en verde: "La iglesia sos vos."
+// El lema se muestra con la última palabra en verde: "Hay lugar para ti."
 const palabras = textos.lema.trim().split(' ');
 const lemaFinal = palabras.pop() ?? '';
 const NOMBRE = 'Centro Cristiano Vida Capital';
@@ -49,12 +49,12 @@ const jsonLd = {
 
 <Base
   titulo="Inicio"
-  descripcion={`Iglesia cristiana en Buenos Aires. ${textos.reunion} en ${textos.direccion}, ${textos.barrio}. Vení como estés.`}
+  descripcion={`Iglesia cristiana en Buenos Aires. ${textos.reunion} en ${textos.direccion}, ${textos.barrio}. Ven como estés.`}
   jsonLd={jsonLd}
 >
   <section class="wrap pt-14">
     <div class="flex flex-wrap items-end gap-8">
-      <h1 class="d h1 min-w-0 flex-[1_1_640px]">{palabras.join(' ')} <span class="text-verde-hoja">{lemaFinal}</span></h1>
+      <h1 class="d h1 min-w-0 flex-[1_1_640px]">{palabras.join(' ')} <span class="text-verde-oscuro">{lemaFinal}</span></h1>
       <LogoArbol class="h-auto w-[280px] max-w-full flex-[0_1_280px]" />
     </div>
 
@@ -63,12 +63,12 @@ const jsonLd = {
       <div class="dato"><p class="muted m-0 text-[13px]">Dónde</p><p class="mt-0.5 mb-0 text-xl font-bold">{textos.direccion}, {textos.barrio}</p></div>
       <a href="/pro-templo" class="dato">
         <span class="muted block text-[13px]">Pro Templo</span>
-        <span class="mt-0.5 block text-xl font-bold"><span class="text-amarillo"><span data-pt="porcentaje">{pt.porcentaje}</span>%</span> de la meta</span>
+        <span class="mt-0.5 block text-xl font-bold"><span class="text-azul-vida"><span data-pt="porcentaje">{pt.porcentaje}</span>%</span> de la meta</span>
       </a>
       <div class="acciones flex flex-[1_1_300px] flex-wrap items-center justify-end gap-2.5 py-4 pl-6">
         <a href="/visitanos" class="btn b-verde min-h-14">
-          Planeá tu visita
-          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d={flecha}></path></svg>
+          Planea tu visita
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0d1f2d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d={flecha}></path></svg>
         </a>
         <a href="/en-vivo" class="btn b-borde min-h-14"><span class="size-2 rounded-full bg-[#e5484d]"></span>En vivo</a>
       </div>
@@ -82,7 +82,7 @@ const jsonLd = {
     </div>
     <div class="flex flex-[1_1_260px] flex-col gap-3">
       <div class="flex-[1_1_200px] overflow-hidden rounded-3xl bg-verde-hoja"><Foto foto={fotos.amigas} sizes="(max-width: 860px) 100vw, 30vw" /></div>
-      <div class="flex-[1_1_200px] overflow-hidden rounded-3xl bg-amarillo"><Foto foto={fotos.kidsVida} sizes="(max-width: 860px) 100vw, 30vw" /></div>
+      <div class="flex-[1_1_200px] overflow-hidden rounded-3xl bg-celeste-vida"><Foto foto={fotos.kidsVida} sizes="(max-width: 860px) 100vw, 30vw" /></div>
     </div>
   </section>
 
@@ -93,7 +93,7 @@ const jsonLd = {
         {
           agenda.length > 0 ? (
             <>
-              <p class="d text-[56px] leading-[.95] tracking-[-.04em] text-amarillo">{agenda[0].hora}</p>
+              <p class="d text-[56px] leading-[.95] tracking-[-.04em] text-azul-vida">{agenda[0].hora}</p>
               <ul class="muted m-0 flex list-none flex-col gap-1 p-0">
                 {agenda.map((a) => (
                   <li>
@@ -127,10 +127,10 @@ const jsonLd = {
     <div class="wrap flex flex-wrap items-center gap-12 py-30">
       <div class="flex min-w-0 flex-[1_1_560px] flex-col gap-7">
         <h2 class="d text-[clamp(36px,5vw,72px)] leading-[1.02] tracking-[-.035em] text-balance">
-          ¿Qué hace que un lugar sea un hogar? <span class="text-black">Las personas que viven en él.</span>
+          ¿Qué hace que un lugar sea un hogar? <span class="text-azul-noche">Las personas que viven en él.</span>
         </h2>
         <p class="lead max-w-[520px]">Con la iglesia pasa exactamente lo mismo. El templo es solo el punto de encuentro: la iglesia somos nosotros.</p>
-        <a href="/nosotros" class="btn b-negro self-start">Conocé nuestra historia</a>
+        <a href="/nosotros" class="btn b-negro self-start">Conoce nuestra historia</a>
       </div>
       <div class="h-[440px] min-w-0 flex-[1_1_360px] overflow-hidden rounded-[999px_999px_24px_24px]">
         <Foto foto={fotos.abuelaNieta} sizes="(max-width: 860px) 100vw, 40vw" />
@@ -140,7 +140,7 @@ const jsonLd = {
 
   <section class="wrap flex flex-col gap-10 py-30">
     <div class="flex flex-wrap items-end justify-between gap-x-14 gap-y-5">
-      <h2 class="d text-[clamp(56px,9vw,144px)] leading-[.85] tracking-[-.05em]">Pro <span class="text-amarillo">Templo</span></h2>
+      <h2 class="d text-[clamp(56px,9vw,144px)] leading-[.85] tracking-[-.05em]">Pro <span class="text-azul-vida">Templo</span></h2>
       <p class="lead muted flex-[0_1_440px]">
         Hoy usamos un teatro solo 3 horas los domingos. Estamos juntando para alquilar <span class="font-bold text-texto">nuestro primer local</span>.
       </p>
@@ -148,7 +148,7 @@ const jsonLd = {
     <div class="flex flex-wrap gap-3">
       <div class="flex min-w-0 flex-[3_1_560px] flex-col gap-6 rounded-[28px] border border-linea bg-panel p-[clamp(24px,4vw,44px)]">
         <div class="flex flex-wrap items-end justify-between gap-4">
-          <p class="d text-[clamp(56px,7.5vw,112px)] leading-[.88] tracking-[-.05em] text-amarillo tabular-nums">USD <span data-pt="recaudado">{usd(pt.recaudadoUsd)}</span></p>
+          <p class="d text-[clamp(56px,7.5vw,112px)] leading-[.88] tracking-[-.05em] text-azul-vida tabular-nums">USD <span data-pt="recaudado">{usd(pt.recaudadoUsd)}</span></p>
           <p class="muted m-0 inline-flex items-center gap-2 text-sm font-bold"><span class="pulso size-2.5 rounded-full bg-verde-hoja"></span>En tiempo real</p>
         </div>
         <Pared estado={pt} />
@@ -157,12 +157,12 @@ const jsonLd = {
             de USD <span data-pt="meta">{usd(pt.metaUsd)}</span> · <span data-pt="ladrillos">{pt.ladrillos}</span> de 100 ladrillos ·
             <strong class="text-texto"><span data-pt="porcentaje">{pt.porcentaje}</span>%</strong>
           </p>
-          <a href="/pro-templo#voucher" class="btn b-amarillo">Quiero mi voucher</a>
+          <a href="/pro-templo#voucher" class="btn b-azul">Quiero mi voucher</a>
         </div>
       </div>
       <div class="relative min-h-[340px] flex-[2_1_360px] overflow-hidden rounded-[28px]">
         <Foto foto={fotos.salonVacio} sizes="(max-width: 860px) 100vw, 40vw" class="absolute inset-0" />
-        <span class="chip absolute bottom-[18px] left-[18px] bg-black px-3.5 py-2 text-sm text-texto">Nuestro próximo hogar</span>
+        <span class="chip absolute bottom-[18px] left-[18px] bg-azul-noche px-3.5 py-2 text-sm text-texto">Nuestro próximo hogar</span>
       </div>
     </div>
   </section>
@@ -177,7 +177,7 @@ const jsonLd = {
       <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,260px),1fr))] gap-3">
         {
           ministerios.map((m) => (
-            <a href={`/ministerios/${m.slug}`} class="fila flex min-h-[420px] flex-col overflow-hidden rounded-3xl no-underline" style={`background: ${m.color ?? '#f5f5f0'}; color: ${colorTexto(m.color)}`}>
+            <a href={`/ministerios/${m.slug}`} class="fila flex min-h-[420px] flex-col overflow-hidden rounded-3xl no-underline" style={`background: ${m.color ?? '#b1d9e1'}; color: ${colorTexto(m.color)}`}>
               {m.foto && (
                 <span class="block h-[200px] w-full">
                   <Foto foto={m.foto} decorativa sizes="(max-width: 860px) 100vw, 25vw" />
@@ -190,8 +190,8 @@ const jsonLd = {
                 </span>
                 <span class="flex items-center justify-between gap-3">
                   <span class="text-sm font-bold">{m.horario}</span>
-                  <span class="flecha inline-flex size-11 flex-none items-center justify-center rounded-full bg-black">
-                    <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f5f5f0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8" /></svg>
+                  <span class="flecha inline-flex size-11 flex-none items-center justify-center rounded-full bg-azul-noche">
+                    <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8" /></svg>
                   </span>
                 </span>
               </span>
@@ -208,7 +208,7 @@ const jsonLd = {
       <section class="linea">
         <div class="wrap flex flex-col gap-10 py-30">
           <div class="flex flex-wrap items-end justify-between gap-4">
-            <h2 class="d h2">Próximos <span class="text-amarillo">eventos</span></h2>
+            <h2 class="d h2">Próximos <span class="text-azul-vida">eventos</span></h2>
             <a href="/eventos" class="btn b-borde">Ver todos los eventos</a>
           </div>
           <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,340px),1fr))] gap-3">
@@ -230,11 +230,11 @@ const jsonLd = {
       {ultimaPredica && (
       <a href={`/predicas/${ultimaPredica.slug}`} aria-label={`Ver la última prédica: ${ultimaPredica.titulo}`} class="relative aspect-[16/10] min-w-0 flex-[1_1_520px] overflow-hidden rounded-3xl border border-linea bg-panel">
         {ultimaPredica.foto && <Foto foto={ultimaPredica.foto} decorativa sizes="(max-width: 860px) 100vw, 50vw" class="absolute inset-0" />}
-        <span class="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,.92),rgba(0,0,0,.1))]"></span>
-        <span class="absolute top-[42%] left-1/2 inline-flex size-22 -translate-1/2 items-center justify-center rounded-full bg-texto">
-          <svg aria-hidden="true" width="32" height="32" viewBox="0 0 24 24" fill="#000000"><path d="M8 5l11 7-11 7z"></path></svg>
+        <span class="absolute inset-0 bg-[linear-gradient(to_top,rgba(13,31,45,.92),rgba(13,31,45,.1))]"></span>
+        <span class="absolute top-[42%] left-1/2 inline-flex size-22 -translate-1/2 items-center justify-center rounded-full bg-white">
+          <svg aria-hidden="true" width="32" height="32" viewBox="0 0 24 24" fill="#0d1f2d"><path d="M8 5l11 7-11 7z"></path></svg>
         </span>
-        <span class="absolute right-6 bottom-[22px] left-6 text-left text-texto">
+        <span class="absolute right-6 bottom-[22px] left-6 oscuro text-left">
           <span class="muted block text-sm">Última prédica · {fechaLarga(ultimaPredica.fecha)}</span>
           <span class="d block text-[30px] leading-[1.1]">{ultimaPredica.titulo}</span>
         </span>
@@ -243,12 +243,12 @@ const jsonLd = {
     </div>
   </section>
 
-  <section class="claro bg-verde-hoja text-black">
+  <section class="claro bg-verde-hoja text-azul-noche">
     <div class="wrap flex flex-wrap items-center justify-between gap-8 py-24">
       <h2 class="d h2 flex-[1_1_560px]">Te esperamos este domingo.</h2>
       <div class="flex flex-col items-start gap-3.5">
         <p class="m-0 text-lg font-bold">{textos.reunion} · {textos.direccion}, {textos.barrio}</p>
-        <a href="/visitanos" class="btn b-negro min-h-14">Planeá tu visita</a>
+        <a href="/visitanos" class="btn b-negro min-h-14">Planea tu visita</a>
       </div>
     </div>
   </section>

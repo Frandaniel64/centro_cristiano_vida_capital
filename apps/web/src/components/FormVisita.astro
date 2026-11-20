@@ -14,14 +14,14 @@ const errorClase = 'm-0 text-sm font-semibold text-error';
 ---
 
 <div class="min-w-0 flex-[1_1_480px] rounded-[28px] border border-linea bg-panel p-[clamp(24px,4vw,40px)]">
-  <div data-visita-ok hidden role="status" tabindex="-1" class="claro flex flex-col gap-3.5 rounded-[20px] bg-verde-hoja p-8 text-black outline-none">
+  <div data-visita-ok hidden role="status" tabindex="-1" class="claro flex flex-col gap-3.5 rounded-[20px] bg-verde-hoja p-8 text-azul-noche outline-none">
     <p class="d text-4xl leading-[1.05]">¡Gracias, <span data-ok="nombre"></span>!</p>
     <p class="m-0 text-[17px]" data-ok="mensaje"></p>
-    <button type="button" data-cambiar class="min-h-11 cursor-pointer self-start border-0 bg-transparent p-0 font-extrabold text-black underline">Cambiar mis datos</button>
+    <button type="button" data-cambiar class="min-h-11 cursor-pointer self-start border-0 bg-transparent p-0 font-extrabold text-azul-noche underline">Cambiar mis datos</button>
   </div>
 
   <form id="form-visita" novalidate class="flex flex-col gap-[18px]" data-despedida={`Nos vemos ${reunion.toLowerCase()} en ${direccion}.`}>
-    <h2 class="d h3">Avisanos que venís</h2>
+    <h2 class="d h3">Avísanos que vienes</h2>
     <p class="muted m-0 text-sm">Los campos con * son obligatorios.</p>
 
     <div class="flex flex-col gap-1.5">
@@ -86,7 +86,7 @@ const errorClase = 'm-0 text-sm font-semibold text-error';
 
     const validar = () => {
       limpiarErrores(form);
-      if (!valorDe(form, 'nombre').trim()) mostrarError(form, 'nombre', 'Escribí tu nombre para que sepamos a quién recibir.');
+      if (!valorDe(form, 'nombre').trim()) mostrarError(form, 'nombre', 'Escribe tu nombre para que sepamos a quién recibir.');
       mostrarError(form, 'email', errorEmail(valorDe(form, 'email')));
       mostrarError(form, 'whatsapp', errorWhatsapp(valorDe(form, 'whatsapp')));
       if (!form.querySelector<HTMLInputElement>('input[name="aceptaPrivacidad"]')!.checked) {

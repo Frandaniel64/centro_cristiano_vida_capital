@@ -4,7 +4,7 @@ import type { EstadoProTemplo } from '@ccvida/shared';
 import { fotoDiseno } from '../lib/fotos';
 
 export const fotos = {
-  alabanza: fotoDiseno('alabanza', 'Personas levantando las manos durante la alabanza'),
+  alabanza: fotoDiseno('alabanza', 'El pastor Carlos Fuenmayor predicando un domingo'),
   amigas: fotoDiseno('amigas', 'Amigas riendo juntas'),
   kidsVida: fotoDiseno('kids-vida', 'Nenas pintando en Vida Kids'),
   abuelaNieta: fotoDiseno('abuela-nieta', 'Una abuela abrazando a su nieta'),
@@ -24,20 +24,20 @@ export const fotos = {
 };
 
 export const primeraVez = [
-  { titulo: 'Vida Kids', texto: 'Mientras vos estás en la reunión, los chicos aprenden y juegan.' },
-  { titulo: 'Vení como estés', texto: 'No hay código de vestimenta. Alguien te va a recibir en la puerta con un café.' },
+  { titulo: 'Vida Kids', texto: 'Mientras tú estás en la reunión, los chicos aprenden y juegan.' },
+  { titulo: 'Ven como estés', texto: 'No hay código de vestimenta. Alguien te va a recibir en la puerta con un café.' },
 ];
 
 export const proTemploDestinos = [
-  { monto: 'USD 4.000', titulo: 'Depósito y garantía', texto: 'Para firmar el contrato del local.', bg: '#0c74b8', fg: '#ffffff' },
-  { monto: 'USD 3.500', titulo: 'Primeros tres meses', texto: 'El alquiler cubierto mientras nos acomodamos.', bg: '#8cc63f', fg: '#000000' },
-  { monto: 'USD 2.500', titulo: 'Acondicionamiento', texto: 'Sillas, sonido, luces y la sala de Vida Kids.', bg: '#f5d547', fg: '#000000' },
+  { monto: 'USD 4.000', titulo: 'Depósito y garantía', texto: 'Para firmar el contrato del local.', bg: '#0a6cac', fg: '#ffffff' },
+  { monto: 'USD 3.500', titulo: 'Primeros tres meses', texto: 'El alquiler cubierto mientras nos acomodamos.', bg: '#a0d062', fg: '#0d1f2d' },
+  { monto: 'USD 2.500', titulo: 'Acondicionamiento', texto: 'Sillas, sonido, luces y la sala de Vida Kids.', bg: '#b1d9e1', fg: '#0d1f2d' },
 ];
 
 export const proTemploPasos = [
-  { n: '1', titulo: 'Elegí tu monto', texto: 'Desde USD 1. No hay mínimo ni máximo.', bg: '#0c74b8', fg: '#ffffff' },
-  { n: '2', titulo: 'Recibí tu voucher', texto: 'Lo pagás el domingo o por transferencia y te damos tu voucher numerado.', bg: '#8cc63f', fg: '#000000' },
-  { n: '3', titulo: 'Mirá cómo sube la pared', texto: 'Cada USD 100 levanta un ladrillo. Lo ves acá en tiempo real.', bg: '#f5d547', fg: '#000000' },
+  { n: '1', titulo: 'Elige tu monto', texto: 'Desde USD 1. No hay mínimo ni máximo.', bg: '#0a6cac', fg: '#ffffff' },
+  { n: '2', titulo: 'Recibe tu voucher', texto: 'Lo pagas el domingo o por transferencia y te damos tu voucher numerado.', bg: '#a0d062', fg: '#0d1f2d' },
+  { n: '3', titulo: 'Mira cómo sube la pared', texto: 'Cada USD 100 levanta un ladrillo. Lo ves aquí en tiempo real.', bg: '#b1d9e1', fg: '#0d1f2d' },
 ];
 
 // Valores de ejemplo del contador para el modo muestra.
@@ -64,4 +64,4 @@ export const nav = [
   { href: '/en-vivo', label: 'En vivo' },
 ];
 
-export const navCompleta = [...nav, { href: '/visitanos', label: 'Visitanos' }];
+export const navCompleta = [...nav, { href: '/visitanos', label: 'Visítanos' }];

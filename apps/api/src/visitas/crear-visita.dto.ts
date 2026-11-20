@@ -8,7 +8,7 @@ const recortar = ({ value }: { value: unknown }) => (typeof value === 'string' ?
 export class CrearVisitaDto implements CrearVisita {
   @Transform(recortar)
   @IsString()
-  @Length(2, 100, { message: 'Escribí tu nombre para que sepamos a quién recibir.' })
+  @Length(2, 100, { message: 'Escribe tu nombre para que sepamos a quién recibir.' })
   nombre!: string;
 
   @CampoEmail()

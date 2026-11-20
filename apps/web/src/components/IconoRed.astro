@@ -1,0 +1,15 @@
+---
+// Íconos simples de redes para los botones que llevan afuera del sitio.
+interface Props {
+  red: 'YouTube' | 'Facebook' | 'Instagram' | 'WhatsApp';
+  size?: number;
+}
+const { red, size = 22 } = Astro.props;
+---
+
+<svg aria-hidden="true" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0">
+  {red === 'YouTube' && (<><rect x="2" y="5" width="20" height="14" rx="4" /><path d="M10 9.5v5l4.5-2.5z" fill="currentColor" /></>)}
+  {red === 'Facebook' && <path d="M15 3h-2.5A3.5 3.5 0 0 0 9 6.5V9H6.5v3.5H9V21h3.5v-8.5H15l.5-3.5h-3V7a1 1 0 0 1 1-1H15z" />}
+  {red === 'Instagram' && (<><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r="0.6" fill="currentColor" /></>)}
+  {red === 'WhatsApp' && <path d="M4 20l1.3-3.9A8 8 0 1 1 8 18.8zM9 8.5c0 3.5 3 6.5 6.5 6.5l1-1.6-2-1-1 1a5 5 0 0 1-2.4-2.4l1-1-1-2z" />}
+</svg>

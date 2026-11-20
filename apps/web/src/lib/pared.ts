@@ -1,5 +1,5 @@
-const COLORES = ['#0c74b8', '#8cc63f', '#f5d547', '#f5f5f0'];
-const VACIO = '#1c1c1c';
+const COLORES = ['#0a6cac', '#a0d062', '#3eabf3', '#b1d9e1'];
+const VACIO = '#e9e3d6';
 export const TOTAL_LADRILLOS = 100;
 
 /** Fondo de cada uno de los 100 ladrillos. El valor de un ladrillo es meta / 100. */

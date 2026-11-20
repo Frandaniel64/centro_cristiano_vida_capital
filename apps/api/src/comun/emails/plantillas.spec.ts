@@ -83,7 +83,7 @@ describe('plantillas de email', () => {
 
   it('transferencia sin datos no deja bloque vacío y avisa que tesorería pasa los datos', () => {
     const { html } = voucher({ formaPago: 'transferencia', datosTransferencia: '' });
-    expect(html).toContain('Respondé este email y tesorería te pasa los datos para transferir (Nº 0348).');
+    expect(html).toContain('Responde este email y tesorería te pasa los datos para transferir (Nº 0348).');
     expect(html).not.toContain('<pre');
   });
 
@@ -91,7 +91,7 @@ describe('plantillas de email', () => {
     const { html } = voucher({ formaPago: 'transferencia', datosTransferencia: 'CBU 123\nAlias <CCVIDA>' });
     expect(html).toContain('CBU 123<br>Alias &lt;CCVIDA&gt;');
     expect(html).not.toContain('pre-line');
-    expect(html).toContain('respondé este email con la foto del comprobante');
+    expect(html).toContain('responde este email con la foto del comprobante');
     expect(html).not.toContain('te mandamos');
     expect(html).toContain('Tu ladrillo aparece en la pared cuando tesorería confirma el pago.');
   });
@@ -131,7 +131,7 @@ describe('plantillas de email', () => {
       expect(html).toContain('#a0d062');
       expect(html).not.toContain('border-left');
       // Clientes que ignoran el CSS (Outlook) igual pintan la tarjeta negra y el botón verde.
-      expect(html).toContain('bgcolor="#000000"');
+      expect(html).toContain('bgcolor="#0d1f2d"');
       expect(html).toContain('bgcolor="#a0d062"');
     }
   });

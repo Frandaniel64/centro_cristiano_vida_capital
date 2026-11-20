@@ -29,7 +29,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   if (ruta === '/vista-previa') return next();
 
   // Con permiso de vista previa se ven los borradores, aunque el sitio esté en
-  // construcción. El permiso se valida acá, antes de armar la página: Astro
+  // construcción. El permiso se valida aquí, antes de armar la página: Astro
   // transmite la respuesta y después ya no se puede cambiar de página.
   const permiso = context.cookies.get(COOKIE_VISTA_PREVIA)?.value;
   if (permiso && !ARCHIVOS.test(ruta)) {

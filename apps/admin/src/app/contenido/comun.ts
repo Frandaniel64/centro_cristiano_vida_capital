@@ -30,10 +30,11 @@ export const deFechaHoraLocal = (valor: string) => (valor ? new Date(valor).toIS
 
 /** Colores de la marca para los bloques de ministerios. */
 export const COLORES_MARCA = [
-  { valor: '#0c74b8', texto: 'Azul' },
-  { valor: '#8cc63f', texto: 'Verde' },
-  { valor: '#f5d547', texto: 'Amarillo' },
-  { valor: '#f5f5f0', texto: 'Blanco' },
+  // Paleta oficial del Manual de Identidad Visual.
+  { valor: '#0a6cac', texto: 'Azul' },
+  { valor: '#a0d062', texto: 'Verde' },
+  { valor: '#b1d9e1', texto: 'Celeste' },
+  { valor: '#0d1f2d', texto: 'Azul noche' },
 ];
 
 /** Abre la web con los borradores visibles en una pestaña nueva. */

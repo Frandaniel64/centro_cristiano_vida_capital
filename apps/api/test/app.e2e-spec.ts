@@ -115,7 +115,7 @@ describe('API pública (e2e)', () => {
     const { email: _sin, ...sinEmail } = voucherValido;
     const res = await crearVoucher(sinEmail);
     expect(res.status).toBe(400);
-    expect(res.body.campos.email).toBe('Escribí tu email para que podamos escribirte.');
+    expect(res.body.campos.email).toBe('Escribe tu email para que podamos escribirte.');
   });
 
   it('el contrato viejo (contactoTipo/contacto) sin email responde 400, no 500', async () => {
@@ -227,7 +227,7 @@ describe('API pública (e2e)', () => {
     const { email: _sin, ...sinEmail } = visitaValida;
     const res = await crearVisita(sinEmail);
     expect(res.status).toBe(400);
-    expect(res.body.campos.email).toBe('Escribí tu email para que podamos escribirte.');
+    expect(res.body.campos.email).toBe('Escribe tu email para que podamos escribirte.');
     const viejo = await crearVisita({ ...sinEmail, contactoTipo: 'whatsapp', contacto: '11 5555 1234' });
     expect(viejo.status).toBe(400);
     expect(viejo.body.campos.email).toBeDefined();

@@ -4,10 +4,10 @@ import { IsOptional, ValidationArguments, ValidatorConstraint, ValidatorConstrai
 // Las mismas reglas que valida la web antes de enviar.
 export function errorEmail(valor: unknown): string {
   const v = typeof valor === 'string' ? valor.trim() : '';
-  if (!v) return 'Escribí tu email para que podamos escribirte.';
+  if (!v) return 'Escribe tu email para que podamos escribirte.';
   if (v.length > 120) return 'El email puede tener hasta 120 letras.';
   if (!/^[^\s@,;]+@[^\s@,;]+\.[^\s@,;]+$/.test(v)) {
-    return 'Revisá el email: le falta la @ o el dominio, por ejemplo nombre@gmail.com.';
+    return 'Revisa el email: le falta la @ o el dominio, por ejemplo nombre@gmail.com.';
   }
   return '';
 }
@@ -15,10 +15,10 @@ export function errorEmail(valor: unknown): string {
 /** WhatsApp es opcional: vacío vale; si viene, con código de área. */
 export function errorWhatsapp(valor: unknown): string {
   if (valor === undefined || valor === null || valor === '') return '';
-  if (typeof valor !== 'string') return 'Escribí tu número de WhatsApp.';
+  if (typeof valor !== 'string') return 'Escribe tu número de WhatsApp.';
   const digitos = valor.replace(/\D/g, '').length;
   if (digitos < 10 || digitos > 15 || valor.length > 40) {
-    return 'El número parece incompleto. Incluí el código de área, por ejemplo 11 5555 1234.';
+    return 'El número parece incompleto. Incluye el código de área, por ejemplo 11 5555 1234.';
   }
   return '';
 }

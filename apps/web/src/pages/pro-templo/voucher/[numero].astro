@@ -21,7 +21,7 @@ if (!Number.isInteger(numero) || numero < 1) {
     estado: 'pendiente',
     formaPago: 'efectivo',
     creado: new Date().toISOString(),
-    instrucciones: `Acercate a la mesa Pro Templo el domingo después de la reunión y decí tu número: Nº ${numeroVoucher(numero)}.`,
+    instrucciones: `Acércate a la mesa Pro Templo el domingo después de la reunión y di tu número: Nº ${numeroVoucher(numero)}.`,
   };
 } else {
   try {
@@ -37,10 +37,10 @@ if (problema === 'no-existe') Astro.response.status = 404;
 Astro.response.headers.set('Cache-Control', 'no-store');
 
 const estados: Record<EstadoVoucher, { titulo: string; texto: string; color: string }> = {
-  pendiente: { titulo: 'Pendiente de pago', texto: 'Cuando tesorería reciba el pago, tu voucher suma a la pared.', color: 'bg-amarillo text-black' },
-  confirmado: { titulo: 'Confirmado', texto: '¡Gracias! Tu voucher ya está en la pared de Pro Templo.', color: 'bg-verde-hoja text-black' },
-  vencido: { titulo: 'Vencido', texto: 'Pasó el plazo sin que registráramos el pago. Si ya pagaste o querés pagarlo ahora, escribinos y lo reactivamos.', color: 'bg-texto text-black' },
-  anulado: { titulo: 'Anulado', texto: 'Este voucher fue anulado. Si creés que es un error, escribinos.', color: 'bg-texto text-black' },
+  pendiente: { titulo: 'Pendiente de pago', texto: 'Cuando tesorería reciba el pago, tu voucher suma a la pared.', color: 'bg-celeste-vida text-azul-noche' },
+  confirmado: { titulo: 'Confirmado', texto: '¡Gracias! Tu voucher ya está en la pared de Pro Templo.', color: 'bg-verde-hoja text-azul-noche' },
+  vencido: { titulo: 'Vencido', texto: 'Pasó el plazo sin que registráramos el pago. Si ya pagaste o quieres pagarlo ahora, escríbenos y lo reactivamos.', color: 'bg-texto text-white' },
+  anulado: { titulo: 'Anulado', texto: 'Este voucher fue anulado. Si crees que es un error, escríbenos.', color: 'bg-texto text-white' },
 };
 const estado = voucher ? estados[voucher.estado] : null;
 ---
@@ -52,12 +52,12 @@ const estado = voucher ? estados[voucher.estado] : null;
       voucher && estado ? (
         <>
           <h1 class="d h2">
-            Tu voucher <span class="text-amarillo">Nº {numeroVoucher(voucher.numero)}</span>
+            Tu voucher <span class="text-azul-vida">Nº {numeroVoucher(voucher.numero)}</span>
           </h1>
           <div class="relative flex items-center justify-between gap-4 overflow-hidden rounded-[18px] border border-linea bg-panel px-7 py-6">
             <span>
-              <span class="block text-xs font-bold tracking-[.08em] text-verde-hoja">VOUCHER PRO TEMPLO</span>
-              <span class="d block text-[clamp(42px,8vw,64px)] leading-none text-amarillo">USD {usd(voucher.montoUsd)}</span>
+              <span class="block text-xs font-bold tracking-[.08em] text-verde-oscuro">VOUCHER PRO TEMPLO</span>
+              <span class="d block text-[clamp(42px,8vw,64px)] leading-none text-azul-vida">USD {usd(voucher.montoUsd)}</span>
             </span>
             <span class:list={['chip px-3.5 py-2 text-sm', estado.color]}>{estado.titulo}</span>
           </div>
@@ -72,12 +72,12 @@ const estado = voucher ? estados[voucher.estado] : null;
       ) : problema === 'no-existe' ? (
         <>
           <h1 class="d h2">No encontramos ese voucher</h1>
-          <p class="lead muted m-0">Revisá el número en el email que te mandamos. Si el problema sigue, escribinos.</p>
+          <p class="lead muted m-0">Revisa el número en el email que te mandamos. Si el problema sigue, escríbenos.</p>
         </>
       ) : (
         <>
           <h1 class="d h2">No pudimos consultar tu voucher</h1>
-          <p class="lead muted m-0">Probá de nuevo en unos minutos. Tu voucher sigue registrado.</p>
+          <p class="lead muted m-0">Prueba de nuevo en unos minutos. Tu voucher sigue registrado.</p>
         </>
       )
     }

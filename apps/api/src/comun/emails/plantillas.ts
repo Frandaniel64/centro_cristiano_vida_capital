@@ -37,7 +37,7 @@ export function bienvenidaVisita(d: {
   const contenido =
     titulo(`¡Te esperamos, ${e(nombre)}!`, `${e(d.reunion)} &middot; ${e(lugar)}`) +
     versiculo(d.versiculo) +
-    parrafo('Vas a encontrar a alguien en la puerta para recibirte. Si venís con chicos, hay espacio para ellos en Vida Kids.') +
+    parrafo('Vas a encontrar a alguien en la puerta para recibirte. Si vienes con chicos, hay espacio para ellos en Vida Kids.') +
     boton('📍 Cómo llegar', urlMapa(d.direccion, d.mapaUrl));
   return { asunto: `¡Te esperamos, ${nombre}!`, html: marco(contenido, { sitioUrl: d.sitioUrl, pie: piePersona(d.direccion) }) };
 }
