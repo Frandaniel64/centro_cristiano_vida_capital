@@ -9,16 +9,16 @@ import { contenido } from '../lib/contenido';
 export const prerender = false;
 
 const { textos, ministerios } = await contenido(Astro.locals);
-const ACENTOS = ['#f5f5f0', '#4fa3e0', '#f5d547', '#8cc63f'];
+const ACENTOS = ['#0d1f2d', '#0a6cac', '#3f7417', '#0a6cac'];
 const mapa = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${textos.direccion}, ${textos.barrio}`)}`;
 const intereses = [...ministerios.map((m) => m.nombre), 'Pro Templo'];
 ---
 
-<Base titulo="Planeá tu visita" descripcion={`Todo lo que necesitás saber para tu primer domingo en CCVida: horarios, cómo llegar a ${textos.direccion} y qué esperar.`} imagen={fotos.comidaFamilias}>
+<Base titulo="Planea tu visita" descripcion={`Todo lo que necesitas saber para tu primer domingo en CCVida: horarios, cómo llegar a ${textos.direccion} y qué esperar.`} imagen={fotos.comidaFamilias}>
   <section class="wrap flex flex-col gap-8 pt-14">
-    <h1 class="d h1">Planeá tu <span class="text-verde-hoja">visita</span></h1>
+    <h1 class="d h1">Planea tu <span class="text-verde-oscuro">visita</span></h1>
     <p class="lead muted max-w-[560px] border-t border-linea pt-6">
-      Si es tu primera vez, te contamos todo para que llegues tranquilo. Y si querés, avisanos y te esperamos en la puerta.
+      Si es tu primera vez, te contamos todo para que llegues tranquilo. Y si quieres, avísanos y te esperamos en la puerta.
     </p>
     <div class="h-[clamp(260px,36vw,520px)] overflow-hidden rounded-3xl">
       <Foto foto={fotos.comidaFamilias} sizes="(max-width: 1408px) 100vw, 1360px" prioridad />
@@ -59,16 +59,16 @@ const intereses = [...ministerios.map((m) => m.nombre), 'Pro Templo'];
         </ul>
         <a href={mapa} class="btn b-negro self-start">Abrir en Google Maps</a>
       </div>
-      <div class="relative min-h-[400px] flex-[2_1_520px] overflow-hidden rounded-3xl bg-black">
+      <div class="relative min-h-[400px] flex-[2_1_520px] overflow-hidden rounded-3xl bg-azul-noche">
         <svg aria-hidden="true" viewBox="0 0 600 400" preserveAspectRatio="xMidYMid slice" class="absolute inset-0 size-full">
-          <rect width="600" height="400" fill="#0a0a0a"></rect>
-          <g stroke="#262626" stroke-width="14"><path d="M-10 90 H610"></path><path d="M-10 260 H610"></path><path d="M120 -10 V410"></path><path d="M330 -10 V410"></path><path d="M520 -10 V410"></path></g>
-          <g stroke="#1c1c1c" stroke-width="6"><path d="M-10 175 H610"></path><path d="M220 -10 V410"></path><path d="M430 -10 V410"></path></g>
-          <rect x="236" y="192" width="80" height="54" rx="10" fill="#1d2b12"></rect>
+          <rect width="600" height="400" fill="#eef1ec"></rect>
+          <g stroke="#ffffff" stroke-width="14"><path d="M-10 90 H610"></path><path d="M-10 260 H610"></path><path d="M120 -10 V410"></path><path d="M330 -10 V410"></path><path d="M520 -10 V410"></path></g>
+          <g stroke="#f8f8f4" stroke-width="6"><path d="M-10 175 H610"></path><path d="M220 -10 V410"></path><path d="M430 -10 V410"></path></g>
+          <rect x="236" y="192" width="80" height="54" rx="10" fill="#d9ebc0"></rect>
         </svg>
         <span class="absolute top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-full flex-col items-center gap-1.5">
-          <span class="chip bg-verde-hoja px-3.5 py-2 text-sm text-black">CCVida · {textos.direccion}</span>
-          <svg aria-hidden="true" width="40" height="48" viewBox="0 0 24 28"><path d="M12 27s-9-8.1-9-15a9 9 0 0 1 18 0c0 6.9-9 15-9 15z" fill="#f5d547"></path><circle cx="12" cy="12" r="3.5" fill="#000000"></circle></svg>
+          <span class="chip bg-verde-hoja px-3.5 py-2 text-sm text-azul-noche">CCVida · {textos.direccion}</span>
+          <svg aria-hidden="true" width="40" height="48" viewBox="0 0 24 28"><path d="M12 27s-9-8.1-9-15a9 9 0 0 1 18 0c0 6.9-9 15-9 15z" fill="#0a6cac"></path><circle cx="12" cy="12" r="3.5" fill="#ffffff"></circle></svg>
         </span>
       </div>
     </div>

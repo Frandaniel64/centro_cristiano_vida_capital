@@ -69,12 +69,12 @@ const hojas = [
 ---
 
 <svg aria-hidden="true" viewBox="4 24 146 106" class:list={['arbol', clase]}>
-  <path d={TRONCO} fill="#ffffff"></path>
+  <path d={TRONCO} fill="#0d1f2d"></path>
   {
     hojas.map((h) => (
       <g class="brote" style={`--origen: ${h.origen}; animation-delay: ${h.retraso}s`}>
         <g class="hoja" style={`--origen: ${h.origen}; animation-duration: ${h.duracion}s; animation-delay: ${-h.duracion * h.retraso * 4}s`}>
-          <path d={h.d} fill="#ffffff" />
+          <path d={h.d} fill="#a0d062" />
         </g>
       </g>
     ))

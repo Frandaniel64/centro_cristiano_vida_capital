@@ -10,11 +10,8 @@ import { firstValueFrom } from 'rxjs';
 import { errorDe } from '../api';
 import { Avisos } from '../avisos';
 import { SelectorFoto } from '../medios/selector-foto';
-import { COLORES_MARCA } from './comun';
 
 const MAX_GALERIA = 8;
-// Los bloques de "Lo que nos mueve" admiten además el negro del sitio.
-const COLORES_PILARES = [...COLORES_MARCA, { valor: '#0a0a0a', texto: 'Negro' }];
 
 @Component({
   selector: 'app-nosotros',
@@ -24,9 +21,6 @@ const COLORES_PILARES = [...COLORES_MARCA, { valor: '#0a0a0a', texto: 'Negro' }]
     .renglon { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) auto; gap: 8px; align-items: start; }
     @media (max-width: 700px) { .renglon { grid-template-columns: minmax(0, 1fr) auto; } }
     .pilar { border: 1px solid var(--linea); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 4px; }
-    .colores { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-    .color { width: 32px; height: 32px; border-radius: 999px; border: 2px solid var(--linea); cursor: pointer; padding: 0; }
-    .color[aria-pressed='true'] { outline: 3px solid var(--texto); outline-offset: 2px; }
     .galeria { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
     .barra { position: sticky; bottom: 0; background: var(--fondo); padding: 12px 0; border-top: 1px solid var(--linea); }
   `,
@@ -58,27 +52,45 @@ const COLORES_PILARES = [...COLORES_MARCA, { valor: '#0a0a0a', texto: 'Negro' }]
           <app-selector-foto [(foto)]="fotoHistoria" />
         </section>
 
-        <section class="tarjeta pila" aria-labelledby="n-pilares">
-          <h2 id="n-pilares">Lo que nos mueve</h2>
-          <p class="ayuda">Bloques de color, de 2 a 6.</p>
-          <div class="dos" style="gap: 12px 16px">
-            @for (p of t.pilares; track $index; let i = $index) {
-              <div class="pilar">
-                <mat-form-field><mat-label>Título</mat-label><input matInput [name]="'pt' + i" maxlength="80" [(ngModel)]="p.titulo" /></mat-form-field>
-                <mat-form-field><mat-label>Texto</mat-label><textarea matInput [name]="'px' + i" rows="2" maxlength="400" [(ngModel)]="p.texto"></textarea></mat-form-field>
-                <div class="fila" style="justify-content: space-between">
-                  <div class="colores" role="group" [attr.aria-label]="'Color del bloque ' + (i + 1)">
-                    @for (c of colores; track c.valor) {
-                      <button type="button" class="color" [style.background]="c.valor" [attr.aria-pressed]="p.color === c.valor" [attr.aria-label]="c.texto" (click)="p.color = c.valor"></button>
-                    }
-                  </div>
-                  <button matIconButton type="button" (click)="t.pilares.splice(i, 1)" [disabled]="t.pilares.length <= 2" aria-label="Quitar este bloque"><mat-icon svgIcon="delete" /></button>
-                </div>
+        <section class="tarjeta pila" aria-labelledby="n-mision">
+          <h2 id="n-mision">Misión y visión</h2>
+          <mat-form-field>
+            <mat-label>Misión</mat-label>
+            <textarea matInput name="mision" rows="6" maxlength="2000" [(ngModel)]="t.mision"></textarea>
+            <mat-hint>El primer párrafo es la frase de la misión; los demás la acompañan. Deja una línea en blanco entre párrafos.</mat-hint>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Visión</mat-label>
+            <textarea matInput name="vision" rows="4" maxlength="2000" [(ngModel)]="t.vision"></textarea>
+            <mat-hint>El primer párrafo es la frase de la visión.</mat-hint>
+          </mat-form-field>
+        </section>
+
+        <section class="tarjeta pila" aria-labelledby="n-modelo">
+          <h2 id="n-modelo">Nuestro modelo</h2>
+          <mat-form-field>
+            <mat-label>Frase que lo presenta</mat-label>
+            <input matInput name="modeloBajada" maxlength="120" [(ngModel)]="t.modeloBajada" placeholder="Un lugar para conectar, crecer y transformar." />
+          </mat-form-field>
+          @for (p of t.modelo; track $index; let i = $index) {
+            <div class="pilar">
+              <div class="dos">
+                <mat-form-field><mat-label>Nombre</mat-label><input matInput [name]="'mt' + i" maxlength="40" [(ngModel)]="p.titulo" /></mat-form-field>
+                <mat-form-field><mat-label>Frase</mat-label><input matInput [name]="'mf' + i" maxlength="80" [(ngModel)]="p.frase" /></mat-form-field>
               </div>
-            }
-          </div>
-          @if (t.pilares.length < 6) {
-            <button matButton type="button" style="align-self: flex-start" (click)="t.pilares.push({ titulo: '', texto: '', color: '#0c74b8' })"><mat-icon svgIcon="add" />Agregar bloque</button>
+              <mat-form-field><mat-label>Texto</mat-label><textarea matInput [name]="'mx' + i" rows="3" maxlength="800" [(ngModel)]="p.texto"></textarea></mat-form-field>
+              <mat-form-field><mat-label>Antes de la lista</mat-label><input matInput [name]="'mi' + i" maxlength="80" [(ngModel)]="p.introItems" /></mat-form-field>
+              @for (it of p.items; track $index; let k = $index) {
+                <div class="renglon">
+                  <mat-form-field><mat-label>Título</mat-label><input matInput [name]="'mit' + i + '-' + k" maxlength="80" [(ngModel)]="it.titulo" /></mat-form-field>
+                  <mat-form-field><mat-label>Texto</mat-label><input matInput [name]="'mix' + i + '-' + k" maxlength="400" [(ngModel)]="it.texto" /></mat-form-field>
+                  <button matIconButton type="button" (click)="p.items.splice(k, 1)" aria-label="Quitar"><mat-icon svgIcon="delete" /></button>
+                </div>
+              }
+              @if (p.items.length < 6) {
+                <button matButton type="button" style="align-self: flex-start" (click)="p.items.push({ titulo: '', texto: '' })"><mat-icon svgIcon="add" />Agregar</button>
+              }
+            </div>
           }
         </section>
 
@@ -88,18 +100,6 @@ const COLORES_PILARES = [...COLORES_MARCA, { valor: '#0a0a0a', texto: 'Negro' }]
           <mat-form-field><mat-label>Sobre los pastores</mat-label><textarea matInput name="ptexto" rows="4" maxlength="1500" [(ngModel)]="t.pastores.texto"></textarea></mat-form-field>
           <mat-form-field><mat-label>Frase</mat-label><input matInput name="pcita" maxlength="300" [(ngModel)]="t.pastores.cita" /></mat-form-field>
           <app-selector-foto [(foto)]="fotoPastores" />
-        </section>
-
-        <section class="tarjeta pila" aria-labelledby="n-creemos">
-          <h2 id="n-creemos">Lo que creemos</h2>
-          @for (c of t.creemos; track $index; let i = $index) {
-            <div class="renglon">
-              <mat-form-field><mat-label>Título</mat-label><input matInput [name]="'kt' + i" maxlength="80" [(ngModel)]="c.titulo" /></mat-form-field>
-              <mat-form-field><mat-label>Texto</mat-label><input matInput [name]="'kx' + i" maxlength="400" [(ngModel)]="c.texto" /></mat-form-field>
-              <button matIconButton type="button" (click)="t.creemos.splice(i, 1)" aria-label="Quitar"><mat-icon svgIcon="delete" /></button>
-            </div>
-          }
-          <button matButton type="button" style="align-self: flex-start" (click)="t.creemos.push({ titulo: '', texto: '' })"><mat-icon svgIcon="add" />Agregar</button>
         </section>
 
         <section class="tarjeta pila" aria-labelledby="n-galeria">
@@ -129,7 +129,6 @@ export class Nosotros {
   private readonly http = inject(HttpClient);
   private readonly avisos = inject(Avisos);
 
-  protected readonly colores = COLORES_PILARES;
   protected readonly maxGaleria = MAX_GALERIA;
   protected readonly t = signal<TextosSitio | null>(null);
   protected readonly galeria = signal<FotoRef[]>([]);

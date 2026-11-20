@@ -27,8 +27,9 @@ export interface CrearVoucher {
   nombre: string;
   mostrarComo: MostrarComo;
   apodo?: string;
-  contactoTipo: ContactoTipo;
-  contacto: string;
+  email: string;
+  // Opcional; si viene, con código de área (mínimo 10 dígitos).
+  whatsapp?: string;
   formaPago: FormaPago;
   mensaje?: string;
   aceptaPrivacidad: true;
@@ -60,8 +61,9 @@ export interface VoucherPublico {
 // POST /api/visitas
 export interface CrearVisita {
   nombre: string;
-  contactoTipo: ContactoTipo;
-  contacto: string;
+  email: string;
+  // Opcional; si viene, con código de área (mínimo 10 dígitos).
+  whatsapp?: string;
   intereses: string[];
   aceptaPrivacidad: true;
   turnstileToken?: string;
@@ -113,6 +115,7 @@ export interface VoucherAdmin {
   apodoAprobado: boolean;
   contactoTipo: ContactoTipo;
   contacto: string;
+  whatsapp: string | null;
   formaPago: FormaPago;
   mensaje: string | null;
   // Estado guardado, salvo los pendientes fuera de plazo, que vienen como "vencido".
@@ -159,6 +162,7 @@ export interface VisitaAdmin {
   nombre: string;
   contactoTipo: ContactoTipo;
   contacto: string;
+  whatsapp: string | null;
   intereses: string[];
   estado: EstadoVisita;
   notas: string | null;
@@ -260,6 +264,15 @@ export interface PreguntaFrecuente {
   respuesta: string;
 }
 
+/** Una de las "3E" del modelo (Encuentro, Entrega, Extensión). */
+export interface PilarModelo {
+  titulo: string; // "Encuentro"
+  frase: string; // "Conectar con Dios"
+  texto: string;
+  introItems: string; // "Lo hacemos a través de:"
+  items: { titulo: string; texto: string }[];
+}
+
 /** Textos editables del sitio ("Textos del sitio" en el panel). */
 export interface TextosSitio {
   lema: string;
@@ -267,6 +280,10 @@ export interface TextosSitio {
   reunion: string; // "Domingos 10 h"
   direccion: string;
   barrio: string;
+  // Link de "Cómo llegar". Vacío: una búsqueda de Google Maps con la dirección.
+  mapaUrl: string;
+  // Versículo del email de bienvenida a quien avisa que viene.
+  versiculoBienvenida: { texto: string; cita: string };
   colectivos: string;
   comoLlegar: { titulo: string; texto: string }[];
   agendaDomingo: { hora: string; titulo: string; texto: string }[];
@@ -275,11 +292,15 @@ export interface TextosSitio {
   historia: string;
   datosIglesia: string; // "Más de 150 personas · Desde 2016 · Floresta, CABA"
   pastores: { nombres: string; texto: string; cita: string };
-  creemos: { titulo: string; texto: string }[];
   // Página Nosotros (sección "Nosotros" del panel).
   nosotrosIntro: string;
-  // "Lo que nos mueve": bloques de color.
-  pilares: { titulo: string; texto: string; color: string }[];
+  // Misión: el primer párrafo es la frase; los demás, el texto que la acompaña.
+  mision: string;
+  // Visión, en párrafos.
+  vision: string;
+  // Modelo de las 3E: la frase que lo presenta y sus tres partes.
+  modeloBajada: string;
+  modelo: PilarModelo[];
   // Fotos de Nosotros, por id de la biblioteca de fotos.
   fotosNosotros: { portada: string | null; historia: string | null; pastores: string | null; galeria: string[] };
   whatsapp: string;

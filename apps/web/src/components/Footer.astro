@@ -2,6 +2,7 @@
 import type { TextosSitio } from '@ccvida/shared';
 import { navCompleta } from '../data/estaticos';
 import { linkWhatsapp } from '../lib/formato';
+import IconoRed from './IconoRed.astro';
 
 interface Props {
   textos: TextosSitio;
@@ -9,27 +10,33 @@ interface Props {
 const { textos } = Astro.props;
 
 const redes = [
-  { label: 'Instagram', url: textos.instagram },
-  { label: 'YouTube', url: textos.youtube },
-  { label: 'Facebook', url: textos.facebook },
-  { label: 'WhatsApp', url: linkWhatsapp(textos.whatsapp) },
+  { label: 'Instagram' as const, url: textos.instagram },
+  { label: 'YouTube' as const, url: textos.youtube },
+  { label: 'Facebook' as const, url: textos.facebook },
+  { label: 'WhatsApp' as const, url: linkWhatsapp(textos.whatsapp) },
 ].filter((r) => r.url);
 
+// Iglesia madre y denominación (pedido de los pastores).
+const familia = [
+  { nombre: 'Centro Cristiano Vida Argentina', detalle: 'San Isidro · iglesia madre', url: 'https://ccvidaargentina.org/site/' },
+  { nombre: 'Unión de Asambleas de Dios', detalle: 'UAD', url: 'https://www.uad.org.ar/v02/' },
+];
+
 const titulo = 'm-0 mb-3 text-[13px] font-bold tracking-[.08em] text-texto-suave uppercase';
-const link = 'inline-flex min-h-9 items-center text-[15px] text-texto no-underline hover:text-verde-hoja';
+const link = 'inline-flex min-h-9 items-center text-[15px] text-texto no-underline hover:text-azul-vida';
 ---
 
 <footer class="border-t border-linea">
   <div class="wrap grid grid-cols-2 gap-x-10 gap-y-12 pt-16 pb-12 lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
     <div class="col-span-2 flex flex-col items-start gap-5 lg:col-span-1">
       <img src="/logo.svg" alt="CCVida Capital" width="88" height="88" class="size-22 rounded-full" loading="lazy" />
-      <p class="d text-[32px] leading-[1.05] tracking-[-.02em]">¡La iglesia sos <span class="text-verde-hoja">vos</span>!</p>
+      <p class="d text-[32px] leading-[1.05] tracking-[-.02em]">{textos.lema}</p>
     </div>
 
     <div class="col-span-2 lg:col-span-1">
       <p class={titulo}>Reunión</p>
       <p class="m-0 text-[15px]">{textos.reunion}<br />{textos.direccion}, {textos.barrio}</p>
-      <a href="/visitanos" class="btn b-verde mt-5 min-h-11 px-5 text-sm">Planeá tu visita</a>
+      <a href="/visitanos" class="btn b-verde mt-5 min-h-11 px-5 text-sm">Planea tu visita</a>
     </div>
 
     <nav aria-label="Pie">
@@ -40,14 +47,34 @@ const link = 'inline-flex min-h-9 items-center text-[15px] text-texto no-underli
     </nav>
 
     <div>
-      <p class={titulo}>Seguinos</p>
-      <ul class="m-0 list-none p-0">
-        {redes.map((r) => <li><a href={r.url} class={link}>{r.label}</a></li>)}
+      <p class={titulo}>Síguenos</p>
+      <ul class="m-0 flex list-none flex-col items-start gap-2 p-0">
+        {
+          redes.map((r) => (
+            <li>
+              <a href={r.url} class="inline-flex min-h-11 items-center gap-2.5 rounded-full border-[1.5px] border-borde-control bg-panel py-1.5 pr-4 pl-1.5 text-[15px] font-semibold text-texto no-underline hover:border-azul-vida">
+                <span class="inline-flex size-8 items-center justify-center rounded-full bg-azul-vida text-white"><IconoRed red={r.label} size={18} /></span>
+                {r.label}
+              </a>
+            </li>
+          ))
+        }
       </ul>
     </div>
   </div>
 
   <div class="wrap">
+    <div class="flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-linea py-6 text-[15px]">
+      <p class="m-0 text-[13px] font-bold tracking-[.08em] text-texto-suave uppercase">Somos parte de</p>
+      {
+        familia.map((f) => (
+          <a href={f.url} class="inline-flex min-h-11 items-center gap-2 rounded-full border-[1.5px] border-borde-control px-4 font-semibold text-texto no-underline hover:border-azul-vida">
+            {f.nombre}
+            <span class="muted text-[13px] font-normal">{f.detalle}</span>
+          </a>
+        ))
+      }
+    </div>
     <p class="muted m-0 flex flex-wrap gap-x-4 gap-y-1 border-t border-linea py-6 text-[13px]">
       <span>© {new Date().getFullYear()} Centro Cristiano Vida Capital</span>
       <a href="/privacidad" class="text-texto-suave hover:text-texto">Política de privacidad</a>

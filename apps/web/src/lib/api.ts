@@ -7,8 +7,8 @@ export const API_URL = (import.meta.env.PUBLIC_API_URL ?? 'http://localhost:3000
 export const DEMO = import.meta.env.PUBLIC_DEMO === 'true';
 
 const INSTRUCCIONES_DEMO: Record<string, string> = {
-  efectivo: 'Acercate a la mesa Pro Templo el domingo después de la reunión y decí tu número.',
-  transferencia: 'Transferí a la cuenta en dólares de la iglesia y mandanos el comprobante por WhatsApp con tu número.\n(Los datos bancarios reales se cargan desde el panel.)',
+  efectivo: 'Acércate a la mesa Pro Templo el domingo después de la reunión y di tu número.',
+  transferencia: 'Transfiere a la cuenta en dólares de la iglesia y responde el email que te mandamos con el comprobante y tu número.\n(Los datos bancarios reales se cargan desde el panel.)',
   mercadopago: 'Te mandamos el link de pago de Mercado Pago.',
 };
 let numeroDemo = 347;
@@ -51,15 +51,15 @@ export async function enviar<T>(ruta: string, cuerpo: unknown): Promise<T> {
       body: JSON.stringify(cuerpo),
     });
   } catch {
-    throw new ErrorDeApi('No pudimos conectarnos. Revisá tu conexión y probá de nuevo.');
+    throw new ErrorDeApi('No pudimos conectarnos. Revisa tu conexión y prueba de nuevo.');
   }
   if (res.ok) return (await res.json()) as T;
   if (res.status === 429) {
-    throw new ErrorDeApi('Recibimos muchos envíos desde tu conexión. Esperá un rato y probá de nuevo.');
+    throw new ErrorDeApi('Recibimos muchos envíos desde tu conexión. Espera un rato y prueba de nuevo.');
   }
   const error = (await res.json().catch(() => null)) as ErrorApi | null;
   throw new ErrorDeApi(
-    error?.mensaje ?? 'Algo salió mal de nuestro lado. Probá de nuevo en unos minutos.',
+    error?.mensaje ?? 'Algo salió mal de nuestro lado. Prueba de nuevo en unos minutos.',
     error?.campos,
   );
 }

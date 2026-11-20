@@ -25,6 +25,7 @@ const aVista = (v: Visita & { atendidoPor: { nombre: string } | null }): VisitaA
   nombre: v.nombre,
   contactoTipo: v.contactoTipo,
   contacto: v.contacto,
+  whatsapp: v.whatsapp,
   intereses: v.intereses,
   estado: v.estado,
   notas: v.notas,

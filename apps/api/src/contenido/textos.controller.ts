@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Put, UseGuards } from '@nestjs/common';
 import type { TextosAdmin, TextosSitio } from '@ccvida/shared';
 import { Type } from 'class-transformer';
-import { ArrayMaxSize, IsArray, IsOptional, IsString, Matches, MaxLength, ValidateNested } from 'class-validator';
+import { ArrayMaxSize, IsArray, IsOptional, IsString, MaxLength, ValidateNested } from 'class-validator';
 import type { SesionActual } from '../auth/auth.service.js';
 import { Roles, Sesion, SesionGuard } from '../auth/sesion.guard.js';
 import { ErrorDeFormulario } from '../comun/validacion.js';
@@ -29,8 +29,17 @@ class PastoresDto {
   @IsString() @MaxLength(300) cita!: string;
 }
 
-class PilarDto extends ItemDto {
-  @Matches(/^#[0-9a-fA-F]{6}$/, { message: 'Elegí un color.' }) color!: string;
+class VersiculoDto {
+  @IsString() @MaxLength(300, { message: 'El versículo puede tener hasta 300 letras.' }) texto!: string;
+  @IsString() @MaxLength(60, { message: 'La cita puede tener hasta 60 letras.' }) cita!: string;
+}
+
+class PilarModeloDto {
+  @IsString() @MaxLength(40) titulo!: string;
+  @IsString() @MaxLength(80) frase!: string;
+  @IsString() @MaxLength(800) texto!: string;
+  @IsString() @MaxLength(80) introItems!: string;
+  @IsArray() @ArrayMaxSize(6) @ValidateNested({ each: true }) @Type(() => ItemDto) items!: ItemDto[];
 }
 
 class FotosNosotrosDto {
@@ -46,6 +55,8 @@ class TextosDto implements TextosSitio {
   @IsString() @MaxLength(60) reunion!: string;
   @IsString() @MaxLength(120) direccion!: string;
   @IsString() @MaxLength(60) barrio!: string;
+  @IsString() @MaxLength(500, { message: 'El link del mapa puede tener hasta 500 letras.' }) mapaUrl!: string;
+  @ValidateNested() @Type(() => VersiculoDto) versiculoBienvenida!: VersiculoDto;
   @IsString() @MaxLength(120) colectivos!: string;
   @IsArray() @ArrayMaxSize(8) @ValidateNested({ each: true }) @Type(() => ItemDto) comoLlegar!: ItemDto[];
   @IsArray() @ArrayMaxSize(10) @ValidateNested({ each: true }) @Type(() => AgendaDto) agendaDomingo!: AgendaDto[];
@@ -54,14 +65,16 @@ class TextosDto implements TextosSitio {
   @IsString() @MaxLength(4000) historia!: string;
   @IsString() @MaxLength(200) datosIglesia!: string;
   @ValidateNested() @Type(() => PastoresDto) pastores!: PastoresDto;
-  @IsArray() @ArrayMaxSize(8) @ValidateNested({ each: true }) @Type(() => ItemDto) creemos!: ItemDto[];
   @IsString() @MaxLength(40) whatsapp!: string;
   @IsString() @MaxLength(300) instagram!: string;
   @IsString() @MaxLength(300) youtube!: string;
   @IsString() @MaxLength(300) facebook!: string;
   @IsString() @MaxLength(1000) datosTransferencia!: string;
   @IsString() @MaxLength(600) nosotrosIntro!: string;
-  @IsArray() @ArrayMaxSize(6) @ValidateNested({ each: true }) @Type(() => PilarDto) pilares!: PilarDto[];
+  @IsString() @MaxLength(2000) mision!: string;
+  @IsString() @MaxLength(2000) vision!: string;
+  @IsString() @MaxLength(120) modeloBajada!: string;
+  @IsArray() @ArrayMaxSize(4) @ValidateNested({ each: true }) @Type(() => PilarModeloDto) modelo!: PilarModeloDto[];
   @ValidateNested() @Type(() => FotosNosotrosDto) fotosNosotros!: FotosNosotrosDto;
 }
 
@@ -87,12 +100,13 @@ export class TextosController {
   async guardar(@Body() d: TextosDto, @Sesion() s: SesionActual): Promise<TextosAdmin> {
     const campos: Record<string, string> = {};
     for (const red of ['instagram', 'youtube', 'facebook'] as const) {
-      if (!esLink(d[red].trim())) campos[red] = 'Pegá el link completo, que empieza con https://';
+      if (!esLink(d[red].trim())) campos[red] = 'Pega el link completo, que empieza con https://';
     }
-    if (d.whatsapp && d.whatsapp.replace(/\D/g, '').length < 10) campos['whatsapp'] = 'Escribí el número con código de área, por ejemplo 11 5555 1234.';
+    if (!esLink(d.mapaUrl.trim())) campos['mapaUrl'] = 'Pega el link completo del mapa, que empieza con https://';
+    if (d.whatsapp && d.whatsapp.replace(/\D/g, '').length < 10) campos['whatsapp'] = 'Escribe el número con código de área, por ejemplo 11 5555 1234.';
     const ids = this.contenido.idsFotosNosotros(d);
     const existentes = await this.contenido.fotosPorId(ids);
-    if (ids.some((id) => !existentes[id])) campos['fotosNosotros'] = 'Alguna de las fotos ya no existe. Elegila de nuevo.';
+    if (ids.some((id) => !existentes[id])) campos['fotosNosotros'] = 'Alguna de las fotos ya no existe. Elígela de nuevo.';
     if (Object.keys(campos).length) throw new ErrorDeFormulario(campos);
 
     const textos = JSON.parse(JSON.stringify(d)) as Prisma.InputJsonValue;

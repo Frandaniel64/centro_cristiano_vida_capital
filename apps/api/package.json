@@ -27,6 +27,7 @@
     "db:deploy": "prisma migrate deploy",
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
+    "emails:muestra": "tsx scripts/emails-muestra.ts",
     "crear-admin": "tsx prisma/crear-admin.ts",
     "crear-token-mcp": "tsx src/cli/crear-token-mcp.ts",
     "crear-token-mcp:prod": "node dist/cli/crear-token-mcp.js",

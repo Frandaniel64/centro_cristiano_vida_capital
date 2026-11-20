@@ -282,6 +282,8 @@ model Voucher {
   apodoAprobado    Boolean       @default(false) @map("apodo_aprobado")
   contactoTipo     ContactoTipo  @map("contacto_tipo")
   contacto         String
+  // Opcional: el contacto principal es el email.
+  whatsapp         String?
   formaPago        FormaPago     @map("forma_pago")
   mensaje          String?       @db.VarChar(500)
   estado           EstadoVoucher @default(pendiente)
@@ -327,6 +329,8 @@ model Visita {
   nombre           String
   contactoTipo     ContactoTipo @map("contacto_tipo")
   contacto         String
+  // Opcional: el contacto principal es el email.
+  whatsapp         String?
   intereses        String[]
   estado           EstadoVisita @default(nueva)
   notas            String?
