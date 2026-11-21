@@ -5,6 +5,7 @@ import {
   avisoRecepcion,
   avisoTesoreria,
   bienvenidaVisita,
+  emailDePrueba,
   ladrilloConfirmado,
   urlMapa,
   voucherRegistrado,
@@ -164,5 +165,47 @@ describe('EmailService.enviar', () => {
     const { svc, send } = armar();
     await svc.enviar(' , ', 'Hola', '<p>x</p>');
     expect(send).not.toHaveBeenCalled();
+  });
+});
+
+describe('EmailService.mandar', () => {
+  const armar = (respuesta: unknown) => {
+    const send = vi.fn().mockImplementation(async () => {
+      if (respuesta instanceof Error) throw respuesta;
+      return respuesta;
+    });
+    const svc = new EmailService();
+    (svc as unknown as { resend: unknown }).resend = { emails: { send } };
+    return svc;
+  };
+
+  it('devuelve enviado cuando Resend acepta', async () => {
+    expect(await armar({ error: null }).mandar('a@x.com', 'Hola', '<p>x</p>')).toEqual({ estado: 'enviado' });
+  });
+
+  it('devuelve el mensaje de Resend cuando rechaza', async () => {
+    const r = await armar({ error: { message: 'The ccvidacapital.org domain is not verified.' } }).mandar('a@x.com', 'Hola', '<p>x</p>');
+    expect(r).toEqual({ estado: 'error', detalle: 'The ccvidacapital.org domain is not verified.' });
+  });
+
+  it('devuelve el error cuando la llamada falla', async () => {
+    expect(await armar(new Error('sin red')).mandar('a@x.com', 'Hola', '<p>x</p>')).toEqual({ estado: 'error', detalle: 'sin red' });
+  });
+
+  it('sin Resend avisa que no hay clave', async () => {
+    const svc = new EmailService();
+    (svc as unknown as { resend: unknown }).resend = null;
+    expect(await svc.mandar('a@x.com', 'Hola', '<p>x</p>')).toEqual({ estado: 'sin-resend' });
+  });
+});
+
+describe('emailDePrueba', () => {
+  it('saluda por el primer nombre, muestra el remitente y escapa', () => {
+    const { asunto, html } = emailDePrueba({ nombre: `Franyer ${malo}`, remitente: 'CCVida <hola@ccvidacapital.org>', sitioUrl, panelUrl });
+    expect(asunto).toBe('Mail de prueba de la web');
+    expect(html).toContain('¡Funciona, Franyer!');
+    expect(html).toContain('CCVida &lt;hola@ccvidacapital.org&gt;');
+    expect(html).toContain(panelUrl);
+    expect(html).not.toContain('<script>');
   });
 });

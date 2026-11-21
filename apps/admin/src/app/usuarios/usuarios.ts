@@ -9,7 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
-import type { ClaveTemporal, Rol, UsuarioAdmin } from '@ccvida/shared';
+import type { ClaveTemporal, EmailPrueba, Rol, UsuarioAdmin } from '@ccvida/shared';
 import { firstValueFrom } from 'rxjs';
 import { errorDe } from '../api';
 import { Avisos } from '../avisos';
@@ -27,6 +27,7 @@ const QUE_PUEDE: Record<Rol, string> = {
   selector: 'app-usuarios',
   imports: [FormsModule, MatTableModule, MatProgressBarModule, MatButtonModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatIconModule],
   styles: `
+    .botones { display: flex; flex-wrap: wrap; gap: 8px; }
     .acciones { display: flex; flex-wrap: wrap; gap: 4px; padding: 6px 0; }
     .rol { width: 11rem; padding-top: 8px; }
     .clave { font-family: ui-monospace, monospace; font-size: 24px; font-weight: 700; letter-spacing: 0.05em; padding: 12px 16px; background: var(--fondo); border-radius: 10px; text-align: center; user-select: all; }
@@ -34,7 +35,12 @@ const QUE_PUEDE: Record<Rol, string> = {
   template: `
     <div class="encabezado">
       <h1>Usuarios</h1>
-      <button matButton="filled" type="button" (click)="abrirNuevo()"><mat-icon svgIcon="person_add" />Agregar persona</button>
+      <div class="botones">
+        <button matButton="outlined" type="button" (click)="emailPrueba()" [disabled]="probando()">
+          {{ probando() ? 'Enviando…' : 'Enviarme un mail de prueba' }}
+        </button>
+        <button matButton="filled" type="button" (click)="abrirNuevo()"><mat-icon svgIcon="person_add" />Agregar persona</button>
+      </div>
     </div>
 
     <div class="tabla-caja">
@@ -158,6 +164,7 @@ export class Usuarios {
   protected readonly usuarios = signal<UsuarioAdmin[]>([]);
   protected readonly cargando = signal(true);
   protected readonly guardando = signal(false);
+  protected readonly probando = signal(false);
   protected readonly campos = signal<Record<string, string>>({});
   protected nuevo: { nombre: string; email: string; rol: Rol } = { nombre: '', email: '', rol: 'editor' };
 
@@ -205,6 +212,20 @@ export class Usuarios {
     } catch (e) {
       this.avisos.error(errorDe(e).mensaje);
       await this.cargar();
+    }
+  }
+
+  /** Manda un mail a quien está conectado: comprueba Resend y el dominio sin pasar por los formularios de la web. */
+  protected async emailPrueba() {
+    this.probando.set(true);
+    try {
+      const r = await firstValueFrom(this.http.post<EmailPrueba>('/api/admin/usuarios/email-prueba', {}));
+      if (r.faltan.length) this.avisos.error(`${r.mensaje} Ojo: la API no tiene cargado ${r.faltan.join(', ')}.`);
+      else this.avisos.exito(r.mensaje);
+    } catch (e) {
+      this.avisos.error(errorDe(e).mensaje);
+    } finally {
+      this.probando.set(false);
     }
   }
 

@@ -31,7 +31,10 @@ describe('Panel (e2e)', () => {
     prisma = app.get(PrismaService);
     // Los emails se espían: ninguno sale de verdad.
     enviar = vi.spyOn(app.get(EmailService), 'enviar').mockResolvedValue(undefined);
+    mandar = vi.spyOn(app.get(EmailService), 'mandar').mockResolvedValue({ estado: 'enviado' });
   });
+
+  let mandar: MockInstance<EmailService['mandar']>;
 
   let enviar: MockInstance<EmailService['enviar']>;
 
@@ -307,5 +310,30 @@ describe('Panel (e2e)', () => {
       codigos.push((await request(app.getHttpServer()).post('/api/auth/ingresar').set('X-Forwarded-For', misma).send({ email: `x-${SUFIJO}`, clave: 'mal' })).status);
     }
     expect(codigos).toEqual([401, 401, 401, 401, 401, 429]);
+  });
+
+  it('el mail de prueba le llega a quien lo pide y sólo lo pide un administrador', async () => {
+    const admin = await ingresar('administrador');
+    mandar.mockClear();
+    const res = await admin.agente.post('/api/admin/usuarios/email-prueba');
+    expect(res.status).toBe(200);
+    expect(res.body.mensaje).toContain(admin.usuario.email);
+    expect(Array.isArray(res.body.faltan)).toBe(true);
+    expect(mandar).toHaveBeenCalledTimes(1);
+    expect(mandar.mock.calls[0][0]).toBe(admin.usuario.email);
+
+    const tesoreria = await ingresar('tesoreria');
+    expect((await tesoreria.agente.post('/api/admin/usuarios/email-prueba')).status).toBe(403);
+  });
+
+  it('el mail de prueba muestra el error de Resend', async () => {
+    const admin = await ingresar('administrador');
+    mandar.mockResolvedValueOnce({ estado: 'error', detalle: 'The domain is not verified.' });
+    const res = await admin.agente.post('/api/admin/usuarios/email-prueba');
+    expect(res.status).toBe(422);
+    expect(res.body.mensaje).toBe('Resend no mandó el mail: The domain is not verified.');
+
+    mandar.mockResolvedValueOnce({ estado: 'sin-resend' });
+    expect((await admin.agente.post('/api/admin/usuarios/email-prueba')).body.mensaje).toContain('RESEND_API_KEY');
   });
 });
