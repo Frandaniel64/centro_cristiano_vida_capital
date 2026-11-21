@@ -109,6 +109,17 @@ export function avisoRecepcion(d: {
   return { asunto: 'Alguien avisó que viene el domingo', html: marco(contenido, { sitioUrl: d.sitioUrl, pie: PIE_INTERNO }) };
 }
 
+/** Lo pide un administrador desde el panel para comprobar que Resend y el dominio andan. */
+export function emailDePrueba(d: { nombre: string; remitente: string; sitioUrl: string; panelUrl: string }): Email {
+  const contenido =
+    titulo(`¡Funciona, ${e(primerNombre(d.nombre))}!`, 'Este es un mail de prueba pedido desde el panel.') +
+    parrafo('Si lo estás leyendo, la web ya puede mandar emails: las confirmaciones de visitas, los vouchers y los avisos internos.') +
+    bloque(`<div style="font-size:13px;color:#a3a3a3">Remitente</div><div>${e(d.remitente)}</div>`) +
+    parrafo('Si llegó a spam, marcalo como "no es spam" y revisá que el dominio esté verificado en Resend.') +
+    boton('Ir al panel', d.panelUrl);
+  return { asunto: 'Mail de prueba de la web', html: marco(contenido, { sitioUrl: d.sitioUrl, pie: PIE_INTERNO }) };
+}
+
 export function ladrilloConfirmado(d: { nombre: string; numero: number; sitioUrl: string; direccion?: string }): Email {
   const n = numeroVoucher(d.numero);
   const contenido =

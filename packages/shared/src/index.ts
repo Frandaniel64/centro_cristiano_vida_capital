@@ -182,6 +182,12 @@ export interface ClaveTemporal {
   claveTemporal: string;
 }
 
+/** Respuesta del mail de prueba del panel. `faltan`: variables de email de la API sin cargar. */
+export interface EmailPrueba {
+  mensaje: string;
+  faltan: string[];
+}
+
 // ── Contenido (panel, etapa 2) ──
 
 export type EstadoContenido = 'borrador' | 'publicado';
