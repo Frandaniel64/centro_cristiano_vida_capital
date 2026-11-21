@@ -51,30 +51,83 @@ export async function cargarVistaPrevia(permiso: string): Promise<VistaPrevia> {
   return { estado: 'error' };
 }
 
+// Pedido en curso: si llegan varias visitas a la vez, comparten la misma llamada.
+let pidiendo: Promise<ContenidoPublico> | null = null;
+
+function pedirContenido(): Promise<ContenidoPublico> {
+  pidiendo ??= (async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/contenido`, { signal: AbortSignal.timeout(ESPERA_MS) });
+      if (!res.ok) throw new Error(`La API respondió ${res.status}`);
+      const datos = (await res.json()) as ContenidoPublico;
+      ultimo = { datos, hasta: Date.now() + VIGENCIA_MS };
+      return datos;
+    } finally {
+      pidiendo = null;
+    }
+  })();
+  return pidiendo;
+}
+
 async function publico(): Promise<ContenidoPublico> {
-  if (ultimo && ultimo.hasta > Date.now()) return ultimo.datos;
-  try {
-    const res = await fetch(`${API_URL}/api/contenido`, { signal: AbortSignal.timeout(ESPERA_MS) });
-    if (!res.ok) throw new Error(`La API respondió ${res.status}`);
-    const datos = (await res.json()) as ContenidoPublico;
-    ultimo = { datos, hasta: Date.now() + VIGENCIA_MS };
-    return datos;
-  } catch (e) {
-    if (ultimo) return ultimo.datos;
-    throw e;
+  mantenerAlDia();
+  if (ultimo) {
+    // Vencido: se responde ya con lo que hay y se renueva sin hacer esperar a la visita.
+    if (ultimo.hasta <= Date.now()) pedirContenido().catch(() => {});
+    return ultimo.datos;
   }
+  return pedirContenido();
+}
+
+// Último estado de Pro Templo, con la misma idea que el contenido.
+let ultimoEstado: { datos: EstadoProTemplo; hasta: number } | null = null;
+let pidiendoEstado: Promise<EstadoProTemplo | null> | null = null;
+
+function pedirEstado(): Promise<EstadoProTemplo | null> {
+  pidiendoEstado ??= (async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/pro-templo/estado`, { signal: AbortSignal.timeout(ESPERA_MS) });
+      if (!res.ok) return null;
+      const datos = (await res.json()) as EstadoProTemplo;
+      ultimoEstado = { datos, hasta: Date.now() + VIGENCIA_MS };
+      return datos;
+    } catch {
+      return null;
+    } finally {
+      pidiendoEstado = null;
+    }
+  })();
+  return pidiendoEstado;
 }
 
 /** Primer valor del contador (después lo actualiza el navegador cada 15 s). */
 export async function estadoProTemplo(metaUsd: number): Promise<EstadoProTemplo> {
   if (DEMO) return estadoProTemploEjemplo;
-  try {
-    const res = await fetch(`${API_URL}/api/pro-templo/estado`, { signal: AbortSignal.timeout(ESPERA_MS) });
-    if (res.ok) return (await res.json()) as EstadoProTemplo;
-  } catch {
-    // Sin respuesta: se muestra en cero y el navegador lo completa al recibirlo.
+  mantenerAlDia();
+  if (ultimoEstado) {
+    if (ultimoEstado.hasta <= Date.now()) void pedirEstado();
+    return ultimoEstado.datos;
   }
-  return { recaudadoUsd: 0, metaUsd, porcentaje: 0, ladrillos: 0, personas: 0, ultimosVouchers: [] };
+  // Sin respuesta: se muestra en cero y el navegador lo completa al recibirlo.
+  return (await pedirEstado()) ?? { recaudadoUsd: 0, metaUsd, porcentaje: 0, ladrillos: 0, personas: 0, ultimosVouchers: [] };
+}
+
+/**
+ * En el servidor Node (producción) se renueva todo cada 20 s aunque no entre
+ * nadie: así la primera visita después de un rato sin tráfico no espera a la
+ * API, y lo publicado en el panel sigue apareciendo en menos de 1 minuto.
+ * En Cloudflare Workers no hay temporizadores entre pedidos: ahí basta con
+ * renovar al vencer (lo hacen `publico` y `estadoProTemplo`).
+ */
+let renovando = false;
+function mantenerAlDia() {
+  if (renovando || DEMO || !globalThis.process?.versions?.node || 'WebSocketPair' in globalThis) return;
+  renovando = true;
+  const t = setInterval(() => {
+    pedirContenido().catch(() => {});
+    void pedirEstado();
+  }, VIGENCIA_MS);
+  t.unref?.();
 }
 
 /** Párrafos de un texto largo cargado en el panel (separados por línea en blanco). */
