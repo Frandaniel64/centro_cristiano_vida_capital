@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { ClienteApi } from './cliente.js';
-import { crearContenido, editarContenido, listarContenido, verContenido } from './contenido.js';
+import { cambiarEstado, crearContenido, editarContenido, listarContenido, verContenido } from './contenido.js';
 
 const json = (estado: number, cuerpo: unknown) =>
   new Response(JSON.stringify(cuerpo), { status: estado, headers: { 'content-type': 'application/json' } });
@@ -52,7 +52,7 @@ describe('contenido', () => {
       'GET /api/admin/ministerios': () => json(200, [{ ...ministerio, estado: 'publicado' }]),
     });
     await expect(editarContenido(cliente, 'ministerios', 'm1', { resumen: 'n' })).rejects.toThrow(
-      'Está publicado: pasalo a borrador desde el panel para editarlo con el MCP.',
+      'Está publicado: pasalo a borrador (con cambiar_estado o desde el panel) para editarlo con el MCP.',
     );
     expect(pedidos.some((p) => p.metodo === 'PUT')).toBe(false);
   });
@@ -70,6 +70,40 @@ describe('contenido', () => {
     expect(put).not.toHaveProperty('actualizado');
     expect(put).not.toHaveProperty('foto');
     expect(r.vistaPrevia).toBe('http://prev/2');
+  });
+
+  it('cambiar estado publica y conserva el resto de los campos', async () => {
+    const { cliente, pedidos } = armar({
+      'GET /api/admin/ministerios': () => json(200, [ministerio]),
+      'PUT /api/admin/ministerios/m1': () => json(200, { ...ministerio, estado: 'publicado' }),
+      'POST /api/admin/vista-previa': () => json(200, { url: 'http://prev/3' }),
+    });
+    const r = await cambiarEstado(cliente, 'ministerios', 'jovenes', 'publicado');
+    const put = pedidos.find((p) => p.metodo === 'PUT')!.cuerpo as Record<string, unknown>;
+    expect(put).toMatchObject({ estado: 'publicado', resumen: 'viejo', actividades: ['a', 'b'], fotoId: 'f1', slug: 'jovenes' });
+    expect(put).not.toHaveProperty('id');
+    expect(put).not.toHaveProperty('foto');
+    expect(r.estado).toBe('publicado');
+  });
+
+  it('cambiar estado despublica', async () => {
+    const { cliente, pedidos } = armar({
+      'GET /api/admin/ministerios': () => json(200, [{ ...ministerio, estado: 'publicado' }]),
+      'PUT /api/admin/ministerios/m1': () => json(200, ministerio),
+      'POST /api/admin/vista-previa': () => json(200, { url: 'http://prev/4' }),
+    });
+    await cambiarEstado(cliente, 'ministerios', 'm1', 'borrador');
+    expect((pedidos.find((p) => p.metodo === 'PUT')!.cuerpo as Record<string, unknown>).estado).toBe('borrador');
+  });
+
+  it('cambiar estado al que ya tiene no hace PUT', async () => {
+    const { cliente, pedidos } = armar({
+      'GET /api/admin/ministerios': () => json(200, [ministerio]),
+      'POST /api/admin/vista-previa': () => json(200, { url: 'http://prev/5' }),
+    });
+    const r = await cambiarEstado(cliente, 'ministerios', 'm1', 'borrador');
+    expect(pedidos.some((p) => p.metodo === 'PUT')).toBe(false);
+    expect(r.estado).toBe('borrador');
   });
 
   it('editar con clave inexistente', async () => {

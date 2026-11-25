@@ -75,11 +75,28 @@ export async function editarContenido(
 ): Promise<ResultadoGuardado> {
   const actual = await verContenido(cliente, tipo, clave);
   if (actual.estado !== 'borrador') {
-    throw new ErrorHerramienta('Está publicado: pasalo a borrador desde el panel para editarlo con el MCP.');
+    throw new ErrorHerramienta('Está publicado: pasalo a borrador (con cambiar_estado o desde el panel) para editarlo con el MCP.');
   }
-  const { id, actualizado: _actualizado, foto, predicas: _predicas, ...resto } = actual as Elemento & { predicas?: number };
   const { estado: _ignorado, ...permitidos } = cambios;
-  const cuerpo = { ...resto, fotoId: foto?.id ?? null, ...permitidos, estado: 'borrador' };
-  const editado = await cliente.put<Elemento>(`/api/admin/${tipo}/${id}`, cuerpo);
-  return resultado(cliente, tipo, editado);
+  return guardar(cliente, tipo, actual, { ...permitidos, estado: 'borrador' });
+}
+
+/** PUT con todos los campos actuales más los cambios (la API pide el elemento completo). */
+async function guardar(cliente: ClienteApi, tipo: Tipo, actual: Elemento, cambios: Record<string, unknown>) {
+  const { id, actualizado: _actualizado, foto, predicas: _predicas, ...resto } = actual as Elemento & { predicas?: number };
+  const cuerpo = { ...resto, fotoId: foto?.id ?? null, ...cambios };
+  const guardado = await cliente.put<Elemento>(`/api/admin/${tipo}/${id}`, cuerpo);
+  return resultado(cliente, tipo, guardado);
+}
+
+/** Publica o pasa a borrador sin tocar ningún otro campo. */
+export async function cambiarEstado(
+  cliente: ClienteApi,
+  tipo: Tipo,
+  clave: string,
+  estado: 'publicado' | 'borrador',
+): Promise<ResultadoGuardado> {
+  const actual = await verContenido(cliente, tipo, clave);
+  if (actual.estado === estado) return resultado(cliente, tipo, actual);
+  return guardar(cliente, tipo, actual, { estado });
 }

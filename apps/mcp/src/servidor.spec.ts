@@ -53,7 +53,7 @@ describe('servidor MCP', () => {
     await cliente.close();
   });
 
-  it('expone las 14 herramientas', async () => {
+  it('expone las 15 herramientas', async () => {
     const { tools } = await cliente.listTools();
     expect(tools.map((t) => t.name).sort()).toEqual(
       [
@@ -71,6 +71,7 @@ describe('servidor MCP', () => {
         'ver_textos',
         'editar_textos',
         'link_vista_previa',
+        'cambiar_estado',
       ].sort(),
     );
   });
