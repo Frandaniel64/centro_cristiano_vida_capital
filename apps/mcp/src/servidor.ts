@@ -2,6 +2,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 import { ClienteApi, ErrorHerramienta } from './cliente.js';
 import {
+  cambiarEstado,
   crearContenido,
   editarContenido,
   linkVistaPrevia,
@@ -93,8 +94,9 @@ function esquemaEditar(campos: Record<string, z.ZodType>) {
   return z.strictObject(forma);
 }
 
-const AVISO_BORRADOR = 'Queda en borrador: no se ve en la web hasta que alguien lo publique desde el panel.';
-const AVISO_EDITAR = 'Solo funciona con elementos en borrador y los deja en borrador. Solo cambia los campos que pasás.';
+const AVISO_BORRADOR = 'Queda en borrador: no se ve en la web hasta que se publique (desde el panel o con cambiar_estado).';
+const AVISO_EDITAR =
+  'Solo funciona con elementos en borrador y los deja en borrador (para editar algo publicado, pasalo antes a borrador con cambiar_estado). Solo cambia los campos que pasás.';
 const AVISO_CAMPOS = 'Los campos desconocidos se rechazan con un error.';
 
 // La API exige estos campos: se completan acá cuando no se pasan.
@@ -164,6 +166,20 @@ export function crearServidor(cliente: ClienteApi): McpServer {
   registrarEditar('editar_evento', 'eventos', 'Edita un evento.', esquemaEditar(camposEvento));
   registrarEditar('editar_predica', 'predicas', 'Edita una prédica.', esquemaEditar(camposPredica));
   registrarEditar('editar_serie', 'series', 'Edita una serie de prédicas.', esquemaEditar(camposSerie));
+
+  servidor.registerTool(
+    'cambiar_estado',
+    {
+      description:
+        'Publica un ministerio, evento, prédica o serie, o lo vuelve a borrador; no toca ningún otro campo. Publicar lo muestra en la web en menos de un minuto y pasar a borrador lo saca: antes de usarla, decile a la persona qué vas a publicar o despublicar y esperá su confirmación. Para publicar, la foto (si tiene) necesita texto alternativo.',
+      inputSchema: z.strictObject({
+        tipo: tipoCreable,
+        clave: z.string().min(1).describe('Id o slug.'),
+        estado: z.enum(['publicado', 'borrador']),
+      }),
+    },
+    ({ tipo, clave, estado }) => responder(() => cambiarEstado(cliente, tipo, clave, estado)),
+  );
 
   servidor.registerTool(
     'subir_foto',

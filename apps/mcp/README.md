@@ -22,8 +22,8 @@ Contra producción el token se crea en la terminal del contenedor de la API con
 ## Seguridad del token
 
 - El token es una credencial de **editor**: fuera del MCP, usado directo contra la API, podría publicar o
-  borrar contenido. Las herramientas del MCP son la barrera (todo queda en borrador, no hay borrar ni
-  publicar). Guardalo solo en `C:\Users\frand\.secrets`, nunca en el repo, y si se filtra generá uno
+  borrar contenido. Las herramientas del MCP son la barrera (lo que se crea o edita queda en borrador,
+  publicar o despublicar pide confirmación, y no hay borrar). Guardalo solo en `C:\Users\frand\.secrets`, nunca en el repo, y si se filtra generá uno
   nuevo (crear otro anula el anterior).
 - Correr las pruebas e2e de la API (`npm run test:e2e -w @ccvida/api`) borra el usuario del MCP de la base
   local, así que el token local deja de andar: después generá uno nuevo.
@@ -50,10 +50,11 @@ responde con un error claro. El token nunca va al repo.
 | `subir_foto` | Sube una foto del disco (JPG, PNG, WebP, AVIF, hasta 15 MB) y devuelve el `fotoId` |
 | `ver_textos` | Textos editables del sitio |
 | `editar_textos` | Sin `confirmar: true` solo muestra antes y después; con él, guarda y sale en la web enseguida |
+| `cambiar_estado` | Publica o pasa a borrador (`tipo`, `clave`, `estado`) sin tocar otros campos; Claude confirma antes de usarla |
 | `link_vista_previa` | Link de vista previa de 1 hora (ministerios, eventos, prédicas) |
 
-Los campos que no existen se rechazan con un error en vez de ignorarse. No hay herramientas para
-borrar ni publicar, ni acceso a tesorería, visitas o usuarios.
+Los campos que no existen se rechazan con un error en vez de ignorarse. No hay herramienta para
+borrar, ni acceso a tesorería, visitas o usuarios.
 
 ## Desarrollo
 
