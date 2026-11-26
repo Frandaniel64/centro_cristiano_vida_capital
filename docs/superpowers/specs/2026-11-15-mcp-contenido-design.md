@@ -19,7 +19,7 @@ fotos del campamento") y Franyer lo revisa con la vista previa antes de publicar
 
 ## Fuera de alcance
 
-- Publicar, despublicar o borrar desde el MCP.
+- Borrar desde el MCP. (Publicar y despublicar se agregaron el 2026-11-25 con `cambiar_estado`.)
 - Uso por otras personas o desde Claude.ai/celular (MCP remoto). Se puede agregar después
   reutilizando las mismas herramientas.
 - Tesorería, vouchers, visitas y usuarios.
@@ -71,10 +71,11 @@ fotos del campamento") y Franyer lo revisa con la vista previa antes de publicar
 | `listar_contenido` | `tipo`: ministerios / eventos / prédicas / series / fotos. Devuelve id, título, slug y estado. |
 | `ver_contenido` | Un elemento completo por `tipo` + `id` o `slug`. |
 | `crear_ministerio`, `crear_evento`, `crear_predica`, `crear_serie` | Crea **siempre en borrador** (ignora cualquier estado que se pase). Devuelve id, slug y link de vista previa. |
-| `editar_ministerio`, `editar_evento`, `editar_predica`, `editar_serie` | Cambio parcial: lee el elemento, mezcla los campos y guarda. **Solo si está en borrador**; si está publicado responde "Está publicado: pasalo a borrador desde el panel para editarlo con el MCP". |
+| `editar_ministerio`, `editar_evento`, `editar_predica`, `editar_serie` | Cambio parcial: lee el elemento, mezcla los campos y guarda. **Solo si está en borrador**; si está publicado responde "Está publicado: pasalo a borrador (con cambiar_estado o desde el panel) para editarlo con el MCP". |
 | `subir_foto` | `ruta` de un archivo local (JPG, PNG, WebP o AVIF), `textoAlternativo` (obligatorio), `credito` opcional. Devuelve el id para usar en `fotoId`. |
 | `ver_textos` | Los textos de la web y el link de YouTube. |
 | `editar_textos` | Cambio parcial de textos/YouTube **en dos pasos**: sin `confirmar` devuelve qué cambiaría (antes → después); con `confirmar: true` lo guarda. Aclara que sale en la web al guardar. |
+| `cambiar_estado` | (Agregada 2026-11-25.) `tipo` + `clave` + `estado` (`publicado` / `borrador`): cambia solo el estado. Su descripción le pide a Claude confirmar con la persona antes de usarla. Si ya tiene ese estado no guarda nada. |
 | `link_vista_previa` | `tipo` + `slug` → URL de vista previa (usa `POST /api/admin/vista-previa`). |
 
 - Los errores de la API (`{ mensaje, campos }`) se devuelven tal cual, para que Claude corrija y
@@ -94,7 +95,7 @@ fotos del campamento") y Franyer lo revisa con la vista previa antes de publicar
 ## Decisiones tomadas por Claude (revisables)
 
 - El token es una sesión de 90 días de un usuario dedicado, no una tabla nueva de tokens.
-- Sin herramientas de borrar ni publicar.
+- Sin herramienta de borrar. Publicar y despublicar, desde el 2026-11-25, con confirmación previa a la persona.
 - Ruta del archivo de credenciales: `C:\Users\frand\.secrets\ccvida-mcp.env`.
 - Nombre del usuario: `mcp@ccvidacapital.org` / "MCP (Claude)".
 - La rama sale de `feat/vista-previa` porque el MCP usa la vista previa.
