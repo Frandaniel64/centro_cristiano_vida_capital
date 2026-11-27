@@ -12,7 +12,7 @@ const adapter =
 
 // https://astro.build/config
 export default defineConfig({
-  site: process.env.SITE_URL ?? 'https://ccvida.com.ar',
+  site: process.env.SITE_URL || 'https://ccvidacapital.org',
   // Las páginas se arman en cada pedido con el contenido de la API (lib/contenido.ts).
   // Las fotos ya llegan optimizadas: las del panel desde la API y las de diseño
   // desde public/fotos (scripts/optimizar-fotos.mjs).
