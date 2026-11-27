@@ -3,6 +3,7 @@ import '../styles/global.css';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import { fotos } from '../data/estaticos';
+import { umami } from '../lib/analitica';
 import { DEMO as demo } from '../lib/api';
 import { contenido } from '../lib/contenido';
 import { imagenCompartir, type Foto } from '../lib/fotos';
@@ -26,6 +27,9 @@ const vistaPrevia = Boolean(Astro.locals.vistaPrevia);
 const tituloCompleto = Astro.url.pathname === '/' ? `${NOMBRE} · ${textos.lema}` : `${titulo} · ${NOMBRE}`;
 const canonica = new URL(Astro.url.pathname, Astro.site);
 const ogUrl = new URL(imagenCompartir(imagen ?? fotos.alabanza)!, Astro.site);
+// Sin medir la demo, la vista previa ni las páginas personales (comprobante de voucher).
+// data-domains: sólo cuenta en el dominio real, no en localhost ni en copias.
+const medir = !demo && !vistaPrevia && !noindex ? umami : null;
 ---
 
 <!doctype html>
@@ -53,6 +57,7 @@ const ogUrl = new URL(imagenCompartir(imagen ?? fotos.alabanza)!, Astro.site);
     <meta name="twitter:card" content="summary_large_image" />
 
     {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+    {medir && <script is:inline defer src={medir.src} data-website-id={medir.id} data-domains={Astro.site?.hostname} />}
   </head>
   <body>
     {

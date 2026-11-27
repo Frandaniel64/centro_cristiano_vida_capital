@@ -52,7 +52,7 @@ const link = 'inline-flex min-h-9 items-center text-[15px] text-texto no-underli
         {
           redes.map((r) => (
             <li>
-              <a href={r.url} class="inline-flex min-h-11 items-center gap-2.5 rounded-full border-[1.5px] border-borde-control bg-panel py-1.5 pr-4 pl-1.5 text-[15px] font-semibold text-texto no-underline hover:border-azul-vida">
+              <a href={r.url} data-umami-event="red-social" data-umami-event-red={r.label} class="inline-flex min-h-11 items-center gap-2.5 rounded-full border-[1.5px] border-borde-control bg-panel py-1.5 pr-4 pl-1.5 text-[15px] font-semibold text-texto no-underline hover:border-azul-vida">
                 <span class="inline-flex size-8 items-center justify-center rounded-full bg-azul-vida text-white"><IconoRed red={r.label} size={18} /></span>
                 {r.label}
               </a>

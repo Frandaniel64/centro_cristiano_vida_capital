@@ -33,7 +33,7 @@ const idYoutube = (p.urlVideo ?? '').match(/(?:v=|youtu\.be\/|\/live\/|\/embed\/
       {p.foto && <Foto foto={p.foto} decorativa sizes="(max-width: 1408px) 100vw, 1360px" class="absolute inset-0" prioridad />}
       {
         idYoutube ? (
-          <button type="button" class="btn b-blanco absolute top-1/2 left-1/2 size-26 -translate-1/2 p-0" aria-label={`Reproducir ${p.titulo}`} data-youtube={idYoutube}>
+          <button type="button" class="btn b-blanco absolute top-1/2 left-1/2 size-26 -translate-1/2 p-0" aria-label={`Reproducir ${p.titulo}`} data-youtube={idYoutube} data-umami-event="predica-reproducir" data-umami-event-predica={p.slug}>
             <svg aria-hidden="true" width="36" height="36" viewBox="0 0 24 24" fill="#0d1f2d"><path d="M8 5l11 7-11 7z" /></svg>
           </button>
         ) : (
