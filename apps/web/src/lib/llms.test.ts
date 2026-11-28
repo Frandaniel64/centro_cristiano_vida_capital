@@ -65,7 +65,9 @@ test('llms.txt arma encabezado, reunión, eventos y páginas', () => {
   assert.match(txt, /^- Domingos 10 h — Av\. Siempre Viva 123, Floresta, CABA$/m);
   assert.match(txt, /^- \[Bautismos\]\(https:\/\/ccvidacapital\.org\/eventos\/bautismos\): domingo 6 de diciembre, 10 h, Templo$/m);
   assert.doesNotMatch(txt, /Ya pasó/);
-  assert.match(txt, /^- \[Prédicas\]\(https:\/\/ccvidacapital\.org\/predicas\)$/m);
+  // /predicas no existe (sólo /predicas/<slug>): no se enlaza.
+  assert.doesNotMatch(txt, /\]\(https:\/\/ccvidacapital\.org\/predicas\/?\)/);
+  assert.ok(txt.includes('- [Visítanos](https://ccvidacapital.org/visitanos)'));
 });
 
 test('llms.txt no escribe secciones sin datos', () => {

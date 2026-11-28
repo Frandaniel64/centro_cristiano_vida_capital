@@ -7,8 +7,7 @@ const NOMBRE = 'Centro Cristiano Vida Capital';
 // Páginas fijas que se listan al final (sólo los títulos van escritos aquí).
 const PAGINAS: [string, string][] = [
   ['Nosotros', '/nosotros'],
-  ['Prédicas', '/predicas'],
-  ['Visitanos', '/visitanos'],
+  ['Visítanos', '/visitanos'],
 ];
 
 /** Texto de una sola línea, sin espacios de más. Vacío si no hay nada. */
