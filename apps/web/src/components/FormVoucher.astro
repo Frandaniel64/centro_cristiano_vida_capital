@@ -147,6 +147,7 @@ const errorClase = 'm-0 text-sm font-bold text-[#7a1a10]';
   import { ErrorDeApi, enviar } from '../lib/api';
   import { numeroVoucher, usd } from '../lib/formato';
   import { enfocarPrimerError, limpiarErrores, mostrarError, valorDe } from '../lib/formularios';
+  import { registrar } from '../lib/analitica';
   import { errorEmail, errorWhatsapp } from '../lib/validar';
 
   const form = document.querySelector<HTMLFormElement>('#form-voucher');
@@ -225,6 +226,7 @@ const errorClase = 'm-0 text-sm font-bold text-[#7a1a10]';
       boton.disabled = true;
       try {
         const v = await enviar<VoucherCreado>('/api/vouchers', datos);
+        registrar('voucher-pedido', { formaPago: v.formaPago });
         ok.querySelector('[data-ok="numero"]')!.textContent = numeroVoucher(v.numero);
         ok.querySelector('[data-ok="monto"]')!.textContent = usd(v.montoUsd);
         ok.querySelector('[data-ok="instrucciones"]')!.textContent = v.instrucciones;

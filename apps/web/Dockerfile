@@ -13,12 +13,17 @@ COPY apps/web apps/web
 ARG PUBLIC_API_URL
 ARG PUBLIC_TURNSTILE_SITE_KEY=
 ARG PUBLIC_DEMO=false
-ARG SITE_URL=https://ccvida.com.ar
+ARG SITE_URL=https://ccvidacapital.org
+# Medición de visitas (Umami en Coolify). Vacías: no se mide nada.
+ARG PUBLIC_UMAMI_URL=
+ARG PUBLIC_UMAMI_ID=
 ENV ASTRO_ADAPTER=node \
     PUBLIC_API_URL=$PUBLIC_API_URL \
     PUBLIC_TURNSTILE_SITE_KEY=$PUBLIC_TURNSTILE_SITE_KEY \
     PUBLIC_DEMO=$PUBLIC_DEMO \
-    SITE_URL=$SITE_URL
+    SITE_URL=$SITE_URL \
+    PUBLIC_UMAMI_URL=$PUBLIC_UMAMI_URL \
+    PUBLIC_UMAMI_ID=$PUBLIC_UMAMI_ID
 RUN if [ "$PUBLIC_DEMO" != "true" ] && [ -z "$PUBLIC_API_URL" ]; then \
       echo "Falta PUBLIC_API_URL (o PUBLIC_DEMO=true)"; exit 1; \
     fi \

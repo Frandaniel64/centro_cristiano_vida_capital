@@ -43,7 +43,7 @@ const pill =
       <span data-solo-en-vivo hidden class="chip absolute top-5 left-5 rounded-lg bg-rojo-vivo text-white">EN VIVO</span>
       {
         canalId ? (
-          <button type="button" class="btn b-blanco absolute top-1/2 left-1/2 size-26 -translate-1/2 p-0" aria-label="Reproducir la transmisión" data-reproducir={canalId}>
+          <button type="button" class="btn b-blanco absolute top-1/2 left-1/2 size-26 -translate-1/2 p-0" aria-label="Reproducir la transmisión" data-reproducir={canalId} data-umami-event="en-vivo-reproducir">
             <svg aria-hidden="true" width="36" height="36" viewBox="0 0 24 24" fill="#0d1f2d"><path d="M8 5l11 7-11 7z" /></svg>
           </button>
         ) : (

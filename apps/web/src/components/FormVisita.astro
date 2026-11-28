@@ -74,6 +74,7 @@ const errorClase = 'm-0 text-sm font-semibold text-error';
 
 <script>
   import type { CrearVisita } from '@ccvida/shared';
+  import { registrar } from '../lib/analitica';
   import { ErrorDeApi, enviar } from '../lib/api';
   import { enfocarPrimerError, limpiarErrores, mostrarError, valorDe } from '../lib/formularios';
   import { errorEmail, errorWhatsapp } from '../lib/validar';
@@ -114,6 +115,7 @@ const errorClase = 'm-0 text-sm font-semibold text-error';
       boton.disabled = true;
       try {
         await enviar('/api/visitas', datos);
+        registrar('visita-avisada');
         ok.querySelector('[data-ok="nombre"]')!.textContent = datos.nombre.split(' ')[0];
         ok.querySelector('[data-ok="mensaje"]')!.textContent =
           `¡Listo! Te mandamos un email a ${datos.email} con todo para el domingo. ${form.dataset.despedida}`;
